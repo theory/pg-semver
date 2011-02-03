@@ -1,0 +1,37 @@
+{
+   "name": "semver",
+   "abstract": "A semantic version data type",
+   "description": "Provides a data domain the enforces the Semantic Version format and includes support for operator-driven sort ordering.",
+   "version": "0.1.0",
+   "maintainer": [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "license": "postgresql",
+   "provides": {
+      "pair": {
+         "file": "sql/semver.sql",
+         "version": "0.1.0"
+      }
+   },
+   "resources": {
+      "bugtracker": {
+         "web": "http://github.com/theory/pg-semver/issues/"
+      },
+      "repository": {
+        "url":  "git://github.com/theory/pg-semver.git",
+        "web":  "http://github.com/theory/pg-semver/",
+        "type": "git"
+      }
+   },
+   "generated_by": "David E. Wheeler",
+   "meta-spec": {
+      "version": "1.0.0",
+      "url": "http://pgxn.org/meta/spec.txt"
+   },
+   "tags": [
+      "semantic version",
+      "semver",
+      "version",
+      "version number"
+   ]
+}
