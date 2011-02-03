@@ -17,6 +17,10 @@
 
 #include "fmgr.h"
 
+#ifdef PG_MODULE_MAGIC
+PG_MODULE_MAGIC;
+#endif
+
 /* IO methods */
 Datum		semver_in_cstring(PG_FUNCTION_ARGS);
 Datum		semver_out_cstring(PG_FUNCTION_ARGS);
@@ -46,15 +50,40 @@ typedef struct semver
 } semver;
 
 semver* make_semver(const int16 *numbers, const char* patchname) {
-	int varsize = offsetof(semver, patchname) + strlen(patchname) + 1;
+	int varsize = offsetof(semver, patchname) + (patchname ? strlen(patchname) : 0) + 1;
 	semver *rv = palloc(varsize);
 	int i;
 	SET_VARSIZE(rv, varsize);
+	elog(WARNING, "making semver: [%d,%d,%d],%s", numbers[0],numbers[1],numbers[2],patchname);
 	for (i = 0; i < 3; i++) {
 		rv->numbers[i] = numbers[i];
 	}
-	strcpy(rv->patchname, patchname);
+	if (patchname) {
+		strcpy(rv->patchname, patchname);
+	}
+	else {
+		rv->patchname[0] = '\0';
+	}
 	return rv;
+}
+
+/* handy little function for dumping chunks of memory as hex :) */
+char* dump_hex(void* ptr, int len)
+{
+	char* hexa;
+	int i;
+	char* x;
+	unsigned char* nx;
+
+	hexa = palloc( len * 2 + 1 );
+	x = hexa;
+	nx = ptr;
+	for ( i = 0; i < len; i++ ) {
+		sprintf(x, "%.2x", *nx);
+		x += 2;
+		nx++;
+	}
+	return hexa;
 }
 
 /* creating a currency from a string */
@@ -71,8 +100,9 @@ semver* parse_semver(char* str)
 		&numbers[0], &numbers[1], &numbers[2],
 		patchname, (char*)&junk
 		);
+	elog(WARNING, "parsed fields: %d", parsed);
 
-	if ( parsed < 2 || strlen(junk) || numbers[0] < 0 || numbers[1] < 0
+	if ( parsed < 2 || parsed > 4 || numbers[0] < 0 || numbers[1] < 0
 	     || (parsed >= 3 && numbers[2] < 0) )
 		elog(ERROR, "bad semver value '%s'", str);
 
@@ -80,6 +110,7 @@ semver* parse_semver(char* str)
 		numbers[2] = -1;
 	}
 	if ( parsed < 4 ) {
+		elog(WARNING, "no patchname");
 		pfree(patchname);
 		patchname = 0;
 	}
@@ -88,11 +119,14 @@ semver* parse_semver(char* str)
 		    !( ( *patchname >= 'A' && *patchname <= 'Z' ) ||
 		       ( *patchname >= 'a' && *patchname <= 'z' ) ) )
 			elog(ERROR, "bad patchlevel '%s' in semver value '%s' (must start with a letter)", patchname, str);
+		elog(WARNING, "valid patchname '%s'", patchname);
 	}
 
 	newval = make_semver(numbers, patchname);
 	if (patchname)
 		pfree(patchname);
+
+	elog(WARNING, "made semver '%s'", dump_hex(newval, VARSIZE(newval)));
 
 	return newval;
 }
@@ -135,6 +169,7 @@ Datum
 semver_in_cstring(PG_FUNCTION_ARGS)
 {
 	char *str = PG_GETARG_CSTRING(0);
+	elog(WARNING, "parsing semver: %s", str);
 	semver *result = parse_semver(str);
 	if (!result)
 		PG_RETURN_NULL();

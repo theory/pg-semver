@@ -38,7 +38,7 @@ CREATE TYPE semver (
 	INPUT = semver_in_cstring,
 	OUTPUT = semver_out_cstring,
 -- values of internallength, passedbyvalue, alignment, and storage are copied from the named type.
-	INTERVALLENGTH = variable,
+	INTERNALLENGTH = variable,
 -- string category, to automatically try string conversion etc
 	CATEGORY = 'S',
 	PREFERRED = false
@@ -67,7 +67,7 @@ CREATE CAST (text AS semver)    WITH FUNCTION semver_in_text(text);
 --
 CREATE OR REPLACE FUNCTION eq(semver, semver)
 	RETURNS bool
-	AS 'semver', 'semver_eq',
+	AS 'semver', 'semver_eq'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR = (
@@ -93,7 +93,7 @@ DEFAULT FOR TYPE semver USING hash AS
 
 CREATE OR REPLACE FUNCTION ne(semver, semver)
 	RETURNS bool
-	AS 'int2ne'
+	AS 'semver', 'semver_ne'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR <> (
@@ -107,7 +107,7 @@ CREATE OPERATOR <> (
 
 CREATE OR REPLACE FUNCTION le(semver, semver)
 	RETURNS bool
-	AS 'int2le'
+	AS 'semver', 'semver_le'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR <= (
@@ -119,7 +119,7 @@ CREATE OPERATOR <= (
 
 CREATE OR REPLACE FUNCTION lt(semver, semver)
 	RETURNS bool
-	AS 'int2lt'
+	AS 'semver', 'semver_lt'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR < (
@@ -131,7 +131,7 @@ CREATE OPERATOR < (
 
 CREATE OR REPLACE FUNCTION ge(semver, semver)
 	RETURNS bool
-	AS 'int2ge'
+	AS 'semver', 'semver_ge'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR >= (
@@ -143,7 +143,7 @@ CREATE OPERATOR >= (
 
 CREATE OR REPLACE FUNCTION gt(semver, semver)
 	RETURNS bool
-	AS 'int2gt'
+	AS 'semver', 'semver_gt'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR > (
