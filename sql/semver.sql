@@ -19,183 +19,144 @@ SET log_min_messages    TO warning;
 -- lexicographic ASCII sort order. For instance: 1.0.0beta1 < 1.0.0beta2 <
 -- 1.0.0.
 
-CREATE DOMAIN semver AS TEXT
- CHECK ( VALUE ~ '^([1-9][0-9]*|0)[.]([1-9][0-9]*|0)[.]([1-9][0-9]*|0)([a-zA-Z][-0-9A-Za-z]*)?$' );
+CREATE TYPE semver;
 
-CREATE FUNCTION semver_cmp(
-    lver semver,
-    rver semver
-) RETURNS INTEGER IMMUTABLE LANGUAGE plpgsql AS $$
-DECLARE
-    lparts TEXT[] := regexp_split_to_array(lver, '[.]');
-    rparts TEXT[] := regexp_split_to_array(rver, '[.]');
-    ret    INTEGER;
-    lstr   TEXT;
-    rstr   TEXT;
-BEGIN
-    ret := btint8cmp(lparts[1]::bigint, rparts[1]::bigint);
-    IF ret <> 0 THEN RETURN ret; END IF;
+--
+-- essential IO
+--
+CREATE OR REPLACE FUNCTION semver_in_cstring(cstring)
+	RETURNS semver
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
 
-    ret := btint8cmp(lparts[2]::bigint, rparts[2]::bigint);
-    IF ret <> 0 THEN RETURN ret; END IF;
+CREATE OR REPLACE FUNCTION semver_out_cstring(semver)
+	RETURNS cstring
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
 
-    lstr = substring(lparts[3] FROM '[a-zA-Z][-0-9A-Za-z]*$');
-    rstr = substring(rparts[3] FROM '[a-zA-Z][-0-9A-Za-z]*$');
+CREATE TYPE semver (
+	INPUT = semver_in_cstring,
+	OUTPUT = semver_out_cstring,
+-- values of internallength, passedbyvalue, alignment, and storage are copied from the named type.
+	INTERVALLENGTH = variable,
+-- string category, to automatically try string conversion etc
+	CATEGORY = 'S',
+	PREFERRED = false
+);
 
-    IF lstr IS NULL THEN
-        IF rstr IS NULL THEN
-            -- No special string, just compare integers.
-            RETURN btint8cmp(lparts[3]::bigint, rparts[3]::bigint);
-        ELSE
-            ret := btint8cmp(lparts[3]::bigint, substring(rparts[3], '^[0-9]+')::bigint);
-            IF ret = 0 THEN
-                -- NULL is greater than non NULL.
-                RETURN 1;
-            ELSE
-                -- The numbers out-weigh the strings.
-                RETURN ret;
-            END IF;
-        END IF;
-    ELSE
-        IF rstr IS NULL THEN
-            ret := btint8cmp(substring(lparts[3], '^[0-9]+')::bigint, rparts[3]::bigint);
-            IF ret = 0 THEN
-                -- The string is less than the number.
-                RETURN -1;
-            ELSE
-                -- The numbers out-weigh the strings.
-                RETURN ret;
-            END IF;
-        ELSE
-            -- Both numbers have appended strings.
-            ret := btint8cmp(substring(lparts[3], '^[0-9]+')::bigint, substring(rparts[3], '^[0-9]+')::bigint);
-            IF ret = 0 THEN
-                -- Compare the strings case-insensitively.
-                RETURN bttext_pattern_cmp(LOWER(lstr), LOWER(rstr));
-            ELSE
-                -- The numeric comparision trumps the strings.
-                RETURN ret;
-            END IF;
-       END IF;
-    END IF;
-END;
-$$;
+--
+-- conversion to/from TEXT
+--
+CREATE OR REPLACE FUNCTION semver_in_text(text)
+	RETURNS semver
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION clean_semver(
-    to_clean TEXT
-) RETURNS SEMVER IMMUTABLE LANGUAGE sql AS $$
-    SELECT (
-           COALESCE(substring(v[1], '^[[:space:]]*[0-9]+')::bigint, '0') || '.'
-        || COALESCE(substring(v[2], '^[[:space:]]*[0-9]+')::bigint, '0') || '.'
-        || COALESCE(substring(v[3], '^[[:space:]]*[0-9]+')::bigint, '0')
-        || COALESCE(trim(substring($1 FROM '[a-zA-Z][-0-9A-Za-z]*[[:space:]]*$')), '')
-    )::semver
-      FROM string_to_array($1, '.') v;
-$$;
+CREATE OR REPLACE FUNCTION semver_out_text(semver)
+	RETURNS text
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION semver_eq(
-    semver,
-    semver
-) RETURNS BOOLEAN LANGUAGE SQL AS $$
-    SELECT semver_cmp($1, $2) = 0;
-$$;
+-- these casts are not IMPLICIT because that makes for ambiguous
+-- interpretations!
+CREATE CAST (semver AS text)    WITH FUNCTION semver_out_text(semver);
+CREATE CAST (text AS semver)    WITH FUNCTION semver_in_text(text);
 
-CREATE OR REPLACE FUNCTION semver_ne(
-    semver,
-    semver
-) RETURNS BOOLEAN LANGUAGE SQL AS $$
-    SELECT semver_cmp($1, $2) <> 0;
-$$;
-
-CREATE OR REPLACE FUNCTION semver_lt(
-    semver,
-    semver
-) RETURNS BOOLEAN LANGUAGE SQL AS $$
-    SELECT semver_cmp($1, $2) < 0;
-$$;
-
-CREATE OR REPLACE FUNCTION semver_le(
-    semver,
-    semver
-) RETURNS BOOLEAN LANGUAGE SQL AS $$
-    SELECT semver_cmp($1, $2) <= 0;
-$$;
-
-CREATE OR REPLACE FUNCTION semver_gt(
-    semver,
-    semver
-) RETURNS BOOLEAN LANGUAGE SQL AS $$
-    SELECT semver_cmp($1, $2) > 0;
-$$;
-
-CREATE OR REPLACE FUNCTION semver_ge(
-    semver,
-    semver
-) RETURNS BOOLEAN LANGUAGE SQL AS $$
-    SELECT semver_cmp($1, $2) >= 0;
-$$;
+--
+--	Comparison functions
+--
+CREATE OR REPLACE FUNCTION eq(semver, semver)
+	RETURNS bool
+	AS 'semver', 'semver_eq',
+	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR = (
-    LEFTARG    = SEMVER,
-    RIGHTARG   = SEMVER,
-    COMMUTATOR = =,
-    NEGATOR    = <>,
-    PROCEDURE  = semver_eq,
-    RESTRICT   = eqsel,
-    JOIN       = eqjoinsel,
-    HASHES,
-    MERGES
+	leftarg = semver,
+	rightarg = semver,
+	negator = <>,
+	procedure = eq,
+	restrict = eqsel,
+	commutator = =,
+	join = eqjoinsel,
+	hashes, merges
 );
+
+CREATE OR REPLACE FUNCTION hash_semver(semver)
+	RETURNS int4
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
+
+CREATE OPERATOR CLASS semver_ops
+DEFAULT FOR TYPE semver USING hash AS
+    OPERATOR    1   =  (semver, semver),
+    FUNCTION    1   hash_semver(semver);
+
+CREATE OR REPLACE FUNCTION ne(semver, semver)
+	RETURNS bool
+	AS 'int2ne'
+	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR <> (
-    LEFTARG    = SEMVER,
-    RIGHTARG   = SEMVER,
-    NEGATOR    = =,
-    COMMUTATOR = <>,
-    PROCEDURE  = semver_ne,
-    RESTRICT   = neqsel,
-    JOIN       = neqjoinsel
+	leftarg = semver,
+	rightarg = semver,
+	negator = =,
+	procedure = ne,
+	restrict = neqsel,
+	join = neqjoinsel
 );
 
-CREATE OPERATOR < (
-    LEFTARG    = SEMVER,
-    RIGHTARG   = SEMVER,
-    NEGATOR    = >=,
-    COMMUTATOR = >,
-    PROCEDURE  = semver_lt,
-    RESTRICT   = scalarltsel,
-    JOIN       = scalarltjoinsel
-);
+CREATE OR REPLACE FUNCTION le(semver, semver)
+	RETURNS bool
+	AS 'int2le'
+	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR <= (
-    LEFTARG    = SEMVER,
-    RIGHTARG   = SEMVER,
-    NEGATOR    = >,
-    COMMUTATOR = >=,
-    PROCEDURE  = semver_le,
-    RESTRICT   = scalarltsel,
-    JOIN       = scalarltjoinsel
+	leftarg = semver,
+	rightarg = semver,
+	negator = >,
+	procedure = le
 );
+
+CREATE OR REPLACE FUNCTION lt(semver, semver)
+	RETURNS bool
+	AS 'int2lt'
+	LANGUAGE C STRICT IMMUTABLE;
+
+CREATE OPERATOR < (
+	leftarg = semver,
+	rightarg = semver,
+	negator = >=,
+	procedure = lt
+);
+
+CREATE OR REPLACE FUNCTION ge(semver, semver)
+	RETURNS bool
+	AS 'int2ge'
+	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR >= (
-    LEFTARG    = SEMVER,
-    RIGHTARG   = SEMVER,
-    NEGATOR    = <,
-    COMMUTATOR = <=,
-    PROCEDURE  = semver_ge,
-    RESTRICT   = scalargtsel,
-    JOIN       = scalargtjoinsel
+	leftarg = semver,
+	rightarg = semver,
+	negator = <,
+	procedure = ge
 );
 
+CREATE OR REPLACE FUNCTION gt(semver, semver)
+	RETURNS bool
+	AS 'int2gt'
+	LANGUAGE C STRICT IMMUTABLE;
+
 CREATE OPERATOR > (
-    LEFTARG    = SEMVER,
-    RIGHTARG   = SEMVER,
-    NEGATOR    = <=,
-    COMMUTATOR = <,
-    PROCEDURE  = semver_gt,
-    RESTRICT   = scalargtsel,
-    JOIN       = scalargtjoinsel
+	leftarg = semver,
+	rightarg = semver,
+	negator = <=,
+	procedure = gt
 );
+
+CREATE OR REPLACE FUNCTION semver_cmp(semver, semver)
+	RETURNS int4
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR CLASS semver_ops
 DEFAULT FOR TYPE SEMVER USING btree AS
@@ -206,29 +167,21 @@ DEFAULT FOR TYPE SEMVER USING btree AS
     OPERATOR    5   >  (semver, semver),
     FUNCTION    1   semver_cmp(semver, semver);
 
-CREATE FUNCTION semver_smaller(
-    semver,
-    semver
-) RETURNS SEMVER LANGUAGE plpgsql IMMUTABLE STRICT AS $$
-BEGIN
-    IF semver_cmp($1, $2) < 0 THEN RETURN $1; ELSE RETURN $2; END IF;
-END;
-$$;
-
-CREATE FUNCTION semver_larger(
-    semver,
-    semver
-) RETURNS SEMVER LANGUAGE plpgsql IMMUTABLE STRICT AS $$
-BEGIN
-    IF semver_cmp($1, $2) > 0 THEN RETURN $1; ELSE RETURN $2; END IF;
-END;
-$$;
+CREATE OR REPLACE FUNCTION semver_smaller(semver, semver)
+	RETURNS semver
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE AGGREGATE min(semver)  (
     SFUNC = semver_smaller,
     STYPE = semver,
     SORTOP = <
 );
+
+CREATE OR REPLACE FUNCTION semver_larger(semver, semver)
+	RETURNS semver
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE AGGREGATE max(semver)  (
     SFUNC = semver_larger,

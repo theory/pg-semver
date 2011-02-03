@@ -3,6 +3,8 @@ DOCS = $(wildcard doc/*.txt)
 TESTS = $(wildcard test/sql/*.sql)
 REGRESS = $(patsubst test/sql/%.sql,%,$(TESTS))
 REGRESS_OPTS = --inputdir=test
+OBJS = semver.o
+MODULE_big = semver
 
 ifdef NO_PGXS
 top_builddir = ../..
