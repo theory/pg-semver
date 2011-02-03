@@ -41,20 +41,22 @@ Datum		semver_out_text(PG_FUNCTION_ARGS);
 Datum		semver_smaller(PG_FUNCTION_ARGS);
 Datum		semver_larger(PG_FUNCTION_ARGS);
 
+/* heap format of version numbers */
+typedef int32 vernum;
+
 /* memory/heap structure (not for binary marshalling) */
 typedef struct semver
 {
 	int32 vl_len_;	/* varlena header */
-        int16 numbers[3];
+        vernum numbers[3];
 	char patchname[]; /* patch name, including the null byte for convenience */
 } semver;
 
-semver* make_semver(const int16 *numbers, const char* patchname) {
+semver* make_semver(const int *numbers, const char* patchname) {
 	int varsize = offsetof(semver, patchname) + (patchname ? strlen(patchname) : 0) + 1;
 	semver *rv = palloc(varsize);
 	int i;
 	SET_VARSIZE(rv, varsize);
-	elog(WARNING, "making semver: [%d,%d,%d],%s", numbers[0],numbers[1],numbers[2],patchname);
 	for (i = 0; i < 3; i++) {
 		rv->numbers[i] = numbers[i];
 	}
@@ -67,42 +69,24 @@ semver* make_semver(const int16 *numbers, const char* patchname) {
 	return rv;
 }
 
-/* handy little function for dumping chunks of memory as hex :) */
-char* dump_hex(void* ptr, int len)
-{
-	char* hexa;
-	int i;
-	char* x;
-	unsigned char* nx;
-
-	hexa = palloc( len * 2 + 1 );
-	x = hexa;
-	nx = ptr;
-	for ( i = 0; i < len; i++ ) {
-		sprintf(x, "%.2x", *nx);
-		x += 2;
-		nx++;
-	}
-	return hexa;
-}
+char* emit_semver(semver* version);
 
 /* creating a currency from a string */
 semver* parse_semver(char* str)
 {
-	int16 numbers[3];
+	int numbers[3];
 	char* patchname = palloc(strlen(str));
 	char junk[2];
 	semver * newval;
 	int parsed;
 
 	parsed = sscanf(
-		str, "%hd.%hd.%hd%[A-Za-z0-9-]%c",
+		str, "%d.%d.%d%[A-Za-z0-9-]%c",
 		&numbers[0], &numbers[1], &numbers[2],
 		patchname, (char*)&junk
 		);
-	elog(WARNING, "parsed fields: %d", parsed);
 
-	if ( parsed < 2 || parsed > 4 || numbers[0] < 0 || numbers[1] < 0
+	if ( parsed < 3 || parsed > 4 || numbers[0] < 0 || numbers[1] < 0
 	     || (parsed >= 3 && numbers[2] < 0) )
 		elog(ERROR, "bad semver value '%s'", str);
 
@@ -110,7 +94,6 @@ semver* parse_semver(char* str)
 		numbers[2] = -1;
 	}
 	if ( parsed < 4 ) {
-		elog(WARNING, "no patchname");
 		pfree(patchname);
 		patchname = 0;
 	}
@@ -119,14 +102,11 @@ semver* parse_semver(char* str)
 		    !( ( *patchname >= 'A' && *patchname <= 'Z' ) ||
 		       ( *patchname >= 'a' && *patchname <= 'z' ) ) )
 			elog(ERROR, "bad patchlevel '%s' in semver value '%s' (must start with a letter)", patchname, str);
-		elog(WARNING, "valid patchname '%s'", patchname);
 	}
 
 	newval = make_semver(numbers, patchname);
 	if (patchname)
 		pfree(patchname);
-
-	elog(WARNING, "made semver '%s'", dump_hex(newval, VARSIZE(newval)));
 
 	return newval;
 }
@@ -169,7 +149,6 @@ Datum
 semver_in_cstring(PG_FUNCTION_ARGS)
 {
 	char *str = PG_GETARG_CSTRING(0);
-	elog(WARNING, "parsing semver: %s", str);
 	semver *result = parse_semver(str);
 	if (!result)
 		PG_RETURN_NULL();
@@ -193,7 +172,7 @@ Datum
 semver_in_text(PG_FUNCTION_ARGS)
 {
 	text* sv = PG_GETARG_TEXT_PP(0);
-	semver* rs = parse_semver(VARDATA(sv));
+	semver* rs = parse_semver(text_to_cstring(sv));
 	PG_FREE_IF_COPY(sv, 0);
 	PG_RETURN_POINTER(rs);
 }
@@ -207,6 +186,17 @@ semver_out_text(PG_FUNCTION_ARGS)
 	text* res = cstring_to_text(xxx);
 	pfree(xxx);
 	PG_RETURN_TEXT_P(res);
+}
+
+int patchnamecmp(const char* a, const char* b)
+{
+	if (*a == '\0' && *b != '\0') {
+		return 1;
+	}
+	if (*a != '\0' && *b == '\0') {
+		return -1;
+	}
+	return strcasecmp(a, b);
 }
 
 /* comparisons */
@@ -227,7 +217,7 @@ int _semver_cmp(semver* a, semver* b)
 		}
 	}
 	if (rv == 0) {
-		rv = strcasecmp(a->patchname, b->patchname);
+		rv = patchnamecmp(a->patchname, b->patchname);
 	}
 	return rv;
 }
@@ -349,8 +339,9 @@ semver_larger(PG_FUNCTION_ARGS)
 	semver* a = (void*)PG_GETARG_POINTER(0);
 	semver* b = (void*)PG_GETARG_POINTER(1);
 	int diff = _semver_cmp(a, b);
+	semver* rv;
 	if (diff >= 0) {
-		PG_FREE_IF_COPY(b, 0);
+		PG_FREE_IF_COPY(b, 1);
 		PG_RETURN_POINTER(a);
 	}
 	else {
@@ -367,7 +358,7 @@ semver_smaller(PG_FUNCTION_ARGS)
 	semver* b = (void*)PG_GETARG_POINTER(1);
 	int diff = _semver_cmp(a, b);
 	if (diff <= 0) {
-		PG_FREE_IF_COPY(b, 0);
+		PG_FREE_IF_COPY(b, 1);
 		PG_RETURN_POINTER(a);
 	}
 	else {

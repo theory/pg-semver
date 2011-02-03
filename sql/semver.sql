@@ -155,7 +155,7 @@ CREATE OPERATOR > (
 
 CREATE OR REPLACE FUNCTION semver_cmp(semver, semver)
 	RETURNS int4
-	AS 'semver'
+	AS 'semver', 'semver_cmp'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR CLASS semver_ops
@@ -188,3 +188,16 @@ CREATE AGGREGATE max(semver)  (
     STYPE = semver,
     SORTOP = >
 );
+
+CREATE OR REPLACE FUNCTION clean_semver(
+    to_clean TEXT
+) RETURNS SEMVER IMMUTABLE LANGUAGE sql AS $$
+    SELECT (
+           COALESCE(substring(v[1], '^[[:space:]]*[0-9]+')::bigint, '0') || '.'
+        || COALESCE(substring(v[2], '^[[:space:]]*[0-9]+')::bigint, '0') || '.'
+        || COALESCE(substring(v[3], '^[[:space:]]*[0-9]+')::bigint, '0')
+        || COALESCE(trim(substring($1 FROM '[a-zA-Z][-0-9A-Za-z]*[[:space:]]*$')), '')
+    )::semver
+      FROM string_to_array($1, '.') v;
+$$;
+

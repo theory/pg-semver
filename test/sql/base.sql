@@ -63,7 +63,7 @@ SELECT throws_ok(
 
 -- Test =, <=, and >=.
 SELECT collect_tap(ARRAY[
-    ok(semver_cmp(lv, rv) = 0, 'semver(' || lv || ', ' || rv || ') should = 0'),
+    ok(semver_cmp(lv::semver, rv::semver) = 0, 'semver(' || lv || ', ' || rv || ') should = 0'),
     ok(lv::semver = rv::semver, 'v' || lv || ' should = v' || rv),
     ok(lv::semver <= rv::semver, 'v' || lv || ' should be <= v' || rv),
     ok(lv::semver >= rv::semver, 'v' || lv || ' should be >= v' || rv)
@@ -78,7 +78,7 @@ SELECT collect_tap(ARRAY[
 
 -- Test semver <> semver
 SELECT collect_tap(ARRAY[
-    ok(semver_cmp(lv, rv) <> 0, 'semver(' || lv || ', ' || rv || ') should <> 0'),
+    ok(semver_cmp(lv::semver, rv::semver) <> 0, 'semver(' || lv || ', ' || rv || ') should <> 0'),
     ok(lv::semver <> rv::semver, 'v' || lv || ' should not equal v' || rv)
 ]) FROM (VALUES
     ('1.2.2', '1.2.3'),
@@ -93,8 +93,8 @@ SELECT collect_tap(ARRAY[
 
 -- Test >, >=, <, and <=.
 SELECT collect_tap(ARRAY[
-    ok( semver_cmp(lv, rv) > 0, 'semver(' || lv || ', ' || rv || ') should > 0'),
-    ok( semver_cmp(rv, lv) < 0, 'semver(' || rv || ', ' || lv || ') should < 0'),
+    ok( semver_cmp(lv::semver, rv::semver) > 0, 'semver(' || lv || ', ' || rv || ') should > 0'),
+    ok( semver_cmp(rv::semver, lv::semver) < 0, 'semver(' || rv || ', ' || lv || ') should < 0'),
     ok(lv::semver > rv::semver, 'v' || lv || ' should be > v' || rv),
     ok(lv::semver >= rv::semver, 'v' || lv || ' should be >= v' || rv),
     ok(rv::semver < lv::semver, 'v' || rv || ' should be < v' || lv),
