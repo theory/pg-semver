@@ -8,8 +8,10 @@
 
 #include <time.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
+#include <values.h>
 
 #include "utils/builtins.h"
 //#include "utils/lsyscache.h"
@@ -72,36 +74,74 @@ semver* make_semver(const int *numbers, const char* patchname) {
 char* emit_semver(semver* version);
 
 /* creating a currency from a string */
-semver* parse_semver(char* str)
+semver* parse_semver(char* str, bool lax)
 {
 	int numbers[3];
-	char* patchname = palloc(strlen(str));
+	char* patchname, *ptr, *nptr;
 	char junk[2];
 	semver * newval;
-	int parsed;
+	long int n;
+	int i, x;
 
-	parsed = sscanf(
-		str, "%d.%d.%d%[A-Za-z0-9-]%c",
-		&numbers[0], &numbers[1], &numbers[2],
-		patchname, (char*)&junk
-		);
+	ptr = str;
+	if (lax) { x = strspn(ptr, " \t"); ptr += x; }
+		
+	for (i = 0; i < 3; i++) {
+		n = strtol(ptr, &nptr, 10);
+		if (ptr == nptr) {
+			if (lax) {
+				n = 0;
+			}
+			else {
+				elog(ERROR, "bad semver value '%s': expected number at %s", str, ptr);
+			}
+		}
+		if ( n > MAXINT )
+			elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
 
-	if ( parsed < 3 || parsed > 4 || numbers[0] < 0 || numbers[1] < 0
-	     || (parsed >= 3 && numbers[2] < 0) )
-		elog(ERROR, "bad semver value '%s'", str);
+		if ( !lax && *ptr == '0' && n != 0 )
+			elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
 
-	if ( parsed == 2 ) {
-		numbers[2] = -1;
+		numbers[i] = n;
+		ptr = nptr;
+		
+		if (lax) { x = strspn(ptr, " \t"); ptr += x; }
+		if (i < 2) {
+			if (*ptr == '.') {
+				ptr++;
+				if (lax) { x = strspn(ptr, " \t"); ptr += x; }
+			}
+			else {
+				if (!lax) {
+					elog(ERROR, "bad semver value '%s': expected '.' at: '%s'", str, ptr);
+				}
+			}
+		}
 	}
-	if ( parsed < 4 ) {
-		pfree(patchname);
-		patchname = 0;
+
+	if (lax) { x = strspn(ptr, " \t"); ptr += x; }
+	
+	if ( strlen(ptr) ) {
+		if ( !( ( *ptr >= 'A' && *ptr <= 'Z' ) ||
+			( *ptr >= 'a' && *ptr <= 'z' ) ) )
+			elog(ERROR, "bad patchlevel '%s' in semver value '%s' (must start with a letter)", ptr, str);
+		patchname = palloc(strlen(ptr));
+		x = sscanf(ptr, "%[A-Za-z0-9-]%c", patchname, (char*)&junk);
+		if (x == 2) {
+			if (!lax || !(*junk == ' ' || *junk == '\t' ) ) {
+				elog(ERROR, "bad patchlevel '%s' in semver value '%s' (contains invalid character)", ptr, str);
+			}
+			ptr += strlen(patchname);
+			if (lax) {
+				x = strspn(ptr, " \t");
+				ptr += x;
+				if (strlen(ptr))
+					elog(ERROR, "bad semver value '%s' (contains dividing whitespace)", str);
+			}
+		}
 	}
 	else {
-		if (*patchname != '\0' &&
-		    !( ( *patchname >= 'A' && *patchname <= 'Z' ) ||
-		       ( *patchname >= 'a' && *patchname <= 'z' ) ) )
-			elog(ERROR, "bad patchlevel '%s' in semver value '%s' (must start with a letter)", patchname, str);
+		patchname = 0;
 	}
 
 	newval = make_semver(numbers, patchname);
@@ -149,7 +189,7 @@ Datum
 semver_in_cstring(PG_FUNCTION_ARGS)
 {
 	char *str = PG_GETARG_CSTRING(0);
-	semver *result = parse_semver(str);
+	semver *result = parse_semver(str, false);
 	if (!result)
 		PG_RETURN_NULL();
 
@@ -172,7 +212,7 @@ Datum
 semver_in_text(PG_FUNCTION_ARGS)
 {
 	text* sv = PG_GETARG_TEXT_PP(0);
-	semver* rs = parse_semver(text_to_cstring(sv));
+	semver* rs = parse_semver(text_to_cstring(sv), false);
 	PG_FREE_IF_COPY(sv, 0);
 	PG_RETURN_POINTER(rs);
 }
@@ -365,4 +405,14 @@ semver_smaller(PG_FUNCTION_ARGS)
 		PG_FREE_IF_COPY(a, 0);
 		PG_RETURN_POINTER(b);
 	}
+}
+
+PG_FUNCTION_INFO_V1(clean_semver);
+Datum
+clean_semver(PG_FUNCTION_ARGS)
+{
+	text* sv = PG_GETARG_TEXT_PP(0);
+	semver* rs = parse_semver(text_to_cstring(sv), true);
+	PG_FREE_IF_COPY(sv, 0);
+	PG_RETURN_POINTER(rs);
 }
