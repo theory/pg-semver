@@ -1,4 +1,7 @@
 Revision history for PostgreSQL extension semver.
 
-0.1.0 
+0.1.0  2010-10-07 18:31:43
       - Initial version.
+      - Implementation in pure PL/pgSQL.
+      - Included in [PGXN Manager](https://github.com/theory/pgxn-manager).
+      - Not otherwise released.
