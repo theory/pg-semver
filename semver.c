@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
-#include <values.h>
+#include <limits.h>
 
 #include "utils/builtins.h"
 //#include "utils/lsyscache.h"
@@ -105,7 +105,7 @@ semver* parse_semver(char* str, bool lax)
 				elog(ERROR, "bad semver value '%s': expected number at %s", str, ptr);
 			}
 		}
-		if ( n > MAXINT )
+		if ( n > INT_MAX )
 			elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
 
 		if ( !lax && *ptr == '0' && n != 0 )
