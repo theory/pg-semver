@@ -48,11 +48,11 @@ typedef struct semver
 
 // forward declarations, mostly to shut the compiler up but some are
 // actually necessary.
-char* emit_semver(semver* version);
+char*   emit_semver(semver* version);
 semver* make_semver(const int *numbers, const char* patchname);
 semver* parse_semver(char* str, bool lax);
-int patchnamecmp(const char* a, const char* b);
-int _semver_cmp(semver* a, semver* b);
+int     patchnamecmp(const char* a, const char* b);
+int     _semver_cmp(semver* a, semver* b);
 
 semver* make_semver(const int *numbers, const char* patchname) {
     int varsize = offsetof(semver, patchname) + (patchname ? strlen(patchname) : 0) + 1;

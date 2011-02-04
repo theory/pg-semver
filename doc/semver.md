@@ -52,9 +52,13 @@ Use like any other data type. Here's an example in a table:
         PRIMARY KEY (name, version)
     );
 
-The type can be in indexed using btree:
+The type can be in indexed using btree or hash indexes:
 
     CREATE INDEX idx_extension_version ON extensions(version);
+    CREATE INDEX hdx_extension_version ON extensions USING hash (version);
+
+Hash indexes aren't worth much, but the functionality is there to support hash
+aggregates in query optimizations.
 
 And some sample usage:
 
@@ -76,12 +80,9 @@ And some sample usage:
      pair  │ 0.1.0    │ Key/value pair data type
     
 Note that "0.35.0b1" is less than "0.35.0", as required by the specification.
+Use `ORDER BY` to get more of a feel for semantic version ordering rules:
 
-Currently, `semver` is implemented as a data domain. As such, use of `semver`
-in an `ORDER BY` expression only works using the `<` operator for ascending
-order, and `>` for descending order:
-
-    SELECT version FROM extensions ORDER BY version USING <;
+    SELECT version FROM extensions ORDER BY version;
      version  
     ──────────
      0.1.0
@@ -89,7 +90,7 @@ order, and `>` for descending order:
      0.35.0
      1.5.0
 
-    SELECT version FROM extensions ORDER BY version USING >;
+    SELECT version FROM extensions ORDER BY version DESC;
      version  
     ──────────
      1.5.0
