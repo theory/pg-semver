@@ -14,6 +14,18 @@
          "version": "0.2.0"
       }
    },
+   "prereqs": {
+      "runtime": {
+         "requires": {
+            "PostgreSQL": "8.4.0"
+         }
+      },
+      "test": {
+         "requires": {
+            "plpgsql": 0,
+        }
+      }
+   },
    "resources": {
       "bugtracker": {
          "web": "http://github.com/theory/pg-semver/issues/"
