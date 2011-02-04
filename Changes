@@ -1,6 +1,11 @@
 Revision history for PostgreSQL extension semver.
 
 0.2.0
+      - Converted to a native type implemented in C by Sam Vilain.
+      - As a consequence, `USING` is no longer required in an `ORDER BY`
+        clause to get proper semver sort ordering.
+      - Added casts from nuermic types.
+      - Renamed `clean_semver()` to `to_semver()`.
 
 0.1.0  2010-10-07 18:31:43
       - Initial version.
