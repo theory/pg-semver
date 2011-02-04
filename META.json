@@ -4,7 +4,8 @@
    "description": "Provides a data domain the enforces the Semantic Version format and includes support for operator-driven sort ordering.",
    "version": "0.2.0",
    "maintainer": [
-      "David E. Wheeler <david@justatheory.com>"
+      "David E. Wheeler <david@justatheory.com>",
+      "Sam Vilain <sam@vilain.net>"
    ],
    "license": "postgresql",
    "provides": {
