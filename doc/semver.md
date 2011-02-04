@@ -1,4 +1,4 @@
-semver 0.1.0
+semver 0.2.0
 ============
 
 Synopsis
