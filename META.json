@@ -22,7 +22,7 @@
       },
       "test": {
          "requires": {
-            "plpgsql": 0,
+            "plpgsql": 0
         }
       }
    },
