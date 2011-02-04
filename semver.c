@@ -40,6 +40,9 @@ Datum		semver_cmp(PG_FUNCTION_ARGS);
 Datum		semver_in_text(PG_FUNCTION_ARGS);
 Datum		semver_out_text(PG_FUNCTION_ARGS);
 
+/* this constructor gives access to the lax parsing mode */
+Datum		clean_semver(PG_FUNCTION_ARGS);
+
 Datum		semver_smaller(PG_FUNCTION_ARGS);
 Datum		semver_larger(PG_FUNCTION_ARGS);
 
@@ -53,6 +56,14 @@ typedef struct semver
         vernum numbers[3];
 	char patchname[]; /* patch name, including the null byte for convenience */
 } semver;
+
+// forward declarations, mostly to shut the compiler up but some are
+// actually necessary.
+char* emit_semver(semver* version);
+semver* make_semver(const int *numbers, const char* patchname);
+semver* parse_semver(char* str, bool lax);
+int patchnamecmp(const char* a, const char* b);
+int _semver_cmp(semver* a, semver* b);
 
 semver* make_semver(const int *numbers, const char* patchname) {
 	int varsize = offsetof(semver, patchname) + (patchname ? strlen(patchname) : 0) + 1;
@@ -70,8 +81,6 @@ semver* make_semver(const int *numbers, const char* patchname) {
 	}
 	return rv;
 }
-
-char* emit_semver(semver* version);
 
 /* creating a currency from a string */
 semver* parse_semver(char* str, bool lax)
@@ -379,7 +388,6 @@ semver_larger(PG_FUNCTION_ARGS)
 	semver* a = (void*)PG_GETARG_POINTER(0);
 	semver* b = (void*)PG_GETARG_POINTER(1);
 	int diff = _semver_cmp(a, b);
-	semver* rv;
 	if (diff >= 0) {
 		PG_FREE_IF_COPY(b, 1);
 		PG_RETURN_POINTER(a);
