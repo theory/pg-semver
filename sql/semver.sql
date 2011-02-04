@@ -24,19 +24,19 @@ CREATE TYPE semver;
 --
 -- essential IO
 --
-CREATE OR REPLACE FUNCTION semver_in_cstring(cstring)
+CREATE OR REPLACE FUNCTION semver_in(cstring)
 	RETURNS semver
 	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION semver_out_cstring(semver)
+CREATE OR REPLACE FUNCTION semver_out(semver)
 	RETURNS cstring
 	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE TYPE semver (
-	INPUT = semver_in_cstring,
-	OUTPUT = semver_out_cstring,
+	INPUT = semver_in,
+	OUTPUT = semver_out,
 -- values of internallength, passedbyvalue, alignment, and storage are copied from the named type.
 	INTERNALLENGTH = variable,
 -- string category, to automatically try string conversion etc
@@ -47,18 +47,18 @@ CREATE TYPE semver (
 --
 -- conversion to/from TEXT
 --
-CREATE OR REPLACE FUNCTION semver_in_text(text)
+CREATE OR REPLACE FUNCTION ssemver_in(text)
 	RETURNS semver
 	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION semver_out_text(semver)
+CREATE OR REPLACE FUNCTION ssemver_out(semver)
 	RETURNS text
 	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
-CREATE CAST (semver AS text)    WITH FUNCTION semver_out_text(semver);
-CREATE CAST (text AS semver)    WITH FUNCTION semver_in_text(text);
+CREATE CAST (semver AS text)    WITH FUNCTION ssemver_out(semver);
+CREATE CAST (text AS semver)    WITH FUNCTION ssemver_in(text);
 
 --
 --	Comparison functions

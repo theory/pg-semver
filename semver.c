@@ -13,8 +13,8 @@ PG_MODULE_MAGIC;
 #endif
 
 /* IO methods */
-Datum       semver_in_cstring(PG_FUNCTION_ARGS);
-Datum       semver_out_cstring(PG_FUNCTION_ARGS);
+Datum       semver_in(PG_FUNCTION_ARGS);
+Datum       semver_out(PG_FUNCTION_ARGS);
 
 Datum       semver_eq(PG_FUNCTION_ARGS);
 Datum       hash_semver(PG_FUNCTION_ARGS);
@@ -26,8 +26,8 @@ Datum       semver_gt(PG_FUNCTION_ARGS);
 Datum       semver_cmp(PG_FUNCTION_ARGS);
 
 /* these typecasts are necessary for passing to functions that take text */
-Datum       semver_in_text(PG_FUNCTION_ARGS);
-Datum       semver_out_text(PG_FUNCTION_ARGS);
+Datum       ssemver_in(PG_FUNCTION_ARGS);
+Datum       ssemver_out(PG_FUNCTION_ARGS);
 
 /* this constructor gives access to the lax parsing mode */
 Datum       clean_semver(PG_FUNCTION_ARGS);
@@ -182,9 +182,9 @@ char* emit_semver(semver* version) {
  */
 
 /* input function: C string */
-PG_FUNCTION_INFO_V1(semver_in_cstring);
+PG_FUNCTION_INFO_V1(semver_in);
 Datum
-semver_in_cstring(PG_FUNCTION_ARGS)
+semver_in(PG_FUNCTION_ARGS)
 {
     char *str = PG_GETARG_CSTRING(0);
     semver *result = parse_semver(str, false);
@@ -194,9 +194,9 @@ semver_in_cstring(PG_FUNCTION_ARGS)
     PG_RETURN_POINTER(result);
 }/* output function: C string */
 
-PG_FUNCTION_INFO_V1(semver_out_cstring);
+PG_FUNCTION_INFO_V1(semver_out);
 Datum
-semver_out_cstring(PG_FUNCTION_ARGS)
+semver_out(PG_FUNCTION_ARGS)
 {
     semver* amount = (void*)PG_GETARG_POINTER(0);
     char *result;
@@ -205,9 +205,9 @@ semver_out_cstring(PG_FUNCTION_ARGS)
     PG_RETURN_CSTRING(result);
 }
 
-PG_FUNCTION_INFO_V1(semver_in_text);
+PG_FUNCTION_INFO_V1(ssemver_in);
 Datum
-semver_in_text(PG_FUNCTION_ARGS)
+ssemver_in(PG_FUNCTION_ARGS)
 {
     text* sv = PG_GETARG_TEXT_PP(0);
     semver* rs = parse_semver(text_to_cstring(sv), false);
@@ -215,9 +215,9 @@ semver_in_text(PG_FUNCTION_ARGS)
     PG_RETURN_POINTER(rs);
 }
 
-PG_FUNCTION_INFO_V1(semver_out_text);
+PG_FUNCTION_INFO_V1(ssemver_out);
 Datum
-semver_out_text(PG_FUNCTION_ARGS)
+ssemver_out(PG_FUNCTION_ARGS)
 {
     semver* semver = (void*) PG_GETARG_POINTER(0);
     char* xxx = emit_semver(semver);
