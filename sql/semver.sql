@@ -58,8 +58,9 @@ CREATE OR REPLACE FUNCTION clean_semver(text)
 	LANGUAGE C STRICT IMMUTABLE;
 
 --
--- Typecasting functions.
+--  Typecasting functions.
 --
+
 CREATE OR REPLACE FUNCTION semver(text)
 	RETURNS semver
     AS 'semver', 'text_to_semver'
@@ -71,7 +72,8 @@ CREATE OR REPLACE FUNCTION text(semver)
 	LANGUAGE C STRICT IMMUTABLE;
 
 --
---  Implicit type casts.
+--  Explicit type casts.
+--  XXX Add casts from numbers??
 --
 
 CREATE CAST (semver AS text) WITH FUNCTION text(semver);

@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(150);
+SELECT plan(154);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -186,6 +186,14 @@ SELECT results_eq(
     $$ VALUES ('1.2.0'::semver), ('1.0.0'::semver), ('0.9.10'::semver), ('0.9.9'::semver) $$,
     'ORDER BY semver USING > should work'
 );
+
+-- Test constructors.
+SELECT is( text('1.2.0'::semver), '1.2.0', 'construct to text' );
+SELECT is( semver('1.2.0'), '1.2.0'::semver, 'construct from text' );
+
+-- Test casting.
+SELECT is( semver('1.2.0'::text), '1.2.0', 'cast to text' );
+SELECT is( text('1.2.0')::semver, '1.2.0'::semver, 'cast from text' );
 
 SELECT * FROM finish();
 ROLLBACK;
