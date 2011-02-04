@@ -2,7 +2,7 @@ DATA = $(wildcard sql/*.sql)
 DOCS = $(wildcard doc/*.txt)
 TESTS = $(wildcard test/sql/*.sql)
 REGRESS = $(patsubst test/sql/%.sql,%,$(TESTS))
-REGRESS_OPTS = --inputdir=test
+REGRESS_OPTS = --inputdir=test --load-language=plpgsql
 MODULES = $(patsubst %.c,%,$(wildcard src/*.c))
 
 ifdef NO_PGXS
