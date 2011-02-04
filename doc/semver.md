@@ -98,8 +98,8 @@ Use `ORDER BY` to get more of a feel for semantic version ordering rules:
      0.35.0b1
      0.1.0
 
-Operators and Functions
------------------------
+Interface
+---------
 
 ### Operators ###
 
@@ -111,7 +111,27 @@ Operators and Functions
  `<=`     | Is semver less than or equal to semver    | '3.4.0b1'semver <= '3.4.0'::semver | `t`
  `>`      | Is semver greater than right semver       | '3.4.0b1'semver > '3.4.0'::semver  | `f`
  `>=`     | Is semver greater than or equal to semver | '3.4.0b1'semver >= '3.4.0'::semver | `f`
-     
+
+### Functions ###
+
+         Function           |          Description            |          Example                | Result
+----------------------------|---------------------------------|---------------------------------|----------
+ `to_semver(text)`          | Parse semver from text          | `to_semver('1.02')`             | `1.2.0`
+ `semver(text)`             | Cast text to semver             | `semver('1.2.1')`               | `1.2.1`
+ `semver(numeric)`          | Cast numeric to semver          | `semver(1.2)`                   | `1.2.0`
+ `semver(real)`             | Cast real to semver             | `semver(12.0::real)`            | `12.0.0`
+ `semver(double precision)` | Cast double precision to semver | `semver(9.2::double precision)` | `9.2.0`
+ `semver(integer)`          | Cast integer to semver          | `semver(42::integer)`           | `42.0.0`
+ `semver(bigint)`           | Cast bigint to semver           | `semver(19::bigint)`            | `19.0.0`
+ `semver(smallint)`         | Cast smallint to semver         | `semver(2::smallint)`           | `2.0.0`
+ `text(semver)`             | Cast semver to text             | `text('1.2.54'::semver)`        | `1.2.54`
+
+The difference between `semver(text)` and `to_semver(text)` is that the former
+requires a valid semver format, while the latter is a bit more permissive,
+doing its best to convert other version number formats to semantic versions.
+Numeric casts simply extract an integer from the decimal portion, so that
+`1.20` and `1.02` would both be parsed as `1.2.0`.
+
 ### Aggregate Functions ###
 
 The examples assume the values inserted into the `extensions` table in the above examples.
@@ -120,6 +140,22 @@ The examples assume the values inserted into the `extensions` table in the above
 ---------------|-------------|---------------------------|----------------------------------------|--------
  `MIN(semver)` |  `semver`   | Return the lowest semver  | `SELECT MIN(version) FROM extensions;` | `0.1.0`
  `MAX(semver)` |  `semver`   | Return the highest semver | `SELECT MAX(version) FROM extensions;` | `1.5.0`
+
+### Casts ###
+
+      From        |  To    |          Example                | Result
+---------------------------|---------------------------------|---------
+ text             | semver | `'1.2.1'::semver`               | `1.2.1`
+ numeric          | semver | `1.2::semver`                   | `1.2.0`
+ real             | semver | `12.0::real::semver`            | `12.0.0`
+ double precision | semver | `9.2::double precision::semver` | `9.2.0`
+ integer          | semver | `42::integer::semver`           | `42.0.0`
+ bigint           | semver | `19::bigint::semver`            | `19.0.0`
+ smallint         | semver | `2::smallint::semver`           | `2.0.0`
+ semver           | text   | `'1.2.54'::semver::text`        | `1.2.54`
+
+Note that numeric casts simply extract an integer from the decimal portion, so that
+`1.20` and `1.02` would both be parsed as `1.2.0`.
 
 Support
 -------
