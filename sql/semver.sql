@@ -60,22 +60,22 @@ CREATE OR REPLACE FUNCTION clean_semver(text)
 --
 -- Typecasting functions.
 --
-CREATE OR REPLACE FUNCTION ssemver_in(text)
+CREATE OR REPLACE FUNCTION semver(text)
 	RETURNS semver
-	AS 'semver'
+    AS 'semver', 'text_to_semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION ssemver_out(semver)
+CREATE OR REPLACE FUNCTION text(semver)
 	RETURNS text
-	AS 'semver'
+    AS 'semver', 'semver_to_text'
 	LANGUAGE C STRICT IMMUTABLE;
 
 --
 --  Implicit type casts.
 --
 
-CREATE CAST (semver AS text)    WITH FUNCTION ssemver_out(semver);
-CREATE CAST (text AS semver)    WITH FUNCTION ssemver_in(text);
+CREATE CAST (semver AS text) WITH FUNCTION text(semver);
+CREATE CAST (text AS semver) WITH FUNCTION semver(text);
 
 --
 --	Comparison functions and their corresponding operators.

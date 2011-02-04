@@ -26,8 +26,8 @@ Datum       semver_gt(PG_FUNCTION_ARGS);
 Datum       semver_cmp(PG_FUNCTION_ARGS);
 
 /* these typecasts are necessary for passing to functions that take text */
-Datum       ssemver_in(PG_FUNCTION_ARGS);
-Datum       ssemver_out(PG_FUNCTION_ARGS);
+Datum       text_to_semver(PG_FUNCTION_ARGS);
+Datum       semver_to_text(PG_FUNCTION_ARGS);
 
 /* this constructor gives access to the lax parsing mode */
 Datum       clean_semver(PG_FUNCTION_ARGS);
@@ -205,9 +205,9 @@ semver_out(PG_FUNCTION_ARGS)
     PG_RETURN_CSTRING(result);
 }
 
-PG_FUNCTION_INFO_V1(ssemver_in);
+PG_FUNCTION_INFO_V1(text_to_semver);
 Datum
-ssemver_in(PG_FUNCTION_ARGS)
+text_to_semver(PG_FUNCTION_ARGS)
 {
     text* sv = PG_GETARG_TEXT_PP(0);
     semver* rs = parse_semver(text_to_cstring(sv), false);
@@ -215,9 +215,9 @@ ssemver_in(PG_FUNCTION_ARGS)
     PG_RETURN_POINTER(rs);
 }
 
-PG_FUNCTION_INFO_V1(ssemver_out);
+PG_FUNCTION_INFO_V1(semver_to_text);
 Datum
-ssemver_out(PG_FUNCTION_ARGS)
+semver_to_text(PG_FUNCTION_ARGS)
 {
     semver* semver = (void*) PG_GETARG_POINTER(0);
     char* xxx = emit_semver(semver);
