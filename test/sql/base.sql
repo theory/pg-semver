@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(154);
+SELECT plan(176);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -128,6 +128,7 @@ SELECT is(
     ('1.2.02beta-3  ', '1.2.2beta-3'),
     ('1.02.02rc1',     '1.2.2rc1'),
     ('1.0',            '1.0.0'),
+    ('1',              '1.0.0'),
     ('.0.02',          '0.0.2'),
     ('1..02',          '1.0.2'),
     ('1..',            '1.0.0'),
@@ -190,10 +191,31 @@ SELECT results_eq(
 -- Test constructors.
 SELECT is( text('1.2.0'::semver), '1.2.0', 'construct to text' );
 SELECT is( semver('1.2.0'), '1.2.0'::semver, 'construct from text' );
+SELECT is( semver(1.2), '1.2.0'::semver, 'construct from bare number' );
+SELECT is( semver(1.2::numeric), '1.2.0'::semver, 'construct from numeric' );
+SELECT is( semver(1), '1.0.0'::semver, 'construct from bare integer' );
+SELECT is( semver(1::integer), '1.0.0'::semver, 'construct from integer' );
+SELECT is( semver(1::bigint), '1.0.0'::semver, 'construct from bigint' );
+SELECT is( semver(1::smallint), '1.0.0'::semver, 'construct from smallint' );
+SELECT is( semver(1.2::decimal), '1.2.0'::semver, 'construct from decimal' );
+SELECT is( semver(1.2::real), '1.2.0'::semver, 'construct from real' );
+SELECT is( semver(1.2::double precision), '1.2.0'::semver, 'construct from double' );
+SELECT is( semver(1.2::float), '1.2.0'::semver, 'construct from float' );
 
 -- Test casting.
 SELECT is( semver('1.2.0'::text), '1.2.0', 'cast to text' );
 SELECT is( text('1.2.0')::semver, '1.2.0'::semver, 'cast from text' );
+SELECT is( 1::semver, '1.0.0'::semver, 'Cast from bare integer');
+SELECT is( 1.2::semver, '1.2.0'::semver, 'Cast from bare number');
+SELECT is( 1.2::numeric::semver, '1.2.0'::semver, 'Cast from numeric');
+SELECT is( 1::integer::semver, '1.0.0'::semver, 'Cast from integer');
+SELECT is( 1::bigint::semver, '1.0.0'::semver, 'Cast from bigint');
+SELECT is( 1::smallint::semver, '1.0.0'::semver, 'Cast from smallint');
+SELECT is( 1.0::decimal::semver, '1.0.0'::semver, 'Cast from decimal');
+SELECT is( 1::decimal::semver, '1.0.0'::semver, 'Cast from decimal');
+SELECT is( 1.0::real::semver, '1.0.0'::semver, 'Cast from real');
+SELECT is( 1.0::double precision::semver, '1.0.0'::semver, 'Cast from double precision');
+SELECT is( 1.0::float::semver, '1.0.0'::semver, 'Cast from float');
 
 SELECT * FROM finish();
 ROLLBACK;

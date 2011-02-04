@@ -71,13 +71,42 @@ CREATE OR REPLACE FUNCTION text(semver)
     AS 'semver', 'semver_to_text'
 	LANGUAGE C STRICT IMMUTABLE;
 
+CREATE OR REPLACE FUNCTION semver(numeric)
+	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION semver(real)
+	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION semver(double precision)
+	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION semver(integer)
+	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION semver(smallint)
+	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION semver(bigint)
+	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
+
 --
 --  Explicit type casts.
---  XXX Add casts from numbers??
 --
 
-CREATE CAST (semver AS text) WITH FUNCTION text(semver);
-CREATE CAST (text AS semver) WITH FUNCTION semver(text);
+CREATE CAST (semver AS text)             WITH FUNCTION text(semver);
+CREATE CAST (text AS semver)             WITH FUNCTION semver(text);
+CREATE CAST (numeric AS semver)          WITH FUNCTION semver(numeric);
+CREATE CAST (real AS semver)             WITH FUNCTION semver(real);
+CREATE CAST (double precision AS semver) WITH FUNCTION semver(double precision);
+CREATE CAST (integer AS semver)          WITH FUNCTION semver(integer);
+CREATE CAST (smallint AS semver)         WITH FUNCTION semver(smallint);
+CREATE CAST (bigint AS semver)           WITH FUNCTION semver(bigint);
 
 --
 --	Comparison functions and their corresponding operators.

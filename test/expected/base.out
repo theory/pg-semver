@@ -1,5 +1,5 @@
 \set ECHO 0
-1..150
+1..176
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -122,31 +122,57 @@ ok 119 - clean_semver(1.2.02b) should return 1.2.2b
 ok 120 - clean_semver(1.2.02beta-3  ) should return 1.2.2beta-3
 ok 121 - clean_semver(1.02.02rc1) should return 1.2.2rc1
 ok 122 - clean_semver(1.0) should return 1.0.0
-ok 123 - clean_semver(.0.02) should return 0.0.2
-ok 124 - clean_semver(1..02) should return 1.0.2
-ok 125 - clean_semver(1..) should return 1.0.0
-ok 126 - clean_semver(1.1) should return 1.1.0
-ok 127 - clean_semver(1.2.b1) should return 1.2.0b1
-ok 128 - clean_semver(9.0beta4) should return 9.0.0beta4
-ok 129 - clean_semver(9b) should return 9.0.0b
-ok 130 - clean_semver(rc1) should return 0.0.0rc1
-ok 131 - clean_semver() should return 0.0.0
-ok 132 - clean_semver(..2) should return 0.0.2
-ok 133 - clean_semver(1.2.3 a) should return 1.2.3a
-ok 134 - clean_semver(..2 b) should return 0.0.2b
-ok 135 - clean_semver(  012.2.2) should return 12.2.2
-ok 136 - clean_semver(20110204) should return 20110204.0.0
-ok 137 - "1.2.0 beta 4" is not a valid semver
-ok 138 - "1.2.2-" is not a valid semver
-ok 139 - "1.2.3b#5" is not a valid semver
-ok 140 - "v1.2.2" is not a valid semver
-ok 141 - "1.4b.0" is not a valid semver
-ok 142 - "1v.2.2v" is not a valid semver
-ok 143 - "1.2.4b.5" is not a valid semver
-ok 144 - "1.2.3.4" is not a valid semver
-ok 145 - "1.2.3 4" is not a valid semver
-ok 146 - "1.2000000000000000.3.4" is not a valid semver
-ok 147 - max(semver) should work
-ok 148 - min(semver) should work
-ok 149 - ORDER BY semver USING < should work
-ok 150 - ORDER BY semver USING > should work
+ok 123 - clean_semver(1) should return 1.0.0
+ok 124 - clean_semver(.0.02) should return 0.0.2
+ok 125 - clean_semver(1..02) should return 1.0.2
+ok 126 - clean_semver(1..) should return 1.0.0
+ok 127 - clean_semver(1.1) should return 1.1.0
+ok 128 - clean_semver(1.2.b1) should return 1.2.0b1
+ok 129 - clean_semver(9.0beta4) should return 9.0.0beta4
+ok 130 - clean_semver(9b) should return 9.0.0b
+ok 131 - clean_semver(rc1) should return 0.0.0rc1
+ok 132 - clean_semver() should return 0.0.0
+ok 133 - clean_semver(..2) should return 0.0.2
+ok 134 - clean_semver(1.2.3 a) should return 1.2.3a
+ok 135 - clean_semver(..2 b) should return 0.0.2b
+ok 136 - clean_semver(  012.2.2) should return 12.2.2
+ok 137 - clean_semver(20110204) should return 20110204.0.0
+ok 138 - "1.2.0 beta 4" is not a valid semver
+ok 139 - "1.2.2-" is not a valid semver
+ok 140 - "1.2.3b#5" is not a valid semver
+ok 141 - "v1.2.2" is not a valid semver
+ok 142 - "1.4b.0" is not a valid semver
+ok 143 - "1v.2.2v" is not a valid semver
+ok 144 - "1.2.4b.5" is not a valid semver
+ok 145 - "1.2.3.4" is not a valid semver
+ok 146 - "1.2.3 4" is not a valid semver
+ok 147 - "1.2000000000000000.3.4" is not a valid semver
+ok 148 - max(semver) should work
+ok 149 - min(semver) should work
+ok 150 - ORDER BY semver USING < should work
+ok 151 - ORDER BY semver USING > should work
+ok 152 - construct to text
+ok 153 - construct from text
+ok 154 - construct from bare number
+ok 155 - construct from numeric
+ok 156 - construct from bare integer
+ok 157 - construct from integer
+ok 158 - construct from bigint
+ok 159 - construct from smallint
+ok 160 - construct from decimal
+ok 161 - construct from real
+ok 162 - construct from double
+ok 163 - construct from float
+ok 164 - cast to text
+ok 165 - cast from text
+ok 166 - Cast from bare integer
+ok 167 - Cast from bare number
+ok 168 - Cast from numeric
+ok 169 - Cast from integer
+ok 170 - Cast from bigint
+ok 171 - Cast from smallint
+ok 172 - Cast from decimal
+ok 173 - Cast from decimal
+ok 174 - Cast from real
+ok 175 - Cast from double precision
+ok 176 - Cast from float
