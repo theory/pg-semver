@@ -18,6 +18,6 @@ DROP FUNCTION semver_le(semver, semver);
 DROP FUNCTION semver_lt(semver, semver);
 DROP FUNCTION semver_ne(semver, semver);
 DROP FUNCTION semver_eq(semver, semver);
-DROP FUNCTION clean_semver(text);
+DROP FUNCTION to_semver(text);
 DROP FUNCTION semver_cmp(semver, semver);
 DROP DOMAIN semver;

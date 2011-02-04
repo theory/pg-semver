@@ -111,32 +111,32 @@ ok 108 - v0.9.10 should be > v0.9.9
 ok 109 - v0.9.10 should be >= v0.9.9
 ok 110 - v0.9.9 should be < v0.9.10
 ok 111 - v0.9.9 should be <= v0.9.10
-ok 112 - Function clean_semver() should exist
-ok 113 - Function clean_semver(text) should exist
-ok 114 - Function clean_semver() should return semver
-ok 115 - clean_semver(1.2.2) should return 1.2.2
-ok 116 - clean_semver(01.2.2) should return 1.2.2
-ok 117 - clean_semver(1.02.2) should return 1.2.2
-ok 118 - clean_semver(1.2.02) should return 1.2.2
-ok 119 - clean_semver(1.2.02b) should return 1.2.2b
-ok 120 - clean_semver(1.2.02beta-3  ) should return 1.2.2beta-3
-ok 121 - clean_semver(1.02.02rc1) should return 1.2.2rc1
-ok 122 - clean_semver(1.0) should return 1.0.0
-ok 123 - clean_semver(1) should return 1.0.0
-ok 124 - clean_semver(.0.02) should return 0.0.2
-ok 125 - clean_semver(1..02) should return 1.0.2
-ok 126 - clean_semver(1..) should return 1.0.0
-ok 127 - clean_semver(1.1) should return 1.1.0
-ok 128 - clean_semver(1.2.b1) should return 1.2.0b1
-ok 129 - clean_semver(9.0beta4) should return 9.0.0beta4
-ok 130 - clean_semver(9b) should return 9.0.0b
-ok 131 - clean_semver(rc1) should return 0.0.0rc1
-ok 132 - clean_semver() should return 0.0.0
-ok 133 - clean_semver(..2) should return 0.0.2
-ok 134 - clean_semver(1.2.3 a) should return 1.2.3a
-ok 135 - clean_semver(..2 b) should return 0.0.2b
-ok 136 - clean_semver(  012.2.2) should return 12.2.2
-ok 137 - clean_semver(20110204) should return 20110204.0.0
+ok 112 - Function to_semver() should exist
+ok 113 - Function to_semver(text) should exist
+ok 114 - Function to_semver() should return semver
+ok 115 - to_semver(1.2.2) should return 1.2.2
+ok 116 - to_semver(01.2.2) should return 1.2.2
+ok 117 - to_semver(1.02.2) should return 1.2.2
+ok 118 - to_semver(1.2.02) should return 1.2.2
+ok 119 - to_semver(1.2.02b) should return 1.2.2b
+ok 120 - to_semver(1.2.02beta-3  ) should return 1.2.2beta-3
+ok 121 - to_semver(1.02.02rc1) should return 1.2.2rc1
+ok 122 - to_semver(1.0) should return 1.0.0
+ok 123 - to_semver(1) should return 1.0.0
+ok 124 - to_semver(.0.02) should return 0.0.2
+ok 125 - to_semver(1..02) should return 1.0.2
+ok 126 - to_semver(1..) should return 1.0.0
+ok 127 - to_semver(1.1) should return 1.1.0
+ok 128 - to_semver(1.2.b1) should return 1.2.0b1
+ok 129 - to_semver(9.0beta4) should return 9.0.0beta4
+ok 130 - to_semver(9b) should return 9.0.0b
+ok 131 - to_semver(rc1) should return 0.0.0rc1
+ok 132 - to_semver() should return 0.0.0
+ok 133 - to_semver(..2) should return 0.0.2
+ok 134 - to_semver(1.2.3 a) should return 1.2.3a
+ok 135 - to_semver(..2 b) should return 0.0.2b
+ok 136 - to_semver(  012.2.2) should return 12.2.2
+ok 137 - to_semver(20110204) should return 20110204.0.0
 ok 138 - "1.2.0 beta 4" is not a valid semver
 ok 139 - "1.2.2-" is not a valid semver
 ok 140 - "1.2.3b#5" is not a valid semver

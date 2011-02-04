@@ -30,7 +30,7 @@ Datum       text_to_semver(PG_FUNCTION_ARGS);
 Datum       semver_to_text(PG_FUNCTION_ARGS);
 
 /* this constructor gives access to the lax parsing mode */
-Datum       clean_semver(PG_FUNCTION_ARGS);
+Datum       to_semver(PG_FUNCTION_ARGS);
 
 Datum       semver_smaller(PG_FUNCTION_ARGS);
 Datum       semver_larger(PG_FUNCTION_ARGS);
@@ -404,9 +404,9 @@ semver_smaller(PG_FUNCTION_ARGS)
     }
 }
 
-PG_FUNCTION_INFO_V1(clean_semver);
+PG_FUNCTION_INFO_V1(to_semver);
 Datum
-clean_semver(PG_FUNCTION_ARGS)
+to_semver(PG_FUNCTION_ARGS)
 {
     text* sv = PG_GETARG_TEXT_PP(0);
     semver* rs = parse_semver(text_to_cstring(sv), true);

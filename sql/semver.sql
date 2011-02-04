@@ -52,7 +52,7 @@ CREATE TYPE semver (
 --  A lax constructor function.
 --
 
-CREATE OR REPLACE FUNCTION clean_semver(text)
+CREATE OR REPLACE FUNCTION to_semver(text)
 	RETURNS semver
 	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
@@ -72,27 +72,27 @@ CREATE OR REPLACE FUNCTION text(semver)
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver(numeric)
-	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+	RETURNS semver AS $$ SELECT to_semver($1::text) $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver(real)
-	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+	RETURNS semver AS $$ SELECT to_semver($1::text) $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver(double precision)
-	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+	RETURNS semver AS $$ SELECT to_semver($1::text) $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver(integer)
-	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+	RETURNS semver AS $$ SELECT to_semver($1::text) $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver(smallint)
-	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+	RETURNS semver AS $$ SELECT to_semver($1::text) $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver(bigint)
-	RETURNS semver AS $$ SELECT clean_semver($1::text) $$
+	RETURNS semver AS $$ SELECT to_semver($1::text) $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 --

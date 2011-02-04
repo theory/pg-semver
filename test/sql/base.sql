@@ -110,15 +110,15 @@ SELECT collect_tap(ARRAY[
     ('0.9.10', '0.9.9')
   ) AS f(lv, rv);
 
--- Test clean_semver().
-SELECT has_function('clean_semver');
-SELECT has_function('clean_semver', ARRAY['text']);
-SELECT function_returns('clean_semver', 'semver');
+-- Test to_semver().
+SELECT has_function('to_semver');
+SELECT has_function('to_semver', ARRAY['text']);
+SELECT function_returns('to_semver', 'semver');
 
 SELECT is(
-    clean_semver(dirty),
+    to_semver(dirty),
     clean::semver,
-    'clean_semver(' || dirty || ') should return ' || clean
+    'to_semver(' || dirty || ') should return ' || clean
 ) FROM (VALUES
     ('1.2.2',          '1.2.2'),
     ('01.2.2',         '1.2.2'),
@@ -145,7 +145,7 @@ SELECT is(
     ('20110204',  '20110204.0.0')
 ) v(dirty, clean);
 
--- clean_semver still needs to reject truly bad input
+-- to_semver still needs to reject truly bad input
 SELECT throws_ok(
     $$ SELECT '$$ || v || $$'::semver $$,
     NULL,
