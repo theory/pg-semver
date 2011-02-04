@@ -1,5 +1,5 @@
 \set ECHO 0
-1..138
+1..150
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -132,9 +132,21 @@ ok 129 - clean_semver(9b) should return 9.0.0b
 ok 130 - clean_semver(rc1) should return 0.0.0rc1
 ok 131 - clean_semver() should return 0.0.0
 ok 132 - clean_semver(..2) should return 0.0.2
-ok 133 - clean_semver(  012.2.2) should return 12.2.2
-ok 134 - clean_semver(20110204) should return 20110204.0.0
-ok 135 - max(semver) should work
-ok 136 - min(semver) should work
-ok 137 - ORDER BY semver USING < should work
-ok 138 - ORDER BY semver USING > should work
+ok 133 - clean_semver(1.2.3 a) should return 1.2.3a
+ok 134 - clean_semver(..2 b) should return 0.0.2b
+ok 135 - clean_semver(  012.2.2) should return 12.2.2
+ok 136 - clean_semver(20110204) should return 20110204.0.0
+ok 137 - "1.2.0 beta 4" is not a valid semver
+ok 138 - "1.2.2-" is not a valid semver
+ok 139 - "1.2.3b#5" is not a valid semver
+ok 140 - "v1.2.2" is not a valid semver
+ok 141 - "1.4b.0" is not a valid semver
+ok 142 - "1v.2.2v" is not a valid semver
+ok 143 - "1.2.4b.5" is not a valid semver
+ok 144 - "1.2.3.4" is not a valid semver
+ok 145 - "1.2.3 4" is not a valid semver
+ok 146 - "1.2000000000000000.3.4" is not a valid semver
+ok 147 - max(semver) should work
+ok 148 - min(semver) should work
+ok 149 - ORDER BY semver USING < should work
+ok 150 - ORDER BY semver USING > should work

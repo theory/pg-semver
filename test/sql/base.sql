@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(138);
+SELECT plan(150);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -138,9 +138,29 @@ SELECT is(
     ('rc1',            '0.0.0rc1'),
     ('',               '0.0.0'),
     ('..2',            '0.0.2'),
+    ('1.2.3 a',        '1.2.3a'),
+    ('..2 b',          '0.0.2b'),
     ('  012.2.2',      '12.2.2'),
     ('20110204',  '20110204.0.0')
 ) v(dirty, clean);
+
+-- clean_semver still needs to reject truly bad input
+SELECT throws_ok(
+    $$ SELECT '$$ || v || $$'::semver $$,
+    NULL,
+    '"' || v || '" is not a valid semver'
+)  FROM unnest(ARRAY[
+   '1.2.0 beta 4',
+   '1.2.2-',
+   '1.2.3b#5',
+   'v1.2.2',
+   '1.4b.0',
+   '1v.2.2v',
+   '1.2.4b.5',
+   '1.2.3.4',
+   '1.2.3 4',
+   '1.2000000000000000.3.4'
+]) AS v;
 
 -- Test sort ordering
 CREATE TABLE vs (
