@@ -11,7 +11,7 @@ ok 8 - "9999.9999999.823823" is a valid semver
 ok 9 - "1.0.0beta1" is a valid semver
 ok 10 - "1.0.0beta2" is a valid semver
 ok 11 - "1.0.0" is a valid semver
-ok 12 - "999999999999999333333.0.0" is a valid semver
+ok 12 - "20110204.0.0" is a valid semver
 ok 13 - "1.2" is not a valid semver
 ok 14 - "1.2.02" is not a valid semver
 ok 15 - "1.2.2-" is not a valid semver
@@ -133,7 +133,7 @@ ok 130 - clean_semver(rc1) should return 0.0.0rc1
 ok 131 - clean_semver() should return 0.0.0
 ok 132 - clean_semver(..2) should return 0.0.2
 ok 133 - clean_semver(  012.2.2) should return 12.2.2
-ok 134 - clean_semver(9999999999988) should return 9999999999988.0.0
+ok 134 - clean_semver(20110204) should return 20110204.0.0
 ok 135 - max(semver) should work
 ok 136 - min(semver) should work
 ok 137 - ORDER BY semver USING < should work
