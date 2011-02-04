@@ -34,6 +34,10 @@ CREATE OR REPLACE FUNCTION semver_out(semver)
 	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
+--
+--  The type itself.
+--
+
 CREATE TYPE semver (
 	INPUT = semver_in,
 	OUTPUT = semver_out,
@@ -45,7 +49,16 @@ CREATE TYPE semver (
 );
 
 --
--- conversion to/from TEXT
+--  A lax constructor function.
+--
+
+CREATE OR REPLACE FUNCTION clean_semver(text)
+	RETURNS semver
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
+
+--
+-- Typecasting functions.
 --
 CREATE OR REPLACE FUNCTION ssemver_in(text)
 	RETURNS semver
@@ -57,12 +70,17 @@ CREATE OR REPLACE FUNCTION ssemver_out(semver)
 	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
+--
+--  Implicit type casts.
+--
+
 CREATE CAST (semver AS text)    WITH FUNCTION ssemver_out(semver);
 CREATE CAST (text AS semver)    WITH FUNCTION ssemver_in(text);
 
 --
---	Comparison functions
+--	Comparison functions and their corresponding operators.
 --
+
 CREATE OR REPLACE FUNCTION eq(semver, semver)
 	RETURNS bool
 	AS 'semver', 'semver_eq'
@@ -78,16 +96,6 @@ CREATE OPERATOR = (
 	join = eqjoinsel,
 	hashes, merges
 );
-
-CREATE OR REPLACE FUNCTION hash_semver(semver)
-	RETURNS int4
-	AS 'semver'
-	LANGUAGE C STRICT IMMUTABLE;
-
-CREATE OPERATOR CLASS semver_ops
-DEFAULT FOR TYPE semver USING hash AS
-    OPERATOR    1   =  (semver, semver),
-    FUNCTION    1   hash_semver(semver);
 
 CREATE OR REPLACE FUNCTION ne(semver, semver)
 	RETURNS bool
@@ -151,10 +159,23 @@ CREATE OPERATOR > (
 	procedure = gt
 );
 
+--
+-- Support functions for indexing.
+--
+
 CREATE OR REPLACE FUNCTION semver_cmp(semver, semver)
 	RETURNS int4
 	AS 'semver', 'semver_cmp'
 	LANGUAGE C STRICT IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION hash_semver(semver)
+	RETURNS int4
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
+
+--
+-- The btree indexing operator class.
+--
 
 CREATE OPERATOR CLASS semver_ops
 DEFAULT FOR TYPE SEMVER USING btree AS
@@ -164,6 +185,19 @@ DEFAULT FOR TYPE SEMVER USING btree AS
     OPERATOR    4   >= (semver, semver),
     OPERATOR    5   >  (semver, semver),
     FUNCTION    1   semver_cmp(semver, semver);
+
+--
+-- The hash indexing operator class.
+--
+
+CREATE OPERATOR CLASS semver_ops
+DEFAULT FOR TYPE semver USING hash AS
+    OPERATOR    1   =  (semver, semver),
+    FUNCTION    1   hash_semver(semver);
+
+--
+-- Aggregates.
+--
 
 CREATE OR REPLACE FUNCTION semver_smaller(semver, semver)
 	RETURNS semver
@@ -186,9 +220,3 @@ CREATE AGGREGATE max(semver)  (
     STYPE = semver,
     SORTOP = >
 );
-
-CREATE OR REPLACE FUNCTION clean_semver(text)
-	RETURNS semver
-	AS 'semver'
-	LANGUAGE C STRICT IMMUTABLE;
-
