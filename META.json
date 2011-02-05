@@ -2,7 +2,7 @@
    "name": "semver",
    "abstract": "A semantic version data type",
    "description": "Provides a data domain the enforces the Semantic Version format and includes support for operator-driven sort ordering.",
-   "version": "0.2.0",
+   "version": "0.2.1",
    "maintainer": [
       "David E. Wheeler <david@justatheory.com>",
       "Sam Vilain <sam@vilain.net>"
@@ -11,7 +11,7 @@
    "provides": {
       "pair": {
          "file": "sql/semver.sql",
-         "version": "0.2.0"
+         "version": "0.2.1"
       }
    },
    "prereqs": {
