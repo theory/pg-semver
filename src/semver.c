@@ -2,6 +2,10 @@
  * PostgreSQL type definitions for semver type
  * Written by Sam Vilain
  * sam@vilain.net
+ *
+ * Copyright 2011, Sam Vilain.  This program is Free Software; you may
+ * use it and/or redistribute it under the same terms as Postgres
+ * itself, being a permissive BSD-style disclaimer license.
  */
 
 #include "postgres.h"
