@@ -11,7 +11,8 @@ mkdir $tmpdir
 $pgbin/initdb -D $tmpdir
 
 # make the current dir the $libdir
-echo "dynamic_library_path='`pwd`'" >> $tmpdir/postgresql.conf
+dirname=$(cd `dirname $0`; pwd)
+echo "dynamic_library_path='$dirname/src'" >> $tmpdir/postgresql.conf
 cat <<EOF >> $tmpdir/postgresql.conf
 listen_addresses=''
 fsync=no
