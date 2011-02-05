@@ -156,16 +156,17 @@ semver* parse_semver(char* str, bool lax)
 char* emit_semver(semver* version) {
     char* res;
     int i,x,len;
+    long int nl;
 
     len = 0;
     for (i = 0; i < 3; i++) {
         x = version->numbers[i];
-        len += (len ? 1 : 0) +
-            (x >= 10000 ? 5 :
-             x >= 1000  ? 4 :
-             x >= 100   ? 3 :
-             x >= 10    ? 2 :
-             x <  0     ? 0 : 1);
+        nl = 10;
+        len++;
+        while (x >= nl && nl < INT_MAX ) {
+            nl *= 10;
+            len++;
+        }
     }
     len += strlen(version->patchname);
     res = palloc(len+1);
