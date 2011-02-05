@@ -114,7 +114,7 @@ CREATE CAST (bigint AS semver)           WITH FUNCTION semver(bigint);
 
 CREATE OR REPLACE FUNCTION semver_eq(semver, semver)
 	RETURNS bool
-	AS 'semver', 'semver_eq'
+	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR = (
@@ -130,7 +130,7 @@ CREATE OPERATOR = (
 
 CREATE OR REPLACE FUNCTION semver_ne(semver, semver)
 	RETURNS bool
-	AS 'semver', 'semver_ne'
+	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR <> (
@@ -144,7 +144,7 @@ CREATE OPERATOR <> (
 
 CREATE OR REPLACE FUNCTION semver_le(semver, semver)
 	RETURNS bool
-	AS 'semver', 'semver_le'
+	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR <= (
@@ -156,7 +156,7 @@ CREATE OPERATOR <= (
 
 CREATE OR REPLACE FUNCTION semver_lt(semver, semver)
 	RETURNS bool
-	AS 'semver', 'semver_lt'
+	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR < (
@@ -168,7 +168,7 @@ CREATE OPERATOR < (
 
 CREATE OR REPLACE FUNCTION semver_ge(semver, semver)
 	RETURNS bool
-	AS 'semver', 'semver_ge'
+	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR >= (
@@ -180,7 +180,7 @@ CREATE OPERATOR >= (
 
 CREATE OR REPLACE FUNCTION semver_gt(semver, semver)
 	RETURNS bool
-	AS 'semver', 'semver_gt'
+	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR > (
@@ -196,7 +196,7 @@ CREATE OPERATOR > (
 
 CREATE OR REPLACE FUNCTION semver_cmp(semver, semver)
 	RETURNS int4
-	AS 'semver', 'semver_cmp'
+	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION hash_semver(semver)
