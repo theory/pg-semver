@@ -3,9 +3,8 @@
  * Written by Sam Vilain
  * sam@vilain.net
  *
- * Copyright 2011, Sam Vilain.  This program is Free Software; you may
- * use it and/or redistribute it under the same terms as Postgres
- * itself, being a permissive BSD-style disclaimer license.
+ * Copyright 2011, Sam Vilain.  This program is Free Software; see the
+ * README.md file for the license conditions.
  */
 
 #include "postgres.h"
