@@ -112,7 +112,7 @@ CREATE CAST (bigint AS semver)           WITH FUNCTION semver(bigint);
 --	Comparison functions and their corresponding operators.
 --
 
-CREATE OR REPLACE FUNCTION eq(semver, semver)
+CREATE OR REPLACE FUNCTION semver_eq(semver, semver)
 	RETURNS bool
 	AS 'semver', 'semver_eq'
 	LANGUAGE C STRICT IMMUTABLE;
@@ -121,14 +121,14 @@ CREATE OPERATOR = (
 	leftarg = semver,
 	rightarg = semver,
 	negator = <>,
-	procedure = eq,
+	procedure = semver_eq,
 	restrict = eqsel,
 	commutator = =,
 	join = eqjoinsel,
 	hashes, merges
 );
 
-CREATE OR REPLACE FUNCTION ne(semver, semver)
+CREATE OR REPLACE FUNCTION semver_ne(semver, semver)
 	RETURNS bool
 	AS 'semver', 'semver_ne'
 	LANGUAGE C STRICT IMMUTABLE;
@@ -137,12 +137,12 @@ CREATE OPERATOR <> (
 	leftarg = semver,
 	rightarg = semver,
 	negator = =,
-	procedure = ne,
+	procedure = semver_ne,
 	restrict = neqsel,
 	join = neqjoinsel
 );
 
-CREATE OR REPLACE FUNCTION le(semver, semver)
+CREATE OR REPLACE FUNCTION semver_le(semver, semver)
 	RETURNS bool
 	AS 'semver', 'semver_le'
 	LANGUAGE C STRICT IMMUTABLE;
@@ -151,10 +151,10 @@ CREATE OPERATOR <= (
 	leftarg = semver,
 	rightarg = semver,
 	negator = >,
-	procedure = le
+	procedure = semver_le
 );
 
-CREATE OR REPLACE FUNCTION lt(semver, semver)
+CREATE OR REPLACE FUNCTION semver_lt(semver, semver)
 	RETURNS bool
 	AS 'semver', 'semver_lt'
 	LANGUAGE C STRICT IMMUTABLE;
@@ -163,10 +163,10 @@ CREATE OPERATOR < (
 	leftarg = semver,
 	rightarg = semver,
 	negator = >=,
-	procedure = lt
+	procedure = semver_lt
 );
 
-CREATE OR REPLACE FUNCTION ge(semver, semver)
+CREATE OR REPLACE FUNCTION semver_ge(semver, semver)
 	RETURNS bool
 	AS 'semver', 'semver_ge'
 	LANGUAGE C STRICT IMMUTABLE;
@@ -175,10 +175,10 @@ CREATE OPERATOR >= (
 	leftarg = semver,
 	rightarg = semver,
 	negator = <,
-	procedure = ge
+	procedure = semver_ge
 );
 
-CREATE OR REPLACE FUNCTION gt(semver, semver)
+CREATE OR REPLACE FUNCTION semver_gt(semver, semver)
 	RETURNS bool
 	AS 'semver', 'semver_gt'
 	LANGUAGE C STRICT IMMUTABLE;
@@ -187,7 +187,7 @@ CREATE OPERATOR > (
 	leftarg = semver,
 	rightarg = semver,
 	negator = <=,
-	procedure = gt
+	procedure = semver_gt
 );
 
 --
