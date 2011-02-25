@@ -9,7 +9,7 @@
    ],
    "license": "postgresql",
    "provides": {
-      "pair": {
+      "semver": {
          "file": "sql/semver.sql",
          "version": "0.2.1"
       }
