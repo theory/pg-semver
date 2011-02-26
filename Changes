@@ -3,6 +3,7 @@ Revision history for PostgreSQL extension semver.
 0.2.1
       - Fixed the metadata file to reflect that the "pair" extension is not
         included in the semver distribution.
+      - Added abstract to the `provides` section of `META.json`.
 
 0.2.0 2011-02-05T19:32:49
       - Converted to a native type implemented in C by Sam Vilain. While David

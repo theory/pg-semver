@@ -10,6 +10,7 @@
    "license": "postgresql",
    "provides": {
       "semver": {
+         "abstract": "A semantic version data type",
          "file": "sql/semver.sql",
          "version": "0.2.1"
       }
