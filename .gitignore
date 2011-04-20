@@ -4,4 +4,3 @@ tmp/
 *.o
 regression.diffs
 regression.out
-sql/semver--*
