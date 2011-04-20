@@ -16,13 +16,16 @@ PGVER_MINOR = $(shell echo $(VERSION) | awk -F. '{ print ($$2 + 0) }')
 
 ifeq ($(PGVER_MAJOR), 9)
 ifneq ($(PGVER_MINOR), 0)
-all: sql/$(EXTENSION)--$(EXTVERSION).sql
+all: sql/$(EXTENSION)--$(EXTVERSION).sql sql/$(EXTENSION)--unpackaged--$(EXTVERSION).sql
 
 sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
 	cp $< $@
 
-DATA = $(wildcard sql/*--*.sql) sql/$(EXTENSION)--$(EXTVERSION).sql
-EXTRA_CLEAN = sql/$(EXTENSION)--$(EXTVERSION).sql
+sql/$(EXTENSION)--unpackaged--$(EXTVERSION).sql: sql/$(EXTENSION)--unpackaged.sql
+	cp $< $@
+
+DATA = $(filter-out sql/$(EXTENSION)--unpackaged.sql,$(wildcard sql/*--*.sql)) sql/$(EXTENSION)--$(EXTVERSION).sql
+EXTRA_CLEAN = sql/$(EXTENSION)--$(EXTVERSION).sql sql/$(EXTENSION)--unpackaged--$(EXTVERSION).sql
 endif
 endif
 
