@@ -1,5 +1,5 @@
 EXTENSION=semver
-EXTVERSION=0.1.2
+EXTVERSION=0.2.1
 
 DATA = $(filter-out $(wildcard sql/*--*.sql),$(wildcard sql/*.sql))
 DOCS = $(wildcard doc/*.txt)
