@@ -4,6 +4,9 @@ Revision history for PostgreSQL extension semver.
       - Fixed the metadata file to reflect that the "pair" extension is not
         included in the semver distribution.
       - Added abstract and doc file to the `provides` section of `META.json`.
+      - Removed the `NO_PGXS` stuff from `Makefile`, as the PostgreSQL core
+        team does not recommend its use outside of the core contrib
+        extensions.
 
 0.2.0 2011-02-05T19:32:49
       - Converted to a native type implemented in C by Sam Vilain. While David
