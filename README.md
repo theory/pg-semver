@@ -3,10 +3,7 @@ semver 0.2.1
 
 This library contains a single PostgreSQL extension, a data type called
 "semver". It's an implementation of the version number format specified by the
-[Samantic Versioning Specification](http://semver.org/). Currently it's
-implemented as a data domain, but may be converted to a native type
-implemented in C in the future. Either way, functionality should remain the
-same.
+[Samantic Versioning Specification](http://semver.org/).
 
 To build semver, just do this:
 
@@ -44,6 +41,28 @@ You need to run the test suite using a super user, such as the default
 "postgres" super user:
 
     make installcheck PGUSER=postgres
+
+Once semver is installed, you can add it to a database. If you're running
+PostgreSQL 9.1.0 or greater, it's a simple as connecting to a database as a
+super user and running:
+
+    CREATE EXTENSION semver;
+
+If you've upgraded your cluster to PostgreSQL 9.1 and already had semver
+installed, you can upgrade it to a properly packaged extension with:
+
+    CREATE EXTENSION semver FROM unpackaged;
+
+For versions of PostgreSQL less than 9.1.0, you'll need to run the
+installation script:
+
+    psql -d mydb -f /path/to/pgsql/share/contrib/semver.sql
+
+If you want to install semver and all of its supporting objects into a
+specific schema, use the `PGOPTIONS` environment variable to specify the
+schema, like so:
+
+    PGOPTIONS=--search_path=extensions psql -d mydb -f semver.sql
 
 Dependencies
 ------------
