@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.2.1
+0.2.1 2011-04-20T20:37:05
       - Fixed the metadata file to reflect that the "pair" extension is not
         included in the semver distribution.
       - Added abstract and doc file to the `provides` section of `META.json`.
