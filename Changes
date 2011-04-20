@@ -10,6 +10,12 @@ Revision history for PostgreSQL extension semver.
       - Added PostgreSQL 9.1 `CREATE EXTENSION` support, including migration
         from an unpackaged install via `CREATE EXTENSION semver FROM
         unpackaged`.
+      - Renamed `doc/semver.md` to `doc/semver.mdd`, so that PGXN will parse
+        it as MultiMarkdown. This will allow the tables to be properly
+        formatted.
+      - Removed documentation that semver is implemented as a domain. It
+        hasn't been since 0.2.0.
+      - Removed Unicode characters `psql` output in the documentation.
 
 0.2.0 2011-02-05T19:32:49
       - Converted to a native type implemented in C by Sam Vilain. While David

@@ -4,25 +4,24 @@ semver 0.2.1
 Synopsis
 --------
 
+    CREATE EXTENSION semver;
+
     SELECT '1.2.1'::semver;
      semver    
-    ────────
+    --------
      1.2.1
 
     SELECT '1.2.0'::semver > '1.2.0b1'::semver;
      ?column?
-    ──────────
+    ----------
      t
     
 Description
 -----------
 
-This library contains a single PostgreSQL extension, a samantic version data
+This library contains a single PostgreSQL extension, a semantic version data
 type called `semver`. It's an implementation of the version number format
 specified by the [Samantic Versioning Specification](http://semver.org/).
-Currently it's implemented as a data domain, but may be converted to a native
-type implemented in C in the future. Either way, functionality should remain
-the same.
 
 The two important points describing the structure of a semantic version and
 how two versions compare are these, from [the spec](http://semver.org/):
@@ -70,12 +69,12 @@ And some sample usage:
 
     SELECT * FROM extensions WHERE VERSION = '1.5.0';
       name   │ version │      description      
-    ─────────┼─────────┼───────────────────────
+    ---------+---------+-----------------------
      PostGIS │ 1.5.0   │ Gelocation data types
 
     SELECT * FROM extensions WHERE VERSION < '0.35.0';
      name  │ version  │       description        
-    ───────┼──────────┼──────────────────────────
+    -------+----------+--------------------------
      pgtap │ 0.35.0b1 │ PostgreSQL unit testing.
      pair  │ 0.1.0    │ Key/value pair data type
     
@@ -84,7 +83,7 @@ Use `ORDER BY` to get more of a feel for semantic version ordering rules:
 
     SELECT version FROM extensions ORDER BY version;
      version  
-    ──────────
+    ----------
      0.1.0
      0.35.0b1
      0.35.0
@@ -92,7 +91,7 @@ Use `ORDER BY` to get more of a feel for semantic version ordering rules:
 
     SELECT version FROM extensions ORDER BY version DESC;
      version  
-    ──────────
+    ----------
      1.5.0
      0.35.0
      0.35.0b1
