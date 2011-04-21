@@ -3,7 +3,7 @@ semver 0.2.1
 
 This library contains a single PostgreSQL extension, a data type called
 "semver". It's an implementation of the version number format specified by the
-[Samantic Versioning Specification](http://semver.org/).
+[Semantic Versioning Specification](http://semver.org/).
 
 To build semver, just do this:
 
