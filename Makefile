@@ -1,5 +1,5 @@
 EXTENSION=semver
-EXTVERSION=0.2.2
+EXTVERSION=$(shell grep default_version $(EXTENSION).control | sed -e "s/default_version[[:space:]]*=[[:space:]]'\([^']*\)'/\1/")
 
 DATA = $(filter-out $(wildcard sql/*--*.sql),$(wildcard sql/*.sql))
 DOCS = $(wildcard doc/*.txt)
@@ -10,12 +10,9 @@ MODULES = $(patsubst %.c,%,$(wildcard src/*.c))
 
 PG_CONFIG = pg_config
 
-VERSION     = $(shell $(PG_CONFIG) --version | awk '{print $$2}')
-PGVER_MAJOR = $(shell echo $(VERSION) | awk -F. '{ print ($$1 + 0) }')
-PGVER_MINOR = $(shell echo $(VERSION) | awk -F. '{ print ($$2 + 0) }')
+EXTENSIONS = $(shell $(PG_CONFIG) --version | grep -qE " 8\.| 9\.0" && echo no || echo yes)
 
-ifeq ($(PGVER_MAJOR), 9)
-ifneq ($(PGVER_MINOR), 0)
+ifeq ($(EXTENSIONS),yes)
 all: sql/$(EXTENSION)--$(EXTVERSION).sql sql/$(EXTENSION)--unpackaged--$(EXTVERSION).sql
 
 sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
@@ -26,7 +23,6 @@ sql/$(EXTENSION)--unpackaged--$(EXTVERSION).sql: sql/$(EXTENSION)--unpackaged.sq
 
 DATA = $(filter-out sql/$(EXTENSION)--unpackaged.sql,$(wildcard sql/*--*.sql)) sql/$(EXTENSION)--$(EXTVERSION).sql
 EXTRA_CLEAN = sql/$(EXTENSION)--$(EXTVERSION).sql sql/$(EXTENSION)--unpackaged--$(EXTVERSION).sql
-endif
 endif
 
 PGXS := $(shell $(PG_CONFIG) --pgxs)
