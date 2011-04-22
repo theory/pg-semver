@@ -102,7 +102,7 @@ Interface
 
 ### Operators ###
 
- Operator |             Description                   | Example                            | Result
+ Operator | Description                               | Example                            | Result
 ----------|-------------------------------------------|------------------------------------|--------
  `=`      | Are semvers equivalent                    | '1.2.0'semver = '1.2.00'::semver   | `t`
  `<>`     | Are semvers different                     | '1.2.0'semver <> '1.2.00'::semver  | `f`
@@ -113,7 +113,7 @@ Interface
 
 ### Functions ###
 
-         Function           |          Description            |          Example                | Result
+ Function                   | Description                     | Example                         | Result
 ----------------------------|---------------------------------|---------------------------------|----------
  `to_semver(text)`          | Parse semver from text          | `to_semver('1.02')`             | `1.2.0`
  `semver(text)`             | Cast text to semver             | `semver('1.2.1')`               | `1.2.1`
@@ -135,14 +135,14 @@ Numeric casts simply extract an integer from the decimal portion, so that
 
 The examples assume the values inserted into the `extensions` table in the above examples.
 
-   Function    | Return Type |        Description        |               Example                  | Result
+ Function      | Return Type | Description               | Example                                | Result
 ---------------|-------------|---------------------------|----------------------------------------|--------
  `MIN(semver)` |  `semver`   | Return the lowest semver  | `SELECT MIN(version) FROM extensions;` | `0.1.0`
  `MAX(semver)` |  `semver`   | Return the highest semver | `SELECT MAX(version) FROM extensions;` | `1.5.0`
 
 ### Casts ###
 
-      From        |  To    |          Example                | Result
+ From             | To     | Example                         | Result
 ---------------------------|---------------------------------|---------
  text             | semver | `'1.2.1'::semver`               | `1.2.1`
  numeric          | semver | `1.2::semver`                   | `1.2.0`
