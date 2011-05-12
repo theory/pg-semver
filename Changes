@@ -2,8 +2,9 @@ Revision history for PostgreSQL extension semver.
 
 0.2.2
       - Tweaked MultiMarkdown table layout in the docuemntation so that the
-        header row is always prodessed as a header row, rather than a `pre`
+        header row is always processed as a header row, rather than a `pre`
         block.
+      - Simplified the `CREATE EXTENSION` support in the `Makefile`.
 
 0.2.1 2011-04-20T20:37:05
       - Fixed the metadata file to reflect that the "pair" extension is not
