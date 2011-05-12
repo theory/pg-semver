@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.2.2
+0.2.2   2011-05-12T19:01:41
       - Tweaked MultiMarkdown table layout in the docuemntation so that the
         header row is always processed as a header row, rather than a `pre`
         block.
