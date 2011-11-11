@@ -1,5 +1,7 @@
 Revision history for PostgreSQL extension semver.
 
+0.2.4
+
 0.2.3 2011-11-11T06:55:10Z
       - Fixed the `Makefile` so that the documentation file should properly be
         found and installed by `PGXS`.
