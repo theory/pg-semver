@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(176);
+SELECT plan(182);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -216,6 +216,17 @@ SELECT is( 1::decimal::semver, '1.0.0'::semver, 'Cast from decimal');
 SELECT is( 1.0::real::semver, '1.0.0'::semver, 'Cast from real');
 SELECT is( 1.0::double precision::semver, '1.0.0'::semver, 'Cast from double precision');
 SELECT is( 1.0::float::semver, '1.0.0'::semver, 'Cast from float');
+
+-- Test casting some more.
+SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
+  FROM (VALUES
+    ('1.0.0beta'::semver,   '1.0.0beta'),
+    ('1.0.0beta1'::semver, '1.0.0beta1'),
+    ('1.0.0alpha'::semver, '1.0.0alpha'),
+    ('1.0.0alph'::semver,  '1.0.0alph'),
+    ('1.0.0food'::semver,  '1.0.0food'),
+    ('1.0.0f111'::semver,  '1.0.0f111')
+ ) AS f(lv, rv);
 
 SELECT * FROM finish();
 ROLLBACK;

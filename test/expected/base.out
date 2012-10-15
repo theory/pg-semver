@@ -1,5 +1,5 @@
 \set ECHO 0
-1..176
+1..182
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -176,3 +176,9 @@ ok 173 - Cast from decimal
 ok 174 - Cast from real
 ok 175 - Cast from double precision
 ok 176 - Cast from float
+ok 177 - Should correctly cast "1.0.0beta" to text
+ok 178 - Should correctly cast "1.0.0beta1" to text
+ok 179 - Should correctly cast "1.0.0alpha" to text
+ok 180 - Should correctly cast "1.0.0alph" to text
+ok 181 - Should correctly cast "1.0.0food" to text
+ok 182 - Should correctly cast "1.0.0f111" to text

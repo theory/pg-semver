@@ -9,6 +9,7 @@
 
 #include "postgres.h"
 #include <limits.h>
+#include <math.h>
 #include "utils/builtins.h"
 
 #ifdef PG_MODULE_MAGIC
@@ -155,31 +156,26 @@ semver* parse_semver(char* str, bool lax)
 char* emit_semver(semver* version) {
     char* res;
     int i,x,len;
-    long int nl;
 
-    len = 0;
+    len = 3; /* 2 . + nul byte */
     for (i = 0; i < 3; i++) {
         x = version->numbers[i];
-        nl = 10;
-        len++;
-        while (x >= nl && nl < INT_MAX ) {
-            nl *= 10;
-            len++;
-        }
+        /* To support negative numbers. */
+        /* len += (x == 0 ? 1 : ((int)(log10(fabs(x))+1) + (x < 0 ? 1 : 0))); */
+        len += (x == 0 ? 1 : (int)(log10(x)+1));
     }
     len += strlen(version->patchname);
-    res = palloc(len+1);
-    sprintf(
-        res, "%d.%d.%d%s",
+    res = palloc(len);
+    snprintf(
+        res, len, "%d.%d.%d%s",
         version->numbers[0],
         version->numbers[1],
         version->numbers[2],
         version->patchname
-        );
+    );
          
     return res;
 }
-
 
 /*
  * Pg bindings
