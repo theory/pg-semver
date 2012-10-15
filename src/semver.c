@@ -9,7 +9,6 @@
 
 #include "postgres.h"
 #include <limits.h>
-#include <math.h>
 #include "utils/builtins.h"
 
 #ifdef PG_MODULE_MAGIC
@@ -154,27 +153,31 @@ semver* parse_semver(char* str, bool lax)
 }
 
 char* emit_semver(semver* version) {
-    char* res;
-    int i,x,len;
+    int len;
+    char tmpbuf[32];
+    char *buf;
 
-    len = 3; /* 2 . + nul byte */
-    for (i = 0; i < 3; i++) {
-        x = version->numbers[i];
-        /* To support negative numbers. */
-        /* len += (x == 0 ? 1 : ((int)(log10(fabs(x))+1) + (x < 0 ? 1 : 0))); */
-        len += (x == 0 ? 1 : (int)(log10(x)+1));
-    }
-    len += strlen(version->patchname);
-    res = palloc(len);
-    snprintf(
-        res, len, "%d.%d.%d%s",
+    len = snprintf(
+        tmpbuf, sizeof(tmpbuf),"%d.%d.%d%s",
         version->numbers[0],
         version->numbers[1],
         version->numbers[2],
         version->patchname
     );
-         
-    return res;
+
+    /* Should cover the vast majority of cases. */
+    if (len < sizeof(tmpbuf)) return pstrdup(tmpbuf);
+
+    /* Try agin, this time with the known length. */
+    buf = palloc(len+1);
+    snprintf(
+        buf, len + 1,"%d.%d.%d%s",
+        version->numbers[0],
+        version->numbers[1],
+        version->numbers[2],
+        version->patchname
+    );
+    return buf;
 }
 
 /*

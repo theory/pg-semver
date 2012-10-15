@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(182);
+SELECT plan(183);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -225,8 +225,11 @@ SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
     ('1.0.0alpha'::semver, '1.0.0alpha'),
     ('1.0.0alph'::semver,  '1.0.0alph'),
     ('1.0.0food'::semver,  '1.0.0food'),
-    ('1.0.0f111'::semver,  '1.0.0f111')
+    ('1.0.0f111'::semver,  '1.0.0f111'),
+    ('1.0.0f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf'::semver,
+     '1.0.0f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf')
  ) AS f(lv, rv);
+
 
 SELECT * FROM finish();
 ROLLBACK;
