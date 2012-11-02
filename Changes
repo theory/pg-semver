@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.2.4
+0.2.4   2012-11-02T22:32:30Z
       - Fixed a memory allocation bug that could cause semvers to be displayed
         with missing or garbage characters. Thanks to Andrew "RhodiumToad"
         Gierth for help tracking down and fixing the issue.
