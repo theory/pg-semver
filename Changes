@@ -1,12 +1,12 @@
 Revision history for PostgreSQL extension semver.
 
-0.3.0
+0.3.0  2012-11-20T19:04:30Z
       - Updated the parser to support an optional dash before the prerelease
         version, and the formatter to always emit a dash for the prerelease
         version. This brings it in line with the final semver 1.0.0
         specification. Thanks to Pieter van de Bruggen for making it happen.
 
-0.2.4   2012-11-02T22:32:30Z
+0.2.4  2012-11-02T22:32:30Z
       - Fixed a memory allocation bug that could cause semvers to be displayed
         with missing or garbage characters. Thanks to Andrew "RhodiumToad"
         Gierth for help tracking down and fixing the issue.
