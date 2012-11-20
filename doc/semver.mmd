@@ -21,23 +21,24 @@ Description
 
 This library contains a single PostgreSQL extension, a semantic version data
 type called `semver`. It's an implementation of the version number format
-specified by the [Semantic Versioning Specification](http://semver.org/).
+specified by the [Semantic Versioning 1.0.0
+Specification](http://semver.org/spec/v1.0.0.html).
 
 The two important points describing the structure of a semantic version and
 how two versions compare are these, from [the spec](http://semver.org/):
 
-> 1. A normal version number MUST take the form X.Y.Z where X, Y, and
-> Z are integers. X is the major version, Y is the minor version, and
-> Z is the patch version. Each element MUST increase numerically. For
-> instance: 1.9.0 < 1.10.0 < 1.11.0.
+
+> 1. A normal version number MUST take the form X.Y.Z where X, Y, and Z are
+> integers. X is the major version, Y is the minor version, and Z is the patch
+> version. Each element MUST increase numerically by increments of one. For
+> instance: 1.9.0 -> 1.10.0 -> 1.11.0.
 >
-> 2. A special version number MAY be denoted by appending an arbitrary
-> string immediately following the patch version. The string MUST
-> be comprised of only alphanumerics plus dash [0-9A-Za-z-] and
-> MUST begin with an alpha character [A-Za-z]. Special versions
-> satisfy but have a lower precedence than the associated normal
-> version. Precedence SHOULD be determined by lexicographic ASCII sort
-> order. For instance: 1.0.0beta1 < 1.0.0beta2 < 1.0.0.
+> 2. A pre-release version number MAY be denoted by appending an arbitrary
+> string immediately following the patch version and a dash. The string MUST
+> be comprised of only alphanumerics plus dash [0-9A-Za-z-]. Pre-release
+> versions satisfy but have a lower precedence than the associated normal
+> version. Precedence SHOULD be determined by lexicographic ASCII sort order.
+> For instance: 1.0.0-alpha1 < 1.0.0-beta1 < 1.0.0-beta2 < 1.0.0-rc1 < 1.0.0.
 
 Usage
 -----
@@ -62,10 +63,10 @@ aggregates in query optimizations.
 And some sample usage:
 
     INSERT INTO extensions
-    VALUES ('pgtap', '0.35.0',   'PostgreSQL unit testing'),
-           ('pgtap', '0.35.0b1', 'PostgreSQL unit testing.'),
-           ('pair',  '0.1.0',    'Key/value pair data type'),
-           ('PostGIS', '1.5.0',  'Gelocation data types');
+    VALUES ('pgtap', '0.35.0',    'PostgreSQL unit testing'),
+           ('pgtap', '0.35.0-b1', 'PostgreSQL unit testing.'),
+           ('pair',  '0.1.0',     'Key/value pair data type'),
+           ('PostGIS', '1.5.0',   'Gelocation data types');
 
     SELECT * FROM extensions WHERE VERSION = '1.5.0';
       name   │ version │      description      
@@ -73,28 +74,28 @@ And some sample usage:
      PostGIS │ 1.5.0   │ Gelocation data types
 
     SELECT * FROM extensions WHERE VERSION < '0.35.0';
-     name  │ version  │       description        
-    -------+----------+--------------------------
-     pgtap │ 0.35.0b1 │ PostgreSQL unit testing.
-     pair  │ 0.1.0    │ Key/value pair data type
+     name  │ version   │       description        
+    -------+-----------+--------------------------
+     pgtap │ 0.35.0-b1 │ PostgreSQL unit testing.
+     pair  │ 0.1.0     │ Key/value pair data type
     
-Note that "0.35.0b1" is less than "0.35.0", as required by the specification.
+Note that "0.35.0-b1" is less than "0.35.0", as required by the specification.
 Use `ORDER BY` to get more of a feel for semantic version ordering rules:
 
     SELECT version FROM extensions ORDER BY version;
      version  
-    ----------
+    -----------
      0.1.0
-     0.35.0b1
+     0.35.0-b1
      0.35.0
      1.5.0
 
     SELECT version FROM extensions ORDER BY version DESC;
      version  
-    ----------
+    -----------
      1.5.0
      0.35.0
-     0.35.0b1
+     0.35.0-b1
      0.1.0
 
 Interface
@@ -102,14 +103,14 @@ Interface
 
 ### Operators ###
 
- Operator | Description                               | Example                            | Result
-----------|-------------------------------------------|------------------------------------|--------
- `=`      | Are semvers equivalent                    | '1.2.0'semver = '1.2.00'::semver   | `t`
- `<>`     | Are semvers different                     | '1.2.0'semver <> '1.2.00'::semver  | `f`
- `<`      | Is semver less than right semver          | '3.4.0b1'semver < '3.4.0'::semver  | `t`
- `<=`     | Is semver less than or equal to semver    | '3.4.0b1'semver <= '3.4.0'::semver | `t`
- `>`      | Is semver greater than right semver       | '3.4.0b1'semver > '3.4.0'::semver  | `f`
- `>=`     | Is semver greater than or equal to semver | '3.4.0b1'semver >= '3.4.0'::semver | `f`
+ Operator | Description                               | Example                             | Result
+----------|-------------------------------------------|-------------------------------------|--------
+ `=`      | Are semvers equivalent                    | '1.2.0'semver = '1.2.00'::semver    | `t`
+ `<>`     | Are semvers different                     | '1.2.0'semver <> '1.2.00'::semver   | `f`
+ `<`      | Is semver less than right semver          | '3.4.0-b1'semver < '3.4.0'::semver  | `t`
+ `<=`     | Is semver less than or equal to semver    | '3.4.0-b1'semver <= '3.4.0'::semver | `t`
+ `>`      | Is semver greater than right semver       | '3.4.0-b1'semver > '3.4.0'::semver  | `f`
+ `>=`     | Is semver greater than or equal to semver | '3.4.0-b1'semver >= '3.4.0'::semver | `f`
 
 ### Functions ###
 
@@ -173,7 +174,7 @@ Author
 Copyright and License
 ---------------------
 
-Copyright (c) 2010-2011 David E. Wheeler and Sam Vilain.
+Copyright (c) 2010-2012 David E. Wheeler and Sam Vilain.
 
 This module is free software; you can redistribute it and/or modify it under
 the [PostgreSQL License](http://www.opensource.org/licenses/postgresql).

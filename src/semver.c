@@ -3,8 +3,8 @@
  * Written by Sam Vilain
  * sam@vilain.net
  *
- * Copyright 2011, Sam Vilain.  This program is Free Software; see the
- * README.md file for the license conditions.
+ * Copyright 2011-2012, Sam Vilain and David Wheeler. This program is Free
+ * Software; see the README.md file for the license conditions.
  */
 
 #include "postgres.h"
