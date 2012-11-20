@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(183);
+SELECT plan(185);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -37,8 +37,10 @@ SELECT lives_ok(
     '0.0.0',
     '0.1.999',
     '9999.9999999.823823',
-    '1.0.0beta1',
-    '1.0.0beta2',
+    '1.0.0beta1',  -- TODO: Transitional
+    '1.0.0beta2',  -- TODO: Transitional
+    '1.0.0-beta1',
+    '1.0.0-beta2',
     '1.0.0',
     '20110204.0.0'
 ]) AS v;
@@ -72,8 +74,8 @@ SELECT collect_tap(ARRAY[
     ('1.2.23', '1.2.23'),
     ('0.0.0', '0.0.0'),
     ('999.888.7777', '999.888.7777'),
-    ('0.1.2beta3', '0.1.2beta3'),
-    ('1.0.0rc-1', '1.0.0RC-1')
+    ('0.1.2-beta3', '0.1.2-beta3'),
+    ('1.0.0-rc-1', '1.0.0-RC-1')
  ) AS f(lv, rv);
 
 -- Test semver <> semver
@@ -85,10 +87,10 @@ SELECT collect_tap(ARRAY[
     ('0.0.1', '1.0.0'),
     ('1.0.1', '1.1.0'),
     ('1.1.1', '1.1.0'),
-    ('1.2.3b', '1.2.3'),
-    ('1.2.3', '1.2.3b'),
-    ('1.2.3a', '1.2.3b'),
-    ('1.2.3aaaaaaa1', '1.2.3aaaaaaa2')
+    ('1.2.3-b', '1.2.3'),
+    ('1.2.3', '1.2.3-b'),
+    ('1.2.3-a', '1.2.3-b'),
+    ('1.2.3-aaaaaaa1', '1.2.3-aaaaaaa2')
   ) AS f(lv, rv);
 
 -- Test >, >=, <, and <=.
@@ -103,10 +105,10 @@ SELECT collect_tap(ARRAY[
     ('2.2.2', '1.1.1'),
     ('2.2.2', '2.1.1'),
     ('2.2.2', '2.2.1'),
-    ('2.2.2b', '2.2.1'),
-    ('2.2.2', '2.2.2b'),
-    ('2.2.2c', '2.2.2b'),
-    ('2.2.2rc-2', '2.2.2RC-1'),
+    ('2.2.2-b', '2.2.1'),
+    ('2.2.2', '2.2.2-b'),
+    ('2.2.2-c', '2.2.2-b'),
+    ('2.2.2-rc-2', '2.2.2-RC-1'),
     ('0.9.10', '0.9.9')
   ) AS f(lv, rv);
 
@@ -120,29 +122,29 @@ SELECT is(
     clean::semver,
     'to_semver(' || dirty || ') should return ' || clean
 ) FROM (VALUES
-    ('1.2.2',          '1.2.2'),
-    ('01.2.2',         '1.2.2'),
-    ('1.02.2',         '1.2.2'),
-    ('1.2.02',         '1.2.2'),
-    ('1.2.02b',        '1.2.2b'),
-    ('1.2.02beta-3  ', '1.2.2beta-3'),
-    ('1.02.02rc1',     '1.2.2rc1'),
-    ('1.0',            '1.0.0'),
-    ('1',              '1.0.0'),
-    ('.0.02',          '0.0.2'),
-    ('1..02',          '1.0.2'),
-    ('1..',            '1.0.0'),
-    ('1.1',            '1.1.0'),
-    ('1.2.b1',         '1.2.0b1'),
-    ('9.0beta4',       '9.0.0beta4'), -- PostgreSQL format.
-    ('9b',             '9.0.0b'),
-    ('rc1',            '0.0.0rc1'),
-    ('',               '0.0.0'),
-    ('..2',            '0.0.2'),
-    ('1.2.3 a',        '1.2.3a'),
-    ('..2 b',          '0.0.2b'),
-    ('  012.2.2',      '12.2.2'),
-    ('20110204',  '20110204.0.0')
+    ('1.2.2',           '1.2.2'),
+    ('01.2.2',          '1.2.2'),
+    ('1.02.2',          '1.2.2'),
+    ('1.2.02',          '1.2.2'),
+    ('1.2.02b',        '1.2.2-b'),
+    ('1.2.02beta-3  ', '1.2.2-beta-3'),
+    ('1.02.02rc1',     '1.2.2-rc1'),
+    ('1.0',             '1.0.0'),
+    ('1',               '1.0.0'),
+    ('.0.02',           '0.0.2'),
+    ('1..02',           '1.0.2'),
+    ('1..',             '1.0.0'),
+    ('1.1',             '1.1.0'),
+    ('1.2.b1',          '1.2.0-b1'),
+    ('9.0beta4',        '9.0.0-beta4'), -- PostgreSQL format.
+    ('9b',              '9.0.0-b'),
+    ('rc1',             '0.0.0-rc1'),
+    ('',                '0.0.0'),
+    ('..2',             '0.0.2'),
+    ('1.2.3 a',         '1.2.3-a'),
+    ('..2 b',           '0.0.2-b'),
+    ('  012.2.2',       '12.2.2'),
+    ('20110204',        '20110204.0.0')
 ) v(dirty, clean);
 
 -- to_semver still needs to reject truly bad input
@@ -168,7 +170,7 @@ CREATE TABLE vs (
     version semver
 );
 
-INSERT INTO vs VALUES ('1.2.0'), ('1.0.0'), ('0.9.9'), ('0.9.10');
+INSERT INTO vs VALUES ('1.2.0'), ('1.0.0'), ('1.0.0-p0'), ('0.9.9'), ('0.9.10');
 
 SELECT is(max(version), '1.2.0', 'max(semver) should work')
   FROM vs;
@@ -178,13 +180,13 @@ SELECT is(min(version), '0.9.9', 'min(semver) should work')
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING < $$,
-    $$ VALUES ('0.9.9'::semver), ('0.9.10'::semver), ('1.0.0'::semver), ('1.2.0'::semver) $$,
+    $$ VALUES ('0.9.9'::semver), ('0.9.10'::semver), ('1.0.0-p0'::semver), ('1.0.0'::semver), ('1.2.0'::semver) $$,
     'ORDER BY semver USING < should work'
 );
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING > $$,
-    $$ VALUES ('1.2.0'::semver), ('1.0.0'::semver), ('0.9.10'::semver), ('0.9.9'::semver) $$,
+    $$ VALUES ('1.2.0'::semver), ('1.0.0'::semver), ('1.0.0-p0'::semver), ('0.9.10'::semver), ('0.9.9'::semver) $$,
     'ORDER BY semver USING > should work'
 );
 
@@ -220,14 +222,14 @@ SELECT is( 1.0::float::semver, '1.0.0'::semver, 'Cast from float');
 -- Test casting some more.
 SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
   FROM (VALUES
-    ('1.0.0beta'::semver,   '1.0.0beta'),
-    ('1.0.0beta1'::semver, '1.0.0beta1'),
-    ('1.0.0alpha'::semver, '1.0.0alpha'),
-    ('1.0.0alph'::semver,  '1.0.0alph'),
-    ('1.0.0food'::semver,  '1.0.0food'),
-    ('1.0.0f111'::semver,  '1.0.0f111'),
-    ('1.0.0f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf'::semver,
-     '1.0.0f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf')
+    ('1.0.0-beta'::semver,   '1.0.0-beta'),
+    ('1.0.0-beta1'::semver,  '1.0.0-beta1'),
+    ('1.0.0-alpha'::semver,  '1.0.0-alpha'),
+    ('1.0.0-alph'::semver,   '1.0.0-alph'),
+    ('1.0.0-food'::semver,   '1.0.0-food'),
+    ('1.0.0-f111'::semver,   '1.0.0-f111'),
+    ('1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf'::semver,
+     '1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf')
  ) AS f(lv, rv);
 
 

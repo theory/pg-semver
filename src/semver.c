@@ -123,6 +123,7 @@ semver* parse_semver(char* str, bool lax)
     if (lax) { x = strspn(ptr, " \t"); ptr += x; }
     
     if ( strlen(ptr) ) {
+        if ( *ptr == '-' ) ptr += 1;
         if ( !( ( *ptr >= 'A' && *ptr <= 'Z' ) ||
             ( *ptr >= 'a' && *ptr <= 'z' ) ) )
             elog(ERROR, "bad patchlevel '%s' in semver value '%s' (must start with a letter)", ptr, str);
@@ -157,26 +158,44 @@ char* emit_semver(semver* version) {
     char tmpbuf[32];
     char *buf;
 
-    len = snprintf(
-        tmpbuf, sizeof(tmpbuf),"%d.%d.%d%s",
-        version->numbers[0],
-        version->numbers[1],
-        version->numbers[2],
-        version->patchname
-    );
+    if (*version->patchname == '\0') {
+        len = snprintf(tmpbuf, sizeof(tmpbuf), "%d.%d.%d",
+            version->numbers[0],
+            version->numbers[1],
+            version->numbers[2]
+        );
+    }
+    else {
+        len = snprintf(
+            tmpbuf, sizeof(tmpbuf),"%d.%d.%d-%s",
+            version->numbers[0],
+            version->numbers[1],
+            version->numbers[2],
+            version->patchname
+        );
+    }
 
     /* Should cover the vast majority of cases. */
     if (len < sizeof(tmpbuf)) return pstrdup(tmpbuf);
 
     /* Try agin, this time with the known length. */
     buf = palloc(len+1);
-    snprintf(
-        buf, len + 1,"%d.%d.%d%s",
-        version->numbers[0],
-        version->numbers[1],
-        version->numbers[2],
-        version->patchname
-    );
+    if (*version->patchname == '\0') {
+        len = snprintf(buf, len+1, "%d.%d.%d",
+            version->numbers[0],
+            version->numbers[1],
+            version->numbers[2]
+        );
+    }
+    else {
+        len = snprintf(
+            buf, len+1,"%d.%d.%d-%s",
+            version->numbers[0],
+            version->numbers[1],
+            version->numbers[2],
+            version->patchname
+        );
+    }
     return buf;
 }
 
