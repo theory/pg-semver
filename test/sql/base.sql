@@ -168,7 +168,7 @@ CREATE TABLE vs (
     version semver
 );
 
-INSERT INTO vs VALUES ('1.2.0'), ('1.0.0'), ('0.9.9'), ('0.9.10');
+INSERT INTO vs VALUES ('1.2.0'), ('1.0.0'), ('1.0.0-p0'), ('0.9.9'), ('0.9.10');
 
 SELECT is(max(version), '1.2.0', 'max(semver) should work')
   FROM vs;
@@ -178,13 +178,13 @@ SELECT is(min(version), '0.9.9', 'min(semver) should work')
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING < $$,
-    $$ VALUES ('0.9.9'::semver), ('0.9.10'::semver), ('1.0.0'::semver), ('1.2.0'::semver) $$,
+    $$ VALUES ('0.9.9'::semver), ('0.9.10'::semver), ('1.0.0-p0'::semver), ('1.0.0'::semver), ('1.2.0'::semver) $$,
     'ORDER BY semver USING < should work'
 );
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING > $$,
-    $$ VALUES ('1.2.0'::semver), ('1.0.0'::semver), ('0.9.10'::semver), ('0.9.9'::semver) $$,
+    $$ VALUES ('1.2.0'::semver), ('1.0.0'::semver), ('1.0.0-p0'::semver), ('0.9.10'::semver), ('0.9.9'::semver) $$,
     'ORDER BY semver USING > should work'
 );
 

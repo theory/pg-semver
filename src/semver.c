@@ -123,6 +123,7 @@ semver* parse_semver(char* str, bool lax)
     if (lax) { x = strspn(ptr, " \t"); ptr += x; }
     
     if ( strlen(ptr) ) {
+        if ( *ptr == '-' ) ptr += 1;
         if ( !( ( *ptr >= 'A' && *ptr <= 'Z' ) ||
             ( *ptr >= 'a' && *ptr <= 'z' ) ) )
             elog(ERROR, "bad patchlevel '%s' in semver value '%s' (must start with a letter)", ptr, str);
