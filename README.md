@@ -1,4 +1,4 @@
-semver 0.2.5
+semver 0.3.0
 ============
 
 This library contains a single PostgreSQL extension, a data type called

@@ -2,7 +2,7 @@
    "name": "semver",
    "abstract": "A semantic version data type",
    "description": "Provides a data type the enforces the Semantic Version format and includes support btree and hash indexing.",
-   "version": "0.2.5",
+   "version": "0.3.0",
    "maintainer": [
       "David E. Wheeler <david@justatheory.com>",
       "Sam Vilain <sam@vilain.net>"
@@ -13,7 +13,7 @@
          "abstract": "A semantic version data type",
          "file": "sql/semver.sql",
          "docfile": "doc/semver.mmd",
-         "version": "0.2.4"
+         "version": "0.3.0"
       }
    },
    "prereqs": {
