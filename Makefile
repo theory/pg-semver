@@ -26,3 +26,5 @@ sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
 	cp $< $@
 endif
 
+dist:
+	git archive --format zip --prefix=$(EXTENSION)-$(EXTVERSION)/ --output $(EXTENSION)-$(EXTVERSION).zip HEAD
