@@ -1,6 +1,8 @@
 Revision history for PostgreSQL extension semver.
 
 0.4.0
+      - Updated the `Makefile` to reflect the recommended patterns from
+        pgsql-hackers. Thanks to Cédric Villemain for the details.
 
 0.3.0  2012-11-20T19:04:30Z
       - Updated the parser to support an optional dash before the prerelease
