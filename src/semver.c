@@ -389,6 +389,9 @@ hash_semver(PG_FUNCTION_ARGS)
         hash ^= OidFunctionCall1(hashint2, version->numbers[i]);
     }
 
+	/* Avoid leaking memory for toasted inputs */
+	PG_FREE_IF_COPY(version, 0);
+
     PG_RETURN_INT32(hash);
 }
 
