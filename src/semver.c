@@ -49,6 +49,8 @@ typedef struct semver
     char patchname[]; /* patch name, including the null byte for convenience */
 } semver;
 
+#define PG_GETARG_SEMVER_P(n) (semver *)PG_GETARG_POINTER(n)
+
 // forward declarations, mostly to shut the compiler up but some are
 // actually necessary.
 char*   emit_semver(semver* version);
@@ -220,7 +222,7 @@ PG_FUNCTION_INFO_V1(semver_out);
 Datum
 semver_out(PG_FUNCTION_ARGS)
 {
-    semver* amount = (void*)PG_GETARG_POINTER(0);
+    semver* amount = PG_GETARG_SEMVER_P(0);
     char *result;
     result = emit_semver(amount);
 
@@ -241,8 +243,8 @@ PG_FUNCTION_INFO_V1(semver_to_text);
 Datum
 semver_to_text(PG_FUNCTION_ARGS)
 {
-    semver* semver = (void*) PG_GETARG_POINTER(0);
-    char* xxx = emit_semver(semver);
+    semver* sv = PG_GETARG_SEMVER_P(0);
+    char* xxx = emit_semver(sv);
     text* res = cstring_to_text(xxx);
     pfree(xxx);
     PG_RETURN_TEXT_P(res);
@@ -286,8 +288,8 @@ PG_FUNCTION_INFO_V1(semver_eq);
 Datum
 semver_eq(PG_FUNCTION_ARGS)
 {
-    semver* a = (void*)PG_GETARG_POINTER(0);
-    semver* b = (void*)PG_GETARG_POINTER(1);
+    semver* a = PG_GETARG_SEMVER_P(0);
+    semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     PG_FREE_IF_COPY(a, 0);
     PG_FREE_IF_COPY(b, 1);
@@ -298,8 +300,8 @@ PG_FUNCTION_INFO_V1(semver_ne);
 Datum
 semver_ne(PG_FUNCTION_ARGS)
 {
-    semver* a = (void*)PG_GETARG_POINTER(0);
-    semver* b = (void*)PG_GETARG_POINTER(1);
+    semver* a = PG_GETARG_SEMVER_P(0);
+    semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     PG_FREE_IF_COPY(a, 0);
     PG_FREE_IF_COPY(b, 1);
@@ -310,8 +312,8 @@ PG_FUNCTION_INFO_V1(semver_le);
 Datum
 semver_le(PG_FUNCTION_ARGS)
 {
-    semver* a = (void*)PG_GETARG_POINTER(0);
-    semver* b = (void*)PG_GETARG_POINTER(1);
+    semver* a = PG_GETARG_SEMVER_P(0);
+    semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     PG_FREE_IF_COPY(a, 0);
     PG_FREE_IF_COPY(b, 1);
@@ -322,8 +324,8 @@ PG_FUNCTION_INFO_V1(semver_lt);
 Datum
 semver_lt(PG_FUNCTION_ARGS)
 {
-    semver* a = (void*)PG_GETARG_POINTER(0);
-    semver* b = (void*)PG_GETARG_POINTER(1);
+    semver* a = PG_GETARG_SEMVER_P(0);
+    semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     PG_FREE_IF_COPY(a, 0);
     PG_FREE_IF_COPY(b, 1);
@@ -334,8 +336,8 @@ PG_FUNCTION_INFO_V1(semver_ge);
 Datum
 semver_ge(PG_FUNCTION_ARGS)
 {
-    semver* a = (void*)PG_GETARG_POINTER(0);
-    semver* b = (void*)PG_GETARG_POINTER(1);
+    semver* a = PG_GETARG_SEMVER_P(0);
+    semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     PG_FREE_IF_COPY(a, 0);
     PG_FREE_IF_COPY(b, 1);
@@ -346,8 +348,8 @@ PG_FUNCTION_INFO_V1(semver_gt);
 Datum
 semver_gt(PG_FUNCTION_ARGS)
 {
-    semver* a = (void*)PG_GETARG_POINTER(0);
-    semver* b = (void*)PG_GETARG_POINTER(1);
+    semver* a = PG_GETARG_SEMVER_P(0);
+    semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     PG_FREE_IF_COPY(a, 0);
     PG_FREE_IF_COPY(b, 1);
@@ -358,8 +360,8 @@ PG_FUNCTION_INFO_V1(semver_cmp);
 Datum
 semver_cmp(PG_FUNCTION_ARGS)
 {
-    semver* a = (void*)PG_GETARG_POINTER(0);
-    semver* b = (void*)PG_GETARG_POINTER(1);
+    semver* a = PG_GETARG_SEMVER_P(0);
+    semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     PG_FREE_IF_COPY(a, 0);
     PG_FREE_IF_COPY(b, 1);
@@ -375,7 +377,7 @@ PG_FUNCTION_INFO_V1(hash_semver);
 Datum
 hash_semver(PG_FUNCTION_ARGS)
 {
-    semver* version = (void*)PG_GETARG_POINTER(0);
+    semver* version = PG_GETARG_SEMVER_P(0);
     uint32 hash = 0;
     int i;
     Datum patchname;
@@ -399,8 +401,8 @@ PG_FUNCTION_INFO_V1(semver_larger);
 Datum
 semver_larger(PG_FUNCTION_ARGS)
 {
-    semver* a = (void*)PG_GETARG_POINTER(0);
-    semver* b = (void*)PG_GETARG_POINTER(1);
+    semver* a = PG_GETARG_SEMVER_P(0);
+    semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     if (diff >= 0) {
         PG_FREE_IF_COPY(b, 1);
@@ -416,8 +418,8 @@ PG_FUNCTION_INFO_V1(semver_smaller);
 Datum
 semver_smaller(PG_FUNCTION_ARGS)
 {
-    semver* a = (void*)PG_GETARG_POINTER(0);
-    semver* b = (void*)PG_GETARG_POINTER(1);
+    semver* a = PG_GETARG_SEMVER_P(0);
+    semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     if (diff <= 0) {
         PG_FREE_IF_COPY(b, 1);

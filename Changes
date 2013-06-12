@@ -10,6 +10,9 @@ Revision history for PostgreSQL extension semver.
       - Fixed an off-by-one bug in the parser that could add garbage
         characters to the end of certain semvers with patch versions. Thanks
         to Andrew "RhodiumToad" Gierth for pointing out the bug.
+      - Add a macro to fetch a semver from C function arguments, and cast to
+        `semver*` rather than `void*`. Suggested by Andrew "RhodiumToad"
+        Gierth.
 
 0.3.0  2012-11-20T19:04:30Z
       - Updated the parser to support an optional dash before the prerelease
