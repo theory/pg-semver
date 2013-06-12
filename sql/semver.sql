@@ -41,9 +41,10 @@ CREATE OR REPLACE FUNCTION semver_out(semver)
 CREATE TYPE semver (
 	INPUT = semver_in,
 	OUTPUT = semver_out,
--- values of internallength, passedbyvalue, alignment, and storage are copied from the named type.
+-- values of passedbyvalue and alignment are copied from the named type.
+    STORAGE = plain,
 	INTERNALLENGTH = variable,
--- string category, to automatically try string conversion etc
+-- string category, to automatically try string conversion, etc.
 	CATEGORY = 'S',
 	PREFERRED = false
 );
