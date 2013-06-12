@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.4.0
+0.4.0  2013-06-12T06:48:33Z
       - Updated the `Makefile` to reflect the recommended patterns from
         pgsql-hackers. Thanks to Cédric Villemain for the details.
       - Changed the Makefile to read the distribution name and version from
