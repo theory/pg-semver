@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(185);
+SELECT plan(187);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -232,6 +232,14 @@ SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
      '1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf')
  ) AS f(lv, rv);
 
+-- Regressions.
+SELECT is(
+    semver(lv)::TEXT, rv,
+    'Should correctly represent "' || lv || '" as "' || rv || '"'
+) FROM (VALUES
+      ('0.5.0-release1', '0.5.0-release1'),
+      ('0.5.0release1',  '0.5.0-release1')
+) AS f(lv, rv);
 
 SELECT * FROM finish();
 ROLLBACK;

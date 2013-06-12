@@ -1,5 +1,5 @@
 \set ECHO 0
-1..185
+1..187
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -185,3 +185,5 @@ ok 182 - Should correctly cast "1.0.0-alph" to text
 ok 183 - Should correctly cast "1.0.0-food" to text
 ok 184 - Should correctly cast "1.0.0-f111" to text
 ok 185 - Should correctly cast "1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf" to text
+ok 186 - Should correctly represent "0.5.0-release1" as "0.5.0-release1"
+ok 187 - Should correctly represent "0.5.0release1" as "0.5.0-release1"

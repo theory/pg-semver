@@ -127,7 +127,7 @@ semver* parse_semver(char* str, bool lax)
         if ( !( ( *ptr >= 'A' && *ptr <= 'Z' ) ||
             ( *ptr >= 'a' && *ptr <= 'z' ) ) )
             elog(ERROR, "bad patchlevel '%s' in semver value '%s' (must start with a letter)", ptr, str);
-        patchname = palloc(strlen(ptr));
+        patchname = palloc(strlen(ptr) + 1);
         x = sscanf(ptr, "%[A-Za-z0-9-]%c", patchname, (char*)&junk);
         if (x == 2) {
             if (!lax || !(*junk == ' ' || *junk == '\t' ) ) {
@@ -178,7 +178,7 @@ char* emit_semver(semver* version) {
     /* Should cover the vast majority of cases. */
     if (len < sizeof(tmpbuf)) return pstrdup(tmpbuf);
 
-    /* Try agin, this time with the known length. */
+    /* Try again, this time with the known length. */
     buf = palloc(len+1);
     if (*version->patchname == '\0') {
         len = snprintf(buf, len+1, "%d.%d.%d",
