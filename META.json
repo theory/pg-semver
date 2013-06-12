@@ -13,7 +13,7 @@
          "abstract": "A semantic version data type",
          "file": "sql/semver.sql",
          "docfile": "doc/semver.mmd",
-         "version": "0.3.0"
+         "version": "0.4.0"
       }
    },
    "prereqs": {
