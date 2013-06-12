@@ -13,6 +13,8 @@ Revision history for PostgreSQL extension semver.
       - Add a macro to fetch a semver from C function arguments, and cast to
         `semver*` rather than `void*`. Suggested by Andrew "RhodiumToad"
         Gierth.
+      - Removed unnecessary calls to `PG_FREE_IF_COPY()`. Only really needed
+        for toastable values, and semvers are not toastable.
 
 0.3.0  2012-11-20T19:04:30Z
       - Updated the parser to support an optional dash before the prerelease

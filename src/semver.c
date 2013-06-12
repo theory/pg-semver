@@ -235,7 +235,6 @@ text_to_semver(PG_FUNCTION_ARGS)
 {
     text* sv = PG_GETARG_TEXT_PP(0);
     semver* rs = parse_semver(text_to_cstring(sv), false);
-    PG_FREE_IF_COPY(sv, 0);
     PG_RETURN_POINTER(rs);
 }
 
@@ -291,8 +290,6 @@ semver_eq(PG_FUNCTION_ARGS)
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
-    PG_FREE_IF_COPY(a, 0);
-    PG_FREE_IF_COPY(b, 1);
     PG_RETURN_BOOL(diff == 0);
 }
 
@@ -303,8 +300,6 @@ semver_ne(PG_FUNCTION_ARGS)
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
-    PG_FREE_IF_COPY(a, 0);
-    PG_FREE_IF_COPY(b, 1);
     PG_RETURN_BOOL(diff != 0);
 }
 
@@ -315,8 +310,6 @@ semver_le(PG_FUNCTION_ARGS)
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
-    PG_FREE_IF_COPY(a, 0);
-    PG_FREE_IF_COPY(b, 1);
     PG_RETURN_BOOL(diff <= 0);
 }
 
@@ -327,8 +320,6 @@ semver_lt(PG_FUNCTION_ARGS)
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
-    PG_FREE_IF_COPY(a, 0);
-    PG_FREE_IF_COPY(b, 1);
     PG_RETURN_BOOL(diff < 0);
 }
 
@@ -339,8 +330,6 @@ semver_ge(PG_FUNCTION_ARGS)
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
-    PG_FREE_IF_COPY(a, 0);
-    PG_FREE_IF_COPY(b, 1);
     PG_RETURN_BOOL(diff >= 0);
 }
 
@@ -351,8 +340,6 @@ semver_gt(PG_FUNCTION_ARGS)
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
-    PG_FREE_IF_COPY(a, 0);
-    PG_FREE_IF_COPY(b, 1);
     PG_RETURN_BOOL(diff > 0);
 }
 
@@ -363,8 +350,6 @@ semver_cmp(PG_FUNCTION_ARGS)
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
-    PG_FREE_IF_COPY(a, 0);
-    PG_FREE_IF_COPY(b, 1);
     PG_RETURN_INT32(diff);
 }
 
@@ -391,9 +376,6 @@ hash_semver(PG_FUNCTION_ARGS)
         hash ^= OidFunctionCall1(hashint2, version->numbers[i]);
     }
 
-	/* Avoid leaking memory for toasted inputs */
-	PG_FREE_IF_COPY(version, 0);
-
     PG_RETURN_INT32(hash);
 }
 
@@ -405,11 +387,9 @@ semver_larger(PG_FUNCTION_ARGS)
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     if (diff >= 0) {
-        PG_FREE_IF_COPY(b, 1);
         PG_RETURN_POINTER(a);
     }
     else {
-        PG_FREE_IF_COPY(a, 0);
         PG_RETURN_POINTER(b);
     }
 }
@@ -422,11 +402,9 @@ semver_smaller(PG_FUNCTION_ARGS)
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
     if (diff <= 0) {
-        PG_FREE_IF_COPY(b, 1);
         PG_RETURN_POINTER(a);
     }
     else {
-        PG_FREE_IF_COPY(a, 0);
         PG_RETURN_POINTER(b);
     }
 }
@@ -437,6 +415,5 @@ to_semver(PG_FUNCTION_ARGS)
 {
     text* sv = PG_GETARG_TEXT_PP(0);
     semver* rs = parse_semver(text_to_cstring(sv), true);
-    PG_FREE_IF_COPY(sv, 0);
     PG_RETURN_POINTER(rs);
 }
