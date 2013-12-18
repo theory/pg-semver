@@ -8,8 +8,8 @@ This library contains a single PostgreSQL extension, a data type called
 To build semver, just do this:
 
     make
-    make installcheck
     make install
+    make installcheck
 
 If you encounter an error such as:
 
