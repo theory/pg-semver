@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.5.0
+0.5.0   2014-12-06T00:29:17Z
       - Fixed issue where the release file could be listed twice when
         installing, which causes an installation failure on some versions of
         PostgreSQL.
