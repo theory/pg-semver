@@ -71,7 +71,7 @@ The `semver` data type has no dependencies other than PostgreSQL and PL/pgSQL.
 Copyright and License
 ---------------------
 
-Copyright (c) 2010-2012 David E. Wheeler and Sam Vilain.
+Copyright (c) 2010-2014 David E. Wheeler and Sam Vilain.
 
 This module is free software; you can redistribute it and/or modify it under
 the [PostgreSQL License](http://www.opensource.org/licenses/postgresql).
