@@ -1,6 +1,17 @@
 Revision history for PostgreSQL extension semver.
 
 0.5.0
+      - Fixed issue where the release file could be listed twice when
+        installing, which causes an installation failure on some versions of
+        PostgreSQL.
+      - Fixed a typo in the README: `make installcheck` should be run *after*
+        `make install`.
+      - Fixed an issue where the installer would read the distribution version
+        rather than the extension version. The latter is requierd to tell
+        PostgreSQL the correct version number (since the distribution version
+        is quite different from the extension version).
+      - Added `LICENSE` file to simplify packaging, thanks to Richard Marko,
+        who is packaging semver for Fedora.
 
 0.4.0  2013-06-12T06:48:33Z
       - Updated the `Makefile` to reflect the recommended patterns from
