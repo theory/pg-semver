@@ -27,5 +27,9 @@ sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
 	cp $< $@
 endif
 
+.PHONY: results
+results:
+	rsync -avP --delete results/ test/expected
+
 dist:
 	git archive --format zip --prefix=$(EXTENSION)-$(EXTVERSION)/ -o $(EXTENSION)-$(EXTVERSION).zip HEAD

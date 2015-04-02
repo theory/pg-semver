@@ -30,11 +30,11 @@
    },
    "resources": {
       "bugtracker": {
-         "web": "http://github.com/theory/pg-semver/issues/"
+         "web": "https://github.com/theory/pg-semver/issues/"
       },
       "repository": {
         "url":  "git://github.com/theory/pg-semver.git",
-        "web":  "http://github.com/theory/pg-semver/",
+        "web":  "https://github.com/theory/pg-semver/",
         "type": "git"
       }
    },
