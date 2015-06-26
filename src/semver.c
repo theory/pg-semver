@@ -126,11 +126,8 @@ semver* parse_semver(char* str, bool lax)
     
     if ( strlen(ptr) ) {
         if ( *ptr == '-' ) ptr += 1;
-        if ( !( ( *ptr >= 'A' && *ptr <= 'Z' ) ||
-            ( *ptr >= 'a' && *ptr <= 'z' ) ) )
-            elog(ERROR, "bad patchlevel '%s' in semver value '%s' (must start with a letter)", ptr, str);
         patchname = palloc(strlen(ptr) + 1);
-        x = sscanf(ptr, "%[A-Za-z0-9-]%c", patchname, (char*)&junk);
+        x = sscanf(ptr, "%[-A-Za-z0-9.]%c", patchname, (char*)&junk);
         if (x == 2) {
             if (!lax || !(*junk == ' ' || *junk == '\t' ) ) {
                 elog(ERROR, "bad patchlevel '%s' in semver value '%s' (contains invalid character)", ptr, str);
