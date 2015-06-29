@@ -1,4 +1,4 @@
-\set ECHO 0
+\set ECHO none
 BEGIN;
 
 \i test/pgtap-core.sql
@@ -33,15 +33,15 @@ SELECT lives_ok(
 )  FROM unnest(ARRAY[
     '1.2.2',
     '0.2.2',
-    '1.2.2',
     '0.0.0',
     '0.1.999',
     '9999.9999999.823823',
-    '1.0.0beta1',  -- TODO: Transitional
-    '1.0.0beta2',  -- TODO: Transitional
     '1.0.0-beta1',
     '1.0.0-beta2',
     '1.0.0',
+    '1.0.0-1',
+    '1.0.0-alpha+d34dm34t',
+    '1.0.0+d34dm34t',
     '20110204.0.0'
 ]) AS v;
 
@@ -234,7 +234,7 @@ SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
 
 -- Regressions.
 SELECT is(
-    semver(lv)::TEXT, rv,
+    to_semver(lv)::TEXT, rv,
     'Should correctly represent "' || lv || '" as "' || rv || '"'
 ) FROM (VALUES
       ('0.5.0-release1', '0.5.0-release1'),

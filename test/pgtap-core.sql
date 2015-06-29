@@ -1,4 +1,4 @@
-\set ECHO 0
+\set ECHO none
 -- This file defines pgTAP Core, a portable collection of assertion
 -- functions for TAP-based unit testing on PostgreSQL 8.3 or higher. It is
 -- distributed under the revised FreeBSD license. The home page for the pgTAP

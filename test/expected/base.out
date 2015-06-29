@@ -1,18 +1,18 @@
-\set ECHO 0
+\set ECHO none
 1..187
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
 ok 4 - "0.2.2" is a valid semver
-ok 5 - "1.2.2" is a valid semver
-ok 6 - "0.0.0" is a valid semver
-ok 7 - "0.1.999" is a valid semver
-ok 8 - "9999.9999999.823823" is a valid semver
-ok 9 - "1.0.0beta1" is a valid semver
-ok 10 - "1.0.0beta2" is a valid semver
-ok 11 - "1.0.0-beta1" is a valid semver
-ok 12 - "1.0.0-beta2" is a valid semver
-ok 13 - "1.0.0" is a valid semver
+ok 5 - "0.0.0" is a valid semver
+ok 6 - "0.1.999" is a valid semver
+ok 7 - "9999.9999999.823823" is a valid semver
+ok 8 - "1.0.0-beta1" is a valid semver
+ok 9 - "1.0.0-beta2" is a valid semver
+ok 10 - "1.0.0" is a valid semver
+ok 11 - "1.0.0-1" is a valid semver
+ok 12 - "1.0.0-alpha+d34dm34t" is a valid semver
+ok 13 - "1.0.0+d34dm34t" is a valid semver
 ok 14 - "20110204.0.0" is a valid semver
 ok 15 - "1.2" is not a valid semver
 ok 16 - "1.2.02" is not a valid semver
