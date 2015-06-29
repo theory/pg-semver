@@ -5,9 +5,12 @@ semver 0.6.0
 
 This library contains a single PostgreSQL extension, a data type called
 "semver". It's an implementation of the version number format specified by the
-[Semantic Versioning 1.0.0 Specification](http://semver.org/spec/v1.0.0.html).
+[Semantic Versioning 2.0.0 Specification](http://semver.org/spec/v2.0.0.html).
 
-To build semver, just do this:
+Installation
+------------
+
+To build semver:
 
     make
     make install
@@ -18,11 +21,7 @@ If you encounter an error such as:
     "Makefile", line 8: Need an operator
 
 You need to use GNU make, which may well be installed on your system as
-`gmake`:
-
-    gmake
-    gmake install
-    gmake installcheck
+`gmake`.
 
 If you encounter an error such as:
 
@@ -65,6 +64,33 @@ specific schema, use the `PGOPTIONS` environment variable to specify the
 schema, like so:
 
     PGOPTIONS=--search_path=extensions psql -d mydb -f semver.sql
+
+Usage
+-----
+
+You can now define a column as type `semver`. The default parsing
+function for versions is strict. For more permissive parsing, use the
+`to_semver()` function:
+
+    # select '1.0'::semver;
+    ERROR:  bad semver value '1.0': missing major, minor, or patch version
+    LINE 1: select '1.0'::semver;
+
+    # select '1.0.0beta1'::semver;
+    ERROR:  bad semver value '1.0.0beta1': expected - (dash) or + (plus) at char 5
+    LINE 1: select '1.0.0beta1'::semver;
+
+    # select to_semver('1.0');
+     to_semver
+    -----------
+     1.0.0
+    (1 row)
+
+    # select to_semver('1.0beta1');
+     to_semver
+    -----------
+     1.0.0-beta1
+    (1 row)
 
 Dependencies
 ------------

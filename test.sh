@@ -1,7 +1,7 @@
 #!/bin/sh
 
 tmpdir=${tmpdir-`pwd`/tmp}
-pgbin=${PGBIN-/usr/lib/postgresql/9.0/bin}
+pgbin=/usr/lib/postgresql/9.0/bin
 
 make || exit 1
 
