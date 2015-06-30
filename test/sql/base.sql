@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(187);
+SELECT plan(205);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -230,6 +230,53 @@ SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
     ('1.0.0-f111'::semver,   '1.0.0-f111'),
     ('1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf'::semver,
      '1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf')
+ ) AS f(lv, rv);
+
+-- SEMV 2.0.0 tests.
+SELECT lives_ok(
+    $$ SELECT '$$ || v || $$'::semver $$,
+    '"' || v || '" is a valid 2.0.0 semver'
+)  FROM unnest(ARRAY[
+    '1.0.0+1',
+    '1.0.0-1+1',
+    '1.0.0-1.1+1',
+    '1.0.0-1.1.1.1.1.1.1.1.1.1.1+1.1.1.1.1.1.1.1'
+]) AS v;
+
+SELECT throws_ok(
+    $$ SELECT '$$ || v || $$'::semver $$,
+    NULL,
+    '"' || v || '" is not a valid 2.0.0 semver'
+)  FROM unnest(ARRAY[
+   '1.0.0-a..',
+   '1.0.0-a.1.',
+   '1.0.0+1-1',
+   '1.0.0-1....'
+]) AS v;
+
+DELETE FROM vs;
+INSERT INTO vs VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver);
+
+SELECT results_eq(
+    $$ SELECT version FROM vs ORDER BY version USING < $$,
+    $$ VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.2.3'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver) $$,
+    'ORDER BY semver (2.0.0) USING < should work'
+);
+
+SELECT results_eq(
+    $$ SELECT version FROM vs ORDER BY version USING > $$,
+    $$ VALUES ('1.0.0-1'::semver), ('1.0.0+99'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.1+1234'::semver) $$,
+    'ORDER BY semver (2.0.0) USING > should work'
+);
+
+SELECT collect_tap(ARRAY[
+    ok(semver_cmp(lv::semver, rv::semver) = 0, 'semver(' || lv || ', ' || rv || ') should = 0'),
+    ok(lv::semver = rv::semver, 'v' || lv || ' should = v' || rv),
+    ok(lv::semver <= rv::semver, 'v' || lv || ' should be <= v' || rv),
+    ok(lv::semver >= rv::semver, 'v' || lv || ' should be >= v' || rv)
+]) FROM (VALUES
+    ('1.0.0-1+1',  '1.0.0-1+5'),
+    ('1.0.0-1.1+1',  '1.0.0-1.1+5')
  ) AS f(lv, rv);
 
 -- Regressions.

@@ -1,5 +1,5 @@
 \set ECHO none
-1..187
+1..205
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -185,5 +185,23 @@ ok 182 - Should correctly cast "1.0.0-alph" to text
 ok 183 - Should correctly cast "1.0.0-food" to text
 ok 184 - Should correctly cast "1.0.0-f111" to text
 ok 185 - Should correctly cast "1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf" to text
-ok 186 - Should correctly represent "0.5.0-release1" as "0.5.0-release1"
-ok 187 - Should correctly represent "0.5.0release1" as "0.5.0-release1"
+ok 186 - "1.0.0+1" is a valid 2.0.0 semver
+ok 187 - "1.0.0-1+1" is a valid 2.0.0 semver
+ok 188 - "1.0.0-1.1+1" is a valid 2.0.0 semver
+ok 189 - "1.0.0-1.1.1.1.1.1.1.1.1.1.1+1.1.1.1.1.1.1.1" is a valid 2.0.0 semver
+ok 190 - "1.0.0-a.." is not a valid 2.0.0 semver
+ok 191 - "1.0.0-a.1." is not a valid 2.0.0 semver
+ok 192 - "1.0.0+1-1" is not a valid 2.0.0 semver
+ok 193 - "1.0.0-1...." is not a valid 2.0.0 semver
+ok 194 - ORDER BY semver (2.0.0) USING < should work
+ok 195 - ORDER BY semver (2.0.0) USING > should work
+ok 196 - semver(1.0.0-1+1, 1.0.0-1+5) should = 0
+ok 197 - v1.0.0-1+1 should = v1.0.0-1+5
+ok 198 - v1.0.0-1+1 should be <= v1.0.0-1+5
+ok 199 - v1.0.0-1+1 should be >= v1.0.0-1+5
+ok 200 - semver(1.0.0-1.1+1, 1.0.0-1.1+5) should = 0
+ok 201 - v1.0.0-1.1+1 should = v1.0.0-1.1+5
+ok 202 - v1.0.0-1.1+1 should be <= v1.0.0-1.1+5
+ok 203 - v1.0.0-1.1+1 should be >= v1.0.0-1.1+5
+ok 204 - Should correctly represent "0.5.0-release1" as "0.5.0-release1"
+ok 205 - Should correctly represent "0.5.0release1" as "0.5.0-release1"
