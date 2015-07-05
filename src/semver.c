@@ -88,7 +88,7 @@ semver* parse_semver(char* str, bool lax)
     int p = 0;
     int atchar = 0;
     int curpart = 0;
-    char next = NULL;
+    char next;
     char* patch = 0;
     char* ptr, *endptr;
     bool dotlast = false;
@@ -310,7 +310,8 @@ char* strip_meta(const char *str)
         if (str[j] == '+') {
             break;
         } else {
-            copy[j] = str[j++];
+            copy[j] = str[j];
+            j++;
         }
     }
     copy[j] = '\0';
