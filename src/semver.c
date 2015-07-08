@@ -95,6 +95,7 @@ semver* parse_semver(char* str, bool lax)
     bool started_prerel = false;
     bool started_meta = false;
     bool skip_char = false;
+    bool pred;
     semver* newval;
 
     ptr = str;
@@ -172,9 +173,16 @@ semver* parse_semver(char* str, bool lax)
                     elog(ERROR, "bad semver value '%s': non-alphanumeric pre-release at char %d", str, atchar);
             }
             if ((started_prerel || started_meta) && !skip_char) {
+              pred = (i > 0 && patch[i-1] == '0' && next != '.');
+              if (pred && !lax)   {  // Leading zeros
+                    elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
+              } else if (pred && lax)  {  // Swap erroneous leading zero with whatever this is
+                patch[i-1] = next;
+              } else {
                 dotlast = (next == '.');
                 patch[i] = next;
                 i++;
+              }
             }
             atchar++;
             ptr++;
