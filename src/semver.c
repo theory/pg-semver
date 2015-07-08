@@ -116,6 +116,7 @@ semver* parse_semver(char* str, bool lax)
                         // related token. We'll skip to the next number part, but leave
                         // the pointers.
                         curpart++;
+                        continue;
                     } else {
                         elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
                     }
@@ -148,7 +149,7 @@ semver* parse_semver(char* str, bool lax)
             }
 
             if (!patch && (started_meta || started_prerel))
-                patch = palloc(len - atchar + 1);
+                patch = palloc(len - atchar + 2);
 
             // NB: This section is here to maintain compatibility with the SEMV 1.0b
             // version of the library that accepted multiple - (dash) separators.

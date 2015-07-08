@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(205);
+SELECT plan(207);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -285,7 +285,9 @@ SELECT is(
     'Should correctly represent "' || lv || '" as "' || rv || '"'
 ) FROM (VALUES
       ('0.5.0-release1', '0.5.0-release1'),
-      ('0.5.0release1',  '0.5.0-release1')
+      ('0.5.0release1',  '0.5.0-release1'),
+      ('0.5release1',  '0.5.0-release1'),
+      ('0.5-release1',  '0.5.0-release1')
 ) AS f(lv, rv);
 
 SELECT * FROM finish();
