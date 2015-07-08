@@ -104,7 +104,7 @@ semver* parse_semver(char* str, bool lax)
     do {
         next = (char)*ptr;
         skip_char = false;
-        if (curpart < 3) {  // Still figuring out X.Y.Z
+        if (curpart < 3 && parts[2] == -1) {  // Still figuring out X.Y.Z
             if (next == '.') {  // First, check if we hit a period
                 ptr++;
                 atchar++;
@@ -131,8 +131,6 @@ semver* parse_semver(char* str, bool lax)
                 parts[curpart] = num;
                 atchar += (strlen(ptr) - strlen(endptr));
                 ptr = endptr;
-                if (curpart == 2)  // Break out of the `if`; we won't see another period
-                    curpart++;
             }
         } else {  // Onto pre-release/metadata
             if (!started_prerel && (next == '-' || (next != '+' && lax) )) {  // Starts with -
