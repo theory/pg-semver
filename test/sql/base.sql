@@ -265,17 +265,17 @@ SELECT throws_ok(
 ]) AS v;
 
 DELETE FROM vs;
-INSERT INTO vs VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver);
+INSERT INTO vs VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver);
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING < $$,
-    $$ VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.2.3'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver) $$,
+    $$ VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver) $$,
     'ORDER BY semver (2.0.0) USING < should work'
 );
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING > $$,
-    $$ VALUES ('1.0.0-1'::semver), ('1.0.0+99'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.1+1234'::semver) $$,
+    $$ VALUES ('1.0.0-1'::semver), ('1.0.0+99'::semver), ('0.9.9'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.1+1234'::semver) $$,
     'ORDER BY semver (2.0.0) USING > should work'
 );
 
