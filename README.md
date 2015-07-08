@@ -1,5 +1,5 @@
-semver 0.6.0
-============
+semver 0.10.0
+=============
 
 [![PGXN version](https://badge.fury.io/pg/semver.svg)](https://badge.fury.io/pg/semver)
 
