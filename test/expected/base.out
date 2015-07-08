@@ -1,5 +1,5 @@
 \set ECHO none
-1..224
+1..225
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -223,4 +223,5 @@ ok 220 - Should correctly represent "0.5.0-release1" as "0.5.0-release1"
 ok 221 - Should correctly represent "0.5.0release1" as "0.5.0-release1"
 ok 222 - Should correctly represent "0.5-release1" as "0.5.0-release1"
 ok 223 - Should correctly represent "0.5release1" as "0.5.0-release1"
-ok 224 - Should correctly represent "1.2.3-1.02" as "1.2.3-1.2"
+ok 224 - Should correctly represent "0.5-1" as "0.5.0-1"
+ok 225 - Should correctly represent "1.2.3-1.02" as "1.2.3-1.2"

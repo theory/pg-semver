@@ -111,7 +111,12 @@ semver* parse_semver(char* str, bool lax)
                 curpart++;
             } else {  // OK, it should be a version part number then
                 num = strtol(ptr, &endptr, 10);
-                if (ptr == endptr) {  // Not a number
+                // N.B. According to strtol(3), a valid number may be preceded
+                // by a single +/-, so a value like 0.1-1 will end up being
+                // parsed incorrectly when in `lax` mode. It will in fact end
+                // up being 0.0.0 because {0, 0, -1} is coerced to {0, 0, 0}.
+                // Not fun enough? 0.0+2 becomes 0.2.0!
+                if (ptr == endptr || next == '-' || next == '+') {  // Not a number
                     if (lax) {
                         // Since it's not a period, we have to assume it's a legit pre-
                         // related token. We'll skip to the next number part, but leave
@@ -148,12 +153,12 @@ semver* parse_semver(char* str, bool lax)
             }
 
             if (!patch && (started_meta || started_prerel))
-                patch = palloc(len - atchar + 2);
+                patch = palloc(len - atchar + 1);
 
             // NB: This section is here to maintain compatibility with the SEMV 1.0b
             // version of the library that accepted multiple - (dash) separators.
             // This is invalid for SEMV 1.0/2.0 so just turn them into . (period)
-            if (started_prerel && next == '-')
+            if (started_prerel && next == '-' && !skip_char)
                 next = '.';
 
             if (!skip_char &&

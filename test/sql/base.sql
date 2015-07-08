@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(224);
+SELECT plan(225);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -296,9 +296,10 @@ SELECT is(
 ) FROM (VALUES
       ('0.5.0-release1', '0.5.0-release1'),
       ('0.5.0release1',  '0.5.0-release1'),
-      ('0.5-release1',  '0.5.0-release1'),
-      ('0.5release1',  '0.5.0-release1'),
-      ('1.2.3-1.02',  '1.2.3-1.2')
+      ('0.5-release1',   '0.5.0-release1'),
+      ('0.5release1',    '0.5.0-release1'),
+      ('0.5-1',          '0.5.0-1'),
+      ('1.2.3-1.02',     '1.2.3-1.2')
 ) AS f(lv, rv);
 
 SELECT * FROM finish();
