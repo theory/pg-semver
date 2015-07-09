@@ -130,11 +130,26 @@ Interface
  `semver(smallint)`         | Cast smallint to semver         | `semver(2::smallint)`           | `2.0.0`
  `text(semver)`             | Cast semver to text             | `text('1.2.54'::semver)`        | `1.2.54`
 
-The difference between `semver(text)` and `to_semver(text)` is that the former
-requires a valid semver format, while the latter is a bit more permissive,
-doing its best to convert other version number formats to semantic versions.
 Numeric casts simply extract an integer from the decimal portion, so that
 `1.20` and `1.02` would both be parsed as `1.2.0`.
+
+The difference between `semver(text)` and `to_semver(text)` is that the former
+requires a valid semver format, while the latter is a bit more permissive,
+doing its best to convert other version number formats (including the older
+[semver 1.0.0-beta](http://semver.org/spec/v1.0.0-beta.html) prerelease
+format) to semantic versions:
+
+    # select to_semver('1.0');
+     to_semver
+    -----------
+     1.0.0
+    (1 row)
+
+    # select to_semver('1.0beta1');
+     to_semver
+    -----------
+     1.0.0-beta1
+    (1 row)
 
 ### Aggregate Functions ###
 

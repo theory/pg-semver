@@ -69,33 +69,6 @@ schema, like so:
 
     PGOPTIONS=--search_path=extensions psql -d mydb -f semver.sql
 
-Usage
------
-
-You can now define a column as type `semver`. The default parsing
-function for versions is strict. For more permissive parsing, use the
-`to_semver()` function:
-
-    # select '1.0'::semver;
-    ERROR:  bad semver value '1.0': missing major, minor, or patch version
-    LINE 1: select '1.0'::semver;
-
-    # select '1.0.0beta1'::semver;
-    ERROR:  bad semver value '1.0.0beta1': expected - (dash) or + (plus) at char 5
-    LINE 1: select '1.0.0beta1'::semver;
-
-    # select to_semver('1.0');
-     to_semver
-    -----------
-     1.0.0
-    (1 row)
-
-    # select to_semver('1.0beta1');
-     to_semver
-    -----------
-     1.0.0-beta1
-    (1 row)
-
 Dependencies
 ------------
 The `semver` data type has no dependencies other than PostgreSQL and PL/pgSQL.
