@@ -1,4 +1,4 @@
-\set ECHO 0
+\set ECHO none
 BEGIN;
 
 \i test/pgtap-core.sql
@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(187);
+SELECT plan(225);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -33,15 +33,15 @@ SELECT lives_ok(
 )  FROM unnest(ARRAY[
     '1.2.2',
     '0.2.2',
-    '1.2.2',
     '0.0.0',
     '0.1.999',
     '9999.9999999.823823',
-    '1.0.0beta1',  -- TODO: Transitional
-    '1.0.0beta2',  -- TODO: Transitional
     '1.0.0-beta1',
     '1.0.0-beta2',
     '1.0.0',
+    '1.0.0-1',
+    '1.0.0-alpha+d34dm34t',
+    '1.0.0+d34dm34t',
     '20110204.0.0'
 ]) AS v;
 
@@ -90,7 +90,8 @@ SELECT collect_tap(ARRAY[
     ('1.2.3-b', '1.2.3'),
     ('1.2.3', '1.2.3-b'),
     ('1.2.3-a', '1.2.3-b'),
-    ('1.2.3-aaaaaaa1', '1.2.3-aaaaaaa2')
+    ('1.2.3-aaaaaaa1', '1.2.3-aaaaaaa2'),
+    ('1.2.3-1.2.3', '1.2.3-1.2.3.4')
   ) AS f(lv, rv);
 
 -- Test >, >=, <, and <=.
@@ -109,7 +110,8 @@ SELECT collect_tap(ARRAY[
     ('2.2.2', '2.2.2-b'),
     ('2.2.2-c', '2.2.2-b'),
     ('2.2.2-rc-2', '2.2.2-RC-1'),
-    ('0.9.10', '0.9.9')
+    ('0.9.10', '0.9.9'),
+    ('1.0.1-1.2.3', '1.0.1-0.9.9.9')
   ) AS f(lv, rv);
 
 -- Test to_semver().
@@ -232,13 +234,72 @@ SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
      '1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf')
  ) AS f(lv, rv);
 
+-- SEMV 2.0.0 tests.
+SELECT lives_ok(
+    $$ SELECT '$$ || v || $$'::semver $$,
+    '"' || v || '" is a valid 2.0.0 semver'
+)  FROM unnest(ARRAY[
+    '1.0.0+1',
+    '1.0.0-1+1',
+    '1.0.0-1.1+1',
+    '1.0.0-1.1.1.1.1.1.1.1.1.1.1+1.1.1.1.1.1.1.1',
+    '1.0.0-1.2',
+    '1.0.0-1.0.2',
+    '1.0.0-alpha',
+    '1.0.0-alpha.1',
+    '1.0.0-0.3.7',
+    '1.0.0-x.7.z.92'
+]) AS v;
+
+SELECT throws_ok(
+    $$ SELECT '$$ || v || $$'::semver $$,
+    NULL,
+    '"' || v || '" is not a valid 2.0.0 semver'
+)  FROM unnest(ARRAY[
+   '1.0.0-a..',
+   '1.0.0-a.1.',
+   '1.0.0+1-1',
+   '1.0.0-1....',
+   '1.0.0-1_2',
+   '1.0.0-1.02'
+]) AS v;
+
+DELETE FROM vs;
+INSERT INTO vs VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver);
+
+SELECT results_eq(
+    $$ SELECT version FROM vs ORDER BY version USING < $$,
+    $$ VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver) $$,
+    'ORDER BY semver (2.0.0) USING < should work'
+);
+
+SELECT results_eq(
+    $$ SELECT version FROM vs ORDER BY version USING > $$,
+    $$ VALUES ('1.0.0-1'::semver), ('1.0.0+99'::semver), ('0.9.9'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.1+1234'::semver) $$,
+    'ORDER BY semver (2.0.0) USING > should work'
+);
+
+SELECT collect_tap(ARRAY[
+    ok(semver_cmp(lv::semver, rv::semver) = 0, 'semver(' || lv || ', ' || rv || ') should = 0'),
+    ok(lv::semver = rv::semver, 'v' || lv || ' should = v' || rv),
+    ok(lv::semver <= rv::semver, 'v' || lv || ' should be <= v' || rv),
+    ok(lv::semver >= rv::semver, 'v' || lv || ' should be >= v' || rv)
+]) FROM (VALUES
+    ('1.0.0-1+1',  '1.0.0-1+5'),
+    ('1.0.0-1.1+1',  '1.0.0-1.1+5')
+ ) AS f(lv, rv);
+
 -- Regressions.
 SELECT is(
-    semver(lv)::TEXT, rv,
+    to_semver(lv)::TEXT, rv,
     'Should correctly represent "' || lv || '" as "' || rv || '"'
 ) FROM (VALUES
       ('0.5.0-release1', '0.5.0-release1'),
-      ('0.5.0release1',  '0.5.0-release1')
+      ('0.5.0release1',  '0.5.0-release1'),
+      ('0.5-release1',   '0.5.0-release1'),
+      ('0.5release1',    '0.5.0-release1'),
+      ('0.5-1',          '0.5.0-1'),
+      ('1.2.3-1.02',     '1.2.3-1.2')
 ) AS f(lv, rv);
 
 SELECT * FROM finish();

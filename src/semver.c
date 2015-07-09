@@ -8,6 +8,8 @@
  */
 
 #include "postgres.h"
+#include <string.h>
+#include <ctype.h>
 #include <limits.h>
 #include "utils/builtins.h"
 
@@ -46,7 +48,7 @@ typedef struct semver
 {
     int32 vl_len_;  /* varlena header */
     vernum numbers[3];
-    char patchname[]; /* patch name, including the null byte for convenience */
+    char prerel[]; /* pre-release, including the null byte for convenience */
 } semver;
 
 #define PG_GETARG_SEMVER_P(n) (semver *)PG_GETARG_POINTER(n)
@@ -54,103 +56,160 @@ typedef struct semver
 // forward declarations, mostly to shut the compiler up but some are
 // actually necessary.
 char*   emit_semver(semver* version);
-semver* make_semver(const int *numbers, const char* patchname);
+semver* make_semver(const int *numbers, const char* prerel);
 semver* parse_semver(char* str, bool lax);
-int     patchnamecmp(const char* a, const char* b);
+int     prerelcmp(const char* a, const char* b);
 int     _semver_cmp(semver* a, semver* b);
+char*   strip_meta(const char* str);
 
-semver* make_semver(const int *numbers, const char* patchname) {
-    int varsize = offsetof(semver, patchname) + (patchname ? strlen(patchname) : 0) + 1;
+semver* make_semver(const int *numbers, const char* prerel) {
+    int varsize = offsetof(semver, prerel) + (prerel ? strlen(prerel) : 0) + 1;
     semver *rv = palloc(varsize);
     int i;
     SET_VARSIZE(rv, varsize);
     for (i = 0; i < 3; i++) {
         rv->numbers[i] = numbers[i];
     }
-    if (patchname) {
-        strcpy(rv->patchname, patchname);
+    if (prerel) {
+        strcpy(rv->prerel, prerel);
     }
     else {
-        rv->patchname[0] = '\0';
+        rv->prerel[0] = '\0';
     }
     return rv;
 }
 
-/* creating a currency from a string */
 semver* parse_semver(char* str, bool lax)
 {
-    int numbers[3];
-    char* patchname, *ptr, *nptr;
-    char junk[2];
-    semver * newval;
-    long int n;
-    int i, x;
+    int parts[] = {-1, -1, -1};
+    long int num;
+    int len;
+    int i = 0;
+    int p = 0;
+    int atchar = 0;
+    int curpart = 0;
+    char next;
+    char* patch = 0;
+    char* ptr, *endptr;
+    bool dotlast = false;
+    bool started_prerel = false;
+    bool started_meta = false;
+    bool skip_char = false;
+    bool pred;
+    semver* newval;
 
     ptr = str;
-    if (lax) { x = strspn(ptr, " \t"); ptr += x; }
-        
-    for (i = 0; i < 3; i++) {
-        n = strtol(ptr, &nptr, 10);
-        if (ptr == nptr) {
-            if (lax) {
-                n = 0;
-            }
-            else {
-                elog(ERROR, "bad semver value '%s': expected number at %s", str, ptr);
-            }
-        }
-        if ( n > INT_MAX )
-            elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
+    len = strlen(str);
 
-        if ( !lax && *ptr == '0' && n != 0 )
-            elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
-
-        numbers[i] = n;
-        ptr = nptr;
-        
-        if (lax) { x = strspn(ptr, " \t"); ptr += x; }
-        if (i < 2) {
-            if (*ptr == '.') {
+    do {
+        next = (char)*ptr;
+        skip_char = false;
+        if (curpart < 3 && parts[2] == -1) {  // Still figuring out X.Y.Z
+            if (next == '.') {  // First, check if we hit a period
                 ptr++;
-                if (lax) { x = strspn(ptr, " \t"); ptr += x; }
-            }
-            else {
-                if (!lax) {
-                    elog(ERROR, "bad semver value '%s': expected '.' at: '%s'", str, ptr);
+                atchar++;
+                curpart++;
+            } else {  // OK, it should be a version part number then
+                num = strtol(ptr, &endptr, 10);
+                // N.B. According to strtol(3), a valid number may be preceded
+                // by a single +/-, so a value like 0.1-1 will end up being
+                // parsed incorrectly when in `lax` mode. It will in fact end
+                // up being 0.0.0 because {0, 0, -1} is coerced to {0, 0, 0}.
+                // Not fun enough? 0.0+2 becomes 0.2.0!
+                if (ptr == endptr || next == '-' || next == '+') {  // Not a number
+                    if (lax) {
+                        // Since it's not a period, we have to assume it's a legit pre-
+                        // related token. We'll skip to the next number part, but leave
+                        // the pointers.
+                        curpart++;
+                        continue;
+                    } else {
+                        elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
+                    }
                 }
+                if (num > INT_MAX)  // Too big
+                    elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
+
+                if (next == '0' && num != 0 && !lax)  // Leading zeros
+                    elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
+
+                parts[curpart] = num;
+                atchar += (strlen(ptr) - strlen(endptr));
+                ptr = endptr;
             }
+        } else {  // Onto pre-release/metadata
+            if (!started_prerel && (next == '-' || (next != '+' && lax) )) {  // Starts with -
+                if (started_meta)  // Pre-release flag can't come after metadata
+                    elog(ERROR, "bad semver value '%s': pre-release (-) after metadata (+) at char %d", str, atchar);
+
+                started_prerel = true;
+                if (next == '-') {
+                    skip_char = true;
+                }
+            } else if (!started_meta && next == '+') {  // Starts with +
+                started_meta = true;
+                ptr++;
+                atchar++;
+            }
+
+            if (!patch && (started_meta || started_prerel))
+                patch = palloc(len - atchar + 1);
+
+            // NB: This section is here to maintain compatibility with the SEMV 1.0b
+            // version of the library that accepted multiple - (dash) separators.
+            // This is invalid for SEMV 1.0/2.0 so just turn them into . (period)
+            if (started_prerel && next == '-' && !skip_char)
+                next = '.';
+
+            if (!skip_char &&
+                (!started_prerel && next != '-') &&
+                (!started_meta && next != '+'))  {  // Didn't start with -/+
+                elog(ERROR, "bad semver value '%s': expected - (dash) or + (plus) at char %d", str, atchar);
+            }
+            if (next == '.' && (dotlast || (atchar + 1) == len))
+                elog(ERROR, "bad semver value '%s': empty pre-release section at char %d", str, atchar);
+
+            if (!skip_char && (next != '.' && next != '+' && !isalpha(next) && !isdigit(next))) {
+                if (lax && isspace(next))  // In lax mode, ignore whitespace
+                    skip_char = true;
+                else
+                    elog(ERROR, "bad semver value '%s': non-alphanumeric pre-release at char %d", str, atchar);
+            }
+            if ((started_prerel || started_meta) && !skip_char) {
+              pred = (i > 0 && patch[i-1] == '0' && next != '.');
+              if (pred && !lax)   {  // Leading zeros
+                    elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
+              } else if (pred && lax)  {  // Swap erroneous leading zero with whatever this is
+                patch[i-1] = next;
+              } else {
+                dotlast = (next == '.');
+                patch[i] = next;
+                i++;
+              }
+            }
+            atchar++;
+            ptr++;
+        }
+    } while (atchar < len);
+
+    for (p=0; p < 3; p++) {
+        if (parts[p] == -1) {
+            if (lax)
+                parts[p] = 0;
+            else
+                elog(ERROR, "bad semver value '%s': missing major, minor, or patch version", str);
         }
     }
 
-    if (lax) { x = strspn(ptr, " \t"); ptr += x; }
-    
-    if ( strlen(ptr) ) {
-        if ( *ptr == '-' ) ptr += 1;
-        if ( !( ( *ptr >= 'A' && *ptr <= 'Z' ) ||
-            ( *ptr >= 'a' && *ptr <= 'z' ) ) )
-            elog(ERROR, "bad patchlevel '%s' in semver value '%s' (must start with a letter)", ptr, str);
-        patchname = palloc(strlen(ptr) + 1);
-        x = sscanf(ptr, "%[A-Za-z0-9-]%c", patchname, (char*)&junk);
-        if (x == 2) {
-            if (!lax || !(*junk == ' ' || *junk == '\t' ) ) {
-                elog(ERROR, "bad patchlevel '%s' in semver value '%s' (contains invalid character)", ptr, str);
-            }
-            ptr += strlen(patchname);
-            if (lax) {
-                x = strspn(ptr, " \t");
-                ptr += x;
-                if (strlen(ptr))
-                    elog(ERROR, "bad semver value '%s' (contains dividing whitespace)", str);
-            }
-        }
-    }
-    else {
-        patchname = 0;
-    }
+    if ((started_prerel || started_meta) && i == 0)  // No pre-release value after -
+        elog(ERROR, "bad semver value '%s': expected alphanumeric at char %d", str, atchar);
 
-    newval = make_semver(numbers, patchname);
-    if (patchname)
-        pfree(patchname);
+    if (started_prerel || started_meta)
+        patch[i] = '\0';
+
+    newval = make_semver(parts, patch);
+    if (patch)
+        pfree(patch);
 
     return newval;
 }
@@ -160,12 +219,12 @@ char* emit_semver(semver* version) {
     char tmpbuf[32];
     char *buf;
 
-    if (*version->patchname == '\0') {
+    if (*version->prerel == '\0') {
         len = snprintf(tmpbuf, sizeof(tmpbuf), "%d.%d.%d",
-            version->numbers[0],
-            version->numbers[1],
-            version->numbers[2]
-        );
+                       version->numbers[0],
+                       version->numbers[1],
+                       version->numbers[2]
+            );
     }
     else {
         len = snprintf(
@@ -173,8 +232,8 @@ char* emit_semver(semver* version) {
             version->numbers[0],
             version->numbers[1],
             version->numbers[2],
-            version->patchname
-        );
+            version->prerel
+            );
     }
 
     /* Should cover the vast majority of cases. */
@@ -182,12 +241,12 @@ char* emit_semver(semver* version) {
 
     /* Try again, this time with the known length. */
     buf = palloc(len+1);
-    if (*version->patchname == '\0') {
+    if (*version->prerel == '\0') {
         len = snprintf(buf, len+1, "%d.%d.%d",
-            version->numbers[0],
-            version->numbers[1],
-            version->numbers[2]
-        );
+                       version->numbers[0],
+                       version->numbers[1],
+                       version->numbers[2]
+            );
     }
     else {
         len = snprintf(
@@ -195,8 +254,8 @@ char* emit_semver(semver* version) {
             version->numbers[0],
             version->numbers[1],
             version->numbers[2],
-            version->patchname
-        );
+            version->prerel
+            );
     }
     return buf;
 }
@@ -249,15 +308,45 @@ semver_to_text(PG_FUNCTION_ARGS)
     PG_RETURN_TEXT_P(res);
 }
 
-int patchnamecmp(const char* a, const char* b)
+/* Remove everything at and after "+" in a pre-release suffix */
+char* strip_meta(const char *str)
 {
+    int n = strlen(str);
+    char *copy = palloc(n + 1);
+    int j = 0;   // current character
+    strcpy(copy, str);
+
+    while (j < n)
+    {
+        /* if current character is b */
+        if (str[j] == '+') {
+            break;
+        } else {
+            copy[j] = str[j];
+            j++;
+        }
+    }
+    copy[j] = '\0';
+    return copy;
+}
+
+int prerelcmp(const char* a, const char* b)
+{
+    int res;
+    char *ac, *bc;
+
     if (*a == '\0' && *b != '\0') {
         return 1;
     }
     if (*a != '\0' && *b == '\0') {
         return -1;
     }
-    return strcasecmp(a, b);
+    ac = strip_meta(a);
+    bc = strip_meta(b);
+    res = strcasecmp(ac, bc);
+    pfree(ac);
+    pfree(bc);
+    return res;
 }
 
 /* comparisons */
@@ -278,7 +367,7 @@ int _semver_cmp(semver* a, semver* b)
         }
     }
     if (rv == 0) {
-        rv = patchnamecmp(a->patchname, b->patchname);
+        rv = prerelcmp(a->prerel, b->prerel);
     }
     return rv;
 }
@@ -354,7 +443,7 @@ semver_cmp(PG_FUNCTION_ARGS)
 }
 
 /* from catalog/pg_proc.h */
-#define hashtext 400 
+#define hashtext 400
 #define hashint2 449
 
 /* so the '=' function can be 'hashes' */
@@ -365,11 +454,11 @@ hash_semver(PG_FUNCTION_ARGS)
     semver* version = PG_GETARG_SEMVER_P(0);
     uint32 hash = 0;
     int i;
-    Datum patchname;
+    Datum prerel;
 
-    if (*version->patchname != '\0') {
-        patchname = CStringGetTextDatum(version->patchname);
-        hash = OidFunctionCall1(hashtext, patchname);
+    if (*version->prerel != '\0') {
+        prerel = CStringGetTextDatum(version->prerel);
+        hash = OidFunctionCall1(hashtext, prerel);
     }
     for (i = 0; i < 3; i++) {
         hash = (hash << (7+(i<<1))) & (hash >> (25-(i<<1)));

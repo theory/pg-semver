@@ -23,4 +23,3 @@ auto_explain.log_min_duration = '3s'
 EOF
 
 $pgbin/postgres -D $tmpdir -k /tmp 2>$tmpdir/server.err &
-
