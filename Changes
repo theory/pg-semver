@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.10.0
+0.10.0  2016-05-12T00:28:03Z
       - Updated extension to support Semantic Versioning 2.0.0, thanks to Tom
         Davis (PR #13).
       - Improved error output to mark specific bad character, where possible,
