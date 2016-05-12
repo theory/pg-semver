@@ -3,7 +3,7 @@
  * Written by Sam Vilain
  * sam@vilain.net
  *
- * Copyright 2010-2014, Sam Vilain and David Wheeler. This program is Free
+ * Copyright 2010-2016, Sam Vilain and David Wheeler. This program is Free
  * Software; see the README.md file for the license conditions.
  */
 

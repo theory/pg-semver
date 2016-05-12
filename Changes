@@ -1,12 +1,15 @@
 Revision history for PostgreSQL extension semver.
 
 0.10.0
-      - Updated extension to support Semantic Versioning 2.0.0.
-      - Improved error output to mark specific bad character, where possible.
+      - Updated extension to support Semantic Versioning 2.0.0, thanks to Tom
+        Davis (PR #13).
+      - Improved error output to mark specific bad character, where possible,
+        thanks to Tom Davis.
       - BREAKING CHANGE: `semver()` and cast constructors no longer support
         the semver 1.0.0-beta format format "X.Y.Zpre" (that is, without the
-        dash); use `to_semver()` to convert it to X.Y.Z-pre", or specify
-        "X.Y.Z-pre" directly.
+        dash), since it's not compatible with the semver 2.0.0 spec. Use
+        `to_semver()` to convert it to X.Y.Z-pre", or specify "X.Y.Z-pre"
+        directly.
 
 0.5.0   2014-12-06T00:29:17Z
       - Fixed issue where the release file could be listed twice when
