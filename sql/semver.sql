@@ -252,3 +252,70 @@ CREATE AGGREGATE max(semver)  (
     STYPE = semver,
     SORTOP = >
 );
+
+--
+-- Is functions.
+--
+
+CREATE OR REPLACE FUNCTION is_semver(whatever text) RETURNS boolean LANGUAGE PLPGSQL AS $$
+BEGIN
+    PERFORM semver(whatever);
+    RETURN TRUE;
+EXCEPTION
+    WHEN others THEN RETURN FALSE;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION is_semver(whatever numeric) RETURNS boolean LANGUAGE PLPGSQL AS $$
+BEGIN
+    PERFORM semver(whatever);
+    RETURN TRUE;
+EXCEPTION
+    WHEN others THEN RETURN FALSE;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION is_semver(whatever real) RETURNS boolean LANGUAGE PLPGSQL AS $$
+BEGIN
+    PERFORM semver(whatever);
+    RETURN TRUE;
+EXCEPTION
+    WHEN others THEN RETURN FALSE;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION is_semver(whatever double precision) RETURNS boolean LANGUAGE PLPGSQL AS $$
+BEGIN
+    PERFORM semver(whatever);
+    RETURN TRUE;
+EXCEPTION
+    WHEN others THEN RETURN FALSE;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION is_semver(whatever integer) RETURNS boolean LANGUAGE PLPGSQL AS $$
+BEGIN
+    PERFORM semver(whatever);
+    RETURN TRUE;
+EXCEPTION
+    WHEN others THEN RETURN FALSE;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION is_semver(whatever smallint) RETURNS boolean LANGUAGE PLPGSQL AS $$
+BEGIN
+    PERFORM semver(whatever);
+    RETURN TRUE;
+EXCEPTION
+    WHEN others THEN RETURN FALSE;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION is_semver(whatever bigint) RETURNS boolean LANGUAGE PLPGSQL AS $$
+BEGIN
+    PERFORM semver(whatever);
+    RETURN TRUE;
+EXCEPTION
+    WHEN others THEN RETURN FALSE;
+END
+$$;
