@@ -121,6 +121,7 @@ Interface
  Function                   | Description                     | Example                         | Result
 ----------------------------|---------------------------------|---------------------------------|----------
  `to_semver(text)`          | Parse semver from text          | `to_semver('1.02')`             | `1.2.0`
+ `is_semver(text)`          | Test semver text                | `is_semver('1.02')`             | true
  `semver(text)`             | Cast text to semver             | `semver('1.2.1')`               | `1.2.1`
  `semver(numeric)`          | Cast numeric to semver          | `semver(1.2)`                   | `1.2.0`
  `semver(real)`             | Cast real to semver             | `semver(12.0::real)`            | `12.0.0`
@@ -133,7 +134,7 @@ Interface
 Numeric casts simply extract an integer from the decimal portion, so that
 `1.20` and `1.02` would both be parsed as `1.2.0`.
 
-The difference between `semver(text)` and `to_semver(text)` is that the former
+The difference between `semver()` and `to_semver()` is that the former
 requires a valid semver format, while the latter is a bit more permissive,
 doing its best to convert other version number formats (including the older
 [semver 1.0.0-beta](http://semver.org/spec/v1.0.0-beta.html) prerelease
@@ -150,6 +151,10 @@ format) to semantic versions:
     -----------
      1.0.0-beta1
     (1 row)
+
+As for `is_semver()`, it returns true for a valid semver format, and false for
+anything else, including formats that `semver()` would convert to valid
+semvers. In other words, its interpretation of validity is strict.
 
 ### Aggregate Functions ###
 

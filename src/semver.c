@@ -37,6 +37,8 @@ Datum       semver_to_text(PG_FUNCTION_ARGS);
 /* this constructor gives access to the lax parsing mode */
 Datum       to_semver(PG_FUNCTION_ARGS);
 
+Datum       is_semver(PG_FUNCTION_ARGS);
+
 Datum       semver_smaller(PG_FUNCTION_ARGS);
 Datum       semver_larger(PG_FUNCTION_ARGS);
 
@@ -57,7 +59,7 @@ typedef struct semver
 // actually necessary.
 char*   emit_semver(semver* version);
 semver* make_semver(const int *numbers, const char* prerel);
-semver* parse_semver(char* str, bool lax);
+semver* parse_semver(char* str, bool lax, bool throw, bool *bad);
 int     prerelcmp(const char* a, const char* b);
 int     _semver_cmp(semver* a, semver* b);
 char*   strip_meta(const char* str);
@@ -79,7 +81,7 @@ semver* make_semver(const int *numbers, const char* prerel) {
     return rv;
 }
 
-semver* parse_semver(char* str, bool lax)
+semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
 {
     int parts[] = {-1, -1, -1};
     long int num;
@@ -97,6 +99,8 @@ semver* parse_semver(char* str, bool lax)
     bool skip_char = false;
     bool pred;
     semver* newval;
+
+    *bad = false;
 
     ptr = str;
     len = strlen(str);
@@ -124,14 +128,28 @@ semver* parse_semver(char* str, bool lax)
                         curpart++;
                         continue;
                     } else {
-                        elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
+                        *bad = true;
+                        if (throw)
+                            elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
+                        else
+                            break;
                     }
                 }
-                if (num > INT_MAX)  // Too big
-                    elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
+                if (num > INT_MAX) {  // Too big
+                    *bad = true;
+                    if (throw)
+                        elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
+                    else
+                        break;
+                }
 
-                if (next == '0' && num != 0 && !lax)  // Leading zeros
-                    elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
+                if (next == '0' && num != 0 && !lax) {  // Leading zeros
+                    *bad = true;
+                    if (throw)
+                        elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
+                    else
+                        break;
+                }
 
                 parts[curpart] = num;
                 atchar += (strlen(ptr) - strlen(endptr));
@@ -139,8 +157,13 @@ semver* parse_semver(char* str, bool lax)
             }
         } else {  // Onto pre-release/metadata
             if (!started_prerel && (next == '-' || (next != '+' && lax) )) {  // Starts with -
-                if (started_meta)  // Pre-release flag can't come after metadata
-                    elog(ERROR, "bad semver value '%s': pre-release (-) after metadata (+) at char %d", str, atchar);
+                if (started_meta) {  // Pre-release flag can't come after metadata
+                    *bad = true;
+                    if (throw)
+                        elog(ERROR, "bad semver value '%s': pre-release (-) after metadata (+) at char %d", str, atchar);
+                    else
+                        break;
+                }
 
                 started_prerel = true;
                 if (next == '-') {
@@ -164,21 +187,39 @@ semver* parse_semver(char* str, bool lax)
             if (!skip_char &&
                 (!started_prerel && next != '-') &&
                 (!started_meta && next != '+'))  {  // Didn't start with -/+
-                elog(ERROR, "bad semver value '%s': expected - (dash) or + (plus) at char %d", str, atchar);
+                *bad = true;
+                if (throw)
+                    elog(ERROR, "bad semver value '%s': expected - (dash) or + (plus) at char %d", str, atchar);
+                else
+                    break;
             }
-            if (next == '.' && (dotlast || (atchar + 1) == len))
-                elog(ERROR, "bad semver value '%s': empty pre-release section at char %d", str, atchar);
+            if (next == '.' && (dotlast || (atchar + 1) == len)) {
+                *bad = true;
+                if (throw)
+                    elog(ERROR, "bad semver value '%s': empty pre-release section at char %d", str, atchar);
+                else
+                    break;
+            }
 
             if (!skip_char && (next != '.' && next != '+' && !isalpha(next) && !isdigit(next))) {
                 if (lax && isspace(next))  // In lax mode, ignore whitespace
                     skip_char = true;
-                else
-                    elog(ERROR, "bad semver value '%s': non-alphanumeric pre-release at char %d", str, atchar);
+                else {
+                    *bad = true;
+                    if (throw)
+                        elog(ERROR, "bad semver value '%s': non-alphanumeric pre-release at char %d", str, atchar);
+                    else
+                        break;
+                }
             }
             if ((started_prerel || started_meta) && !skip_char) {
               pred = (i > 0 && patch[i-1] == '0' && next != '.');
               if (pred && !lax)   {  // Leading zeros
-                    elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
+                    *bad = true;
+                    if (throw)
+                        elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
+                    else
+                        break;
               } else if (pred && lax)  {  // Swap erroneous leading zero with whatever this is
                 patch[i-1] = next;
               } else {
@@ -196,13 +237,21 @@ semver* parse_semver(char* str, bool lax)
         if (parts[p] == -1) {
             if (lax)
                 parts[p] = 0;
-            else
-                elog(ERROR, "bad semver value '%s': missing major, minor, or patch version", str);
+            else {
+                *bad = true;
+                if (throw)
+                    elog(ERROR, "bad semver value '%s': missing major, minor, or patch version", str);
+                else
+                    break;
+            }
         }
     }
 
-    if ((started_prerel || started_meta) && i == 0)  // No pre-release value after -
-        elog(ERROR, "bad semver value '%s': expected alphanumeric at char %d", str, atchar);
+    if ((started_prerel || started_meta) && i == 0) {  // No pre-release value after -
+        *bad = true;
+        if (throw)
+            elog(ERROR, "bad semver value '%s': expected alphanumeric at char %d", str, atchar);
+    }
 
     if (started_prerel || started_meta)
         patch[i] = '\0';
@@ -270,7 +319,8 @@ Datum
 semver_in(PG_FUNCTION_ARGS)
 {
     char *str = PG_GETARG_CSTRING(0);
-    semver *result = parse_semver(str, false);
+    bool bad = false;
+    semver *result = parse_semver(str, false, true, &bad);
     if (!result)
         PG_RETURN_NULL();
 
@@ -293,7 +343,8 @@ Datum
 text_to_semver(PG_FUNCTION_ARGS)
 {
     text* sv = PG_GETARG_TEXT_PP(0);
-    semver* rs = parse_semver(text_to_cstring(sv), false);
+    bool bad = false;
+    semver* rs = parse_semver(text_to_cstring(sv), false, true, &bad);
     PG_RETURN_POINTER(rs);
 }
 
@@ -503,6 +554,17 @@ Datum
 to_semver(PG_FUNCTION_ARGS)
 {
     text* sv = PG_GETARG_TEXT_PP(0);
-    semver* rs = parse_semver(text_to_cstring(sv), true);
+    bool bad = false;
+    semver* rs = parse_semver(text_to_cstring(sv), true, true, &bad);
     PG_RETURN_POINTER(rs);
+}
+
+PG_FUNCTION_INFO_V1(is_semver);
+Datum
+is_semver(PG_FUNCTION_ARGS)
+{
+    text* sv = PG_GETARG_TEXT_PP(0);
+    bool bad = false;
+    parse_semver(text_to_cstring(sv), false, false, &bad);
+    PG_RETURN_BOOL(!bad);
 }
