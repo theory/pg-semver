@@ -257,65 +257,31 @@ CREATE AGGREGATE max(semver)  (
 -- Is functions.
 --
 
-CREATE OR REPLACE FUNCTION is_semver(whatever text) RETURNS boolean LANGUAGE PLPGSQL AS $$
-BEGIN
-    PERFORM semver(whatever);
-    RETURN TRUE;
-EXCEPTION
-    WHEN others THEN RETURN FALSE;
-END
-$$;
+CREATE OR REPLACE FUNCTION is_semver(text)
+	RETURNS bool
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION is_semver(whatever numeric) RETURNS boolean LANGUAGE PLPGSQL AS $$
-BEGIN
-    PERFORM semver(whatever);
-    RETURN TRUE;
-EXCEPTION
-    WHEN others THEN RETURN FALSE;
-END
-$$;
+CREATE OR REPLACE FUNCTION is_semver(numeric)
+	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION is_semver(whatever real) RETURNS boolean LANGUAGE PLPGSQL AS $$
-BEGIN
-    PERFORM semver(whatever);
-    RETURN TRUE;
-EXCEPTION
-    WHEN others THEN RETURN FALSE;
-END
-$$;
+CREATE OR REPLACE FUNCTION is_semver(real)
+	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION is_semver(whatever double precision) RETURNS boolean LANGUAGE PLPGSQL AS $$
-BEGIN
-    PERFORM semver(whatever);
-    RETURN TRUE;
-EXCEPTION
-    WHEN others THEN RETURN FALSE;
-END
-$$;
+CREATE OR REPLACE FUNCTION is_semver(double precision)
+	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION is_semver(whatever integer) RETURNS boolean LANGUAGE PLPGSQL AS $$
-BEGIN
-    PERFORM semver(whatever);
-    RETURN TRUE;
-EXCEPTION
-    WHEN others THEN RETURN FALSE;
-END
-$$;
+CREATE OR REPLACE FUNCTION is_semver(integer)
+	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION is_semver(whatever smallint) RETURNS boolean LANGUAGE PLPGSQL AS $$
-BEGIN
-    PERFORM semver(whatever);
-    RETURN TRUE;
-EXCEPTION
-    WHEN others THEN RETURN FALSE;
-END
-$$;
+CREATE OR REPLACE FUNCTION is_semver(smallint)
+	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION is_semver(whatever bigint) RETURNS boolean LANGUAGE PLPGSQL AS $$
-BEGIN
-    PERFORM semver(whatever);
-    RETURN TRUE;
-EXCEPTION
-    WHEN others THEN RETURN FALSE;
-END
-$$;
+CREATE OR REPLACE FUNCTION is_semver(bigint)
+	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+    LANGUAGE SQL STRICT IMMUTABLE;
