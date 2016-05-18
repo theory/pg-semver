@@ -1,0 +1,4 @@
+CREATE OR REPLACE FUNCTION is_semver(text)
+	RETURNS bool
+	AS 'semver'
+	LANGUAGE C STRICT IMMUTABLE;
