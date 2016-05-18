@@ -263,25 +263,25 @@ CREATE OR REPLACE FUNCTION is_semver(text)
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION is_semver(numeric)
-	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+	RETURNS bool AS $$ SELECT TRUE; $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION is_semver(real)
-	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+	RETURNS bool AS $$ SELECT TRUE; $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION is_semver(double precision)
-	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+	RETURNS bool AS $$ SELECT TRUE; $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION is_semver(integer)
-	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+	RETURNS bool AS $$ SELECT TRUE; $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION is_semver(smallint)
-	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+	RETURNS bool AS $$ SELECT TRUE; $$
     LANGUAGE SQL STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION is_semver(bigint)
-	RETURNS bool AS $$ SELECT is_semver($1::text) $$
+	RETURNS bool AS $$ SELECT TRUE; $$
     LANGUAGE SQL STRICT IMMUTABLE;
