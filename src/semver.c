@@ -213,7 +213,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 }
             }
             if ((started_prerel || started_meta) && !skip_char) {
-              pred = (i > 0 && patch[i-1] == '0' && next != '.');
+              pred = (i > 1 && patch[i-2] == '.' && patch[i-1] == '0' && next != '.');
               if (pred && !lax)   {  // Leading zeros
                     *bad = true;
                     if (throw)

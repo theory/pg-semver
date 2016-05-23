@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(251);
+SELECT plan(252);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -334,7 +334,8 @@ SELECT is(
     ('1.4b.0',               false),
     ('1v',                   false),
     ('1v.2.2v',              false),
-    ('1.2.4b.5',             false)
+    ('1.2.4b.5',             false),
+    ('2016.5.18-MYW-600',    true)
 ) v(stimulus, expected);
 
 SELECT * FROM finish();

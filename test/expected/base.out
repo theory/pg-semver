@@ -1,5 +1,5 @@
 \set ECHO none
-1..251
+1..252
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -251,3 +251,4 @@ ok 248 - is_semver(1.4b.0) should return false
 ok 249 - is_semver(1v) should return false
 ok 250 - is_semver(1v.2.2v) should return false
 ok 251 - is_semver(1.2.4b.5) should return false
+ok 252 - is_semver(2016.5.18-MYW-600) should return true
