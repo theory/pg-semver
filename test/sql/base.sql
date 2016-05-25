@@ -152,7 +152,7 @@ SELECT is(
 SELECT is(
     to_semver(clean),
     clean::semver,
-    'to_semver(' || clean || ') should return ' || clean
+    'to_semver(' || clean || ') should return incoming text'
 ) FROM (VALUES
     ('1.0.0-alpha'),               -- SV2 9.
     ('1.0.0-alpha.1'),             -- SV2 9.
