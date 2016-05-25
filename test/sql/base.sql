@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(257);
+SELECT plan(258);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -159,7 +159,7 @@ SELECT is(
     ('1.0.0-0.3.7'),               -- SV2 9.
     ('1.0.0-x.7.z.92'),            -- SV2 9.
   --('1.0.0-alpha+001'),           -- SV2 10. FIXME: "semver version numbers can't start with 0"
-  --('1.0.0+20130313144700'),      -- SV2 10. FIXME: "pre-release (-) after metadata (+) at char 7"
+    ('1.0.0+20130313144700'),      -- SV2 10.
     ('1.0.0-beta+exp.sha.5114f85') -- SV2 10.
 ) v(clean);
 
