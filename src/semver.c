@@ -143,7 +143,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                         break;
                 }
 
-                if (next == '0' && num != 0 && !lax) {  // Leading zeros
+                if (next == '0' && num != 0 && !lax && !started_meta) {  // Leading zeros
                     *bad = true;
                     if (throw)
                         elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
