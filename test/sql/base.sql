@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(252);
+SELECT plan(259);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -148,6 +148,20 @@ SELECT is(
     ('  012.2.2',       '12.2.2'),
     ('20110204',        '20110204.0.0')
 ) v(dirty, clean);
+
+SELECT is(
+    to_semver(clean),
+    clean::semver,
+    'to_semver(' || clean || ') should return incoming text'
+) FROM (VALUES
+    ('1.0.0-alpha'),               -- SV2 9.
+    ('1.0.0-alpha.1'),             -- SV2 9.
+    ('1.0.0-0.3.7'),               -- SV2 9.
+    ('1.0.0-x.7.z.92'),            -- SV2 9.
+    ('1.0.0-alpha+001'),           -- SV2 10.
+    ('1.0.0+20130313144700'),      -- SV2 10.
+    ('1.0.0-beta+exp.sha.5114f85') -- SV2 10.
+) v(clean);
 
 -- to_semver still needs to reject truly bad input
 SELECT throws_ok(
