@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.12.0
+0.12.0  2016-06-11T06:00:19Z
       - Fixed bug where some items described in the SemVer 2.0.0 Spec, section
         10, were not properly recognized as semvers. Thanks to Xavier Caron
         for the fix (with tests!) (PR #17).
