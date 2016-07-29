@@ -1,3 +1,4 @@
+//  -*- tab-width:4; c-basic-offset:4; indent-tabs-mode:nil;  -*-
 /*
  * PostgreSQL type definitions for semver type
  * Written by Sam Vilain
@@ -156,15 +157,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 ptr = endptr;
             }
         } else {  // Onto pre-release/metadata
-            if (!started_prerel && (next == '-' || (!started_meta && next != '+' && lax) )) {  // Starts with -
-                if (started_meta) {  // Pre-release flag can't come after metadata
-                    *bad = true;
-                    if (throw)
-                        elog(ERROR, "bad semver value '%s': pre-release (-) after metadata (+) at char %d", str, atchar);
-                    else
-                        break;
-                }
-
+            if (!started_prerel && !started_meta && (next == '-' || (next != '+' && lax))) {  // Starts with -
                 started_prerel = true;
                 if (next == '-') {
                     skip_char = true;
@@ -201,7 +194,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                     break;
             }
 
-            if (!skip_char && (next != '.' && next != '+' && !isalpha(next) && !isdigit(next))) {
+            if (!skip_char && (next != '.' && next != '+' && next != '-' && !isalpha(next) && !isdigit(next))) {
                 if (lax && isspace(next))  // In lax mode, ignore whitespace
                     skip_char = true;
                 else {

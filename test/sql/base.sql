@@ -9,19 +9,19 @@ CREATE FUNCTION create_unnest(
 ) RETURNS SETOF BOOLEAN LANGUAGE PLPGSQL AS $$
 BEGIN
     IF pg_version_num() < 80400 THEN
-        EXECUTE $F$ CREATE FUNCTION unnest(
-            anyarray
-        ) RETURNS SETOF anyelement LANGUAGE sql AS $_$
-            SELECT $1[i]
-              FROM generate_series(array_lower($1, 1), array_upper($1, 1)) AS i;
-        $_$;$F$;
+	EXECUTE $F$ CREATE FUNCTION unnest(
+	    anyarray
+	) RETURNS SETOF anyelement LANGUAGE sql AS $_$
+	    SELECT $1[i]
+	      FROM generate_series(array_lower($1, 1), array_upper($1, 1)) AS i;
+	$_$;$F$;
     END IF;
 END;
 $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(259);
+SELECT plan(260);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -272,7 +272,7 @@ SELECT throws_ok(
 )  FROM unnest(ARRAY[
    '1.0.0-a..',
    '1.0.0-a.1.',
-   '1.0.0+1-1',
+   '1.0.0+1_1',
    '1.0.0-1....',
    '1.0.0-1_2',
    '1.0.0-1.02'
@@ -326,30 +326,31 @@ SELECT is(
     expected,
     'is_semver(' || stimulus || ') should return ' || expected::text
 ) FROM (VALUES
-    ('1.2.2',                true),
-    ('0.2.2',                true),
-    ('0.0.0',                true),
-    ('0.1.999',              true),
-    ('9999.9999999.823823',  true),
-    ('1.0.0-beta1',          true),
-    ('1.0.0-beta2',          true),
-    ('1.0.0',                true),
-    ('1.0.0-1',              true),
-    ('1.0.0-alpha+d34dm34t', true),
-    ('1.0.0+d34dm34t',       true),
-    ('20110204.0.0',         true),
-    ('1.2',                  false),
-    ('1.2.02',               false),
-    ('1.2.2-',               false),
-    ('1.2.3b#5',             false),
-    ('03.3.3',               false),
-    ('v1.2.2',               false),
-    ('1.3b',                 false),
-    ('1.4b.0',               false),
-    ('1v',                   false),
-    ('1v.2.2v',              false),
-    ('1.2.4b.5',             false),
-    ('2016.5.18-MYW-600',    true)
+    ('1.2.2',                    true),
+    ('0.2.2',                    true),
+    ('0.0.0',                    true),
+    ('0.1.999',                  true),
+    ('9999.9999999.823823',      true),
+    ('1.0.0-beta1',              true),
+    ('1.0.0-beta2',              true),
+    ('1.0.0',                    true),
+    ('1.0.0-1',                  true),
+    ('1.0.0-alpha+d34dm34t',     true),
+    ('1.0.0+d34dm34t',           true),
+    ('20110204.0.0',             true),
+    ('1.2',                      false),
+    ('1.2.02',                   false),
+    ('1.2.2-',                   false),
+    ('1.2.3b#5',                 false),
+    ('03.3.3',                   false),
+    ('v1.2.2',                   false),
+    ('1.3b',                     false),
+    ('1.4b.0',                   false),
+    ('1v',                       false),
+    ('1v.2.2v',                  false),
+    ('1.2.4b.5',                 false),
+    ('2016.5.18-MYW-600',        true),
+    ('1010.5.0+2016-05-27-1832', true)
 ) v(stimulus, expected);
 
 SELECT * FROM finish();
