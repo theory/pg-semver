@@ -1,5 +1,7 @@
 Revision history for PostgreSQL extension semver.
 
+0.14.0
+
 0.13.0  2016-07-30T21:06:15Z
       - Fixed bug where a dash (-) was disallowed within the metadata part of
         a semver. Thanks to @TerraTech for teh report (Issue #19) and Tom
