@@ -1,7 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.14.0
-
+0.14.0  2016-08-11T05:38:27Z
       - Updated the extension version in `semver.control` to 0.13.0, which
         evidently I forgot to do for that release. Thanks to Stanislav Lorenc
         for the report (Issue #21).
