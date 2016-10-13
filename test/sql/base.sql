@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(260);
+SELECT plan(263);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -352,6 +352,25 @@ SELECT is(
     ('2016.5.18-MYW-600',        true),
     ('1010.5.0+2016-05-27-1832', true)
 ) v(stimulus, expected);
+
+-- issue-gh-23
+SELECT lives_ok(
+    $$ SELECT '$$ || v || $$'::semver $$,
+    '"' || v || '" is a valid semver'
+)  FROM unnest(ARRAY[
+    '2.3.0+80'
+]) AS v;
+SELECT is(
+    to_semver(dirty),
+    clean::semver,
+    'to_semver(' || dirty || ') should return ' || clean
+) FROM (VALUES
+    ('2.3.0+80', '2.3.0+80')
+) v(dirty, clean);
+SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
+  FROM (VALUES
+    ('2.3.0+80'::semver, '2.3.0+80')
+ ) AS f(lv, rv);
 
 SELECT * FROM finish();
 ROLLBACK;
