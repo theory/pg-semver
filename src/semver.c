@@ -164,8 +164,6 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 }
             } else if (!started_meta && next == '+') {  // Starts with +
                 started_meta = true;
-                ptr++;
-                atchar++;
             }
 
             if (!patch && (started_meta || started_prerel))
@@ -270,10 +268,11 @@ char* emit_semver(semver* version) {
     }
     else {
         len = snprintf(
-            tmpbuf, sizeof(tmpbuf),"%d.%d.%d-%s",
+            tmpbuf, sizeof(tmpbuf),"%d.%d.%d%s%s",
             version->numbers[0],
             version->numbers[1],
             version->numbers[2],
+            ((version->prerel)[0] == '+' ? "" : "-"),
             version->prerel
             );
     }
