@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(265);
+SELECT plan(267);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -379,6 +379,20 @@ SELECT is(lv::semver > rv::semver, true, '"' || lv || '" > "' || rv || '"')
   FROM (VALUES
     ('2.3.0+80', '2.3.0-alpha+110')
 ) AS f(lv, rv);
+CREATE TABLE vs23 (
+    version semver
+);
+INSERT INTO vs23 VALUES ('1.0.0-alpha'), ('1.0.0-alpha.1'), ('1.0.0-alpha.beta'), ('1.0.0-beta'), ('1.0.0-beta.2'), ('1.0.0-beta.11'), ('1.0.0-rc.1'), ('1.0.0');
+SELECT results_eq(
+    $$ SELECT version FROM vs23 ORDER BY version USING < $$,
+    $$ VALUES ('1.0.0-alpha'::semver), ('1.0.0-alpha.1'::semver), ('1.0.0-alpha.beta'::semver), ('1.0.0-beta'::semver), ('1.0.0-beta.2'::semver), ('1.0.0-beta.11'::semver), ('1.0.0-rc.1'::semver), ('1.0.0'::semver) $$,
+    'ORDER BY semver USING < should work (section 11)'
+);
+SELECT results_eq(
+    $$ SELECT version FROM vs23 ORDER BY version USING > $$,
+    $$ VALUES ('1.0.0'::semver), ('1.0.0-rc.1'::semver), ('1.0.0-beta.11'::semver), ('1.0.0-beta.2'::semver), ('1.0.0-beta'::semver), ('1.0.0-alpha.beta'::semver), ('1.0.0-alpha.1'::semver), ('1.0.0-alpha'::semver) $$,
+    'ORDER BY semver USING > should work (section 11)'
+);
 
 SELECT * FROM finish();
 ROLLBACK;
