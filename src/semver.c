@@ -386,6 +386,12 @@ int prerelcmp(const char* a, const char* b)
     }
     ac = strip_meta(a);
     bc = strip_meta(b);
+    if (*ac == '\0' && *bc != '\0') {
+        return 1;
+    }
+    if (*ac != '\0' && *bc == '\0') {
+        return -1;
+    }
     res = strcasecmp(ac, bc);
     pfree(ac);
     pfree(bc);
