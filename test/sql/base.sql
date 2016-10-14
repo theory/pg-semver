@@ -367,7 +367,7 @@ SELECT is(
 ) FROM (VALUES
     ('2.3.0+80', '2.3.0+80')
 ) v(dirty, clean);
-SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
+SELECT is(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
   FROM (VALUES
     ('2.3.0+80'::semver, '2.3.0+80')
 ) AS f(lv, rv);
