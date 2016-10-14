@@ -370,12 +370,15 @@ SELECT is(
 SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
   FROM (VALUES
     ('2.3.0+80'::semver, '2.3.0+80')
- ) AS f(lv, rv);
- SELECT OK(lv::semver > rv::semver, '"' || lv || '" > "' || rv || '"')
-   FROM (VALUES
-     ('2.3.0+80', '2.3.0+110'),
-     ('2.3.0+80', '2.3.0-alpha+110')
-  ) AS f(lv, rv);
+) AS f(lv, rv);
+SELECT isnt(lv::semver > rv::semver, true, '"' || lv || '" > "' || rv || '" (NOT!)')
+  FROM (VALUES
+    ('2.3.0+80', '2.3.0+110')
+) AS f(lv, rv);
+SELECT is(lv::semver > rv::semver, true, '"' || lv || '" > "' || rv || '"')
+  FROM (VALUES
+    ('2.3.0+80', '2.3.0-alpha+110')
+) AS f(lv, rv);
 
 SELECT * FROM finish();
 ROLLBACK;
