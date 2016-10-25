@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(267);
+SELECT plan(270);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -393,6 +393,18 @@ SELECT results_eq(
     $$ VALUES ('1.0.0'::semver), ('1.0.0-rc.1'::semver), ('1.0.0-beta.11'::semver), ('1.0.0-beta.2'::semver), ('1.0.0-beta'::semver), ('1.0.0-alpha.beta'::semver), ('1.0.0-alpha.1'::semver), ('1.0.0-alpha'::semver) $$,
     'ORDER BY semver USING > should work (section 11)'
 );
+SELECT is(lv::semver = rv::semver, true, '"' || lv || '" = "' || rv || '"')
+  FROM (VALUES
+    ('1.0.0', '1.0.0+535')
+) AS f(lv, rv);
+SELECT isnt(lv::semver < rv::semver, true, '"' || lv || '" < "' || rv || '" (NOT!)')
+  FROM (VALUES
+    ('1.0.0', '1.0.0+535')
+) AS f(lv, rv);
+SELECT isnt(lv::semver > rv::semver, true, '"' || lv || '" > "' || rv || '" (NOT!)')
+  FROM (VALUES
+    ('1.0.0', '1.0.0+535')
+) AS f(lv, rv);
 
 SELECT * FROM finish();
 ROLLBACK;

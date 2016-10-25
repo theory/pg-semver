@@ -1,5 +1,5 @@
 \set ECHO none
-1..267
+1..270
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -267,3 +267,6 @@ ok 264 - "2.3.0+80" > "2.3.0+110" (NOT!)
 ok 265 - "2.3.0+80" > "2.3.0-alpha+110"
 ok 266 - ORDER BY semver USING < should work (section 11)
 ok 267 - ORDER BY semver USING > should work (section 11)
+ok 268 - "1.0.0" = "1.0.0+535"
+ok 269 - "1.0.0" < "1.0.0+535" (NOT!)
+ok 270 - "1.0.0" > "1.0.0+535" (NOT!)
