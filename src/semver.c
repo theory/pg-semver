@@ -442,12 +442,6 @@ int prerelcmp(const char* a, const char* b)
     int res;
     char *ac, *bc;
 
-    if (*a == '\0' && *b != '\0') {
-        return 1;
-    }
-    if (*a != '\0' && *b == '\0') {
-        return -1;
-    }
     ac = strip_meta(a);
     bc = strip_meta(b);
     if (*ac == '\0' && *bc != '\0') {
