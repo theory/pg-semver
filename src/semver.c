@@ -64,6 +64,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool *bad);
 int     prerelcmp(const char* a, const char* b);
 int     _semver_cmp(semver* a, semver* b);
 char*   strip_meta(const char* str);
+int     tail_cmp(char *lhs, char *rhs);
 
 semver* make_semver(const int *numbers, const char* prerel) {
     int varsize = offsetof(semver, prerel) + (prerel ? strlen(prerel) : 0) + 1;
