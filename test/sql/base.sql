@@ -21,7 +21,7 @@ $$;
 
 SELECT * FROM create_unnest();
 
-SELECT plan(260);
+SELECT plan(270);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -283,13 +283,13 @@ INSERT INTO vs VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2.3'::semver), ('0
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING < $$,
-    $$ VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver) $$,
+    $$ VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9'::semver), ('1.0.0-1'::semver), ('1.0.0+99'::semver) $$,
     'ORDER BY semver (2.0.0) USING < should work'
 );
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING > $$,
-    $$ VALUES ('1.0.0-1'::semver), ('1.0.0+99'::semver), ('0.9.9'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.1+1234'::semver) $$,
+    $$ VALUES ('1.0.0+99'::semver), ('1.0.0-1'::semver), ('0.9.9'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.1+1234'::semver) $$,
     'ORDER BY semver (2.0.0) USING > should work'
 );
 
@@ -352,6 +352,59 @@ SELECT is(
     ('2016.5.18-MYW-600',        true),
     ('1010.5.0+2016-05-27-1832', true)
 ) v(stimulus, expected);
+
+-- issue-gh-23
+SELECT lives_ok(
+    $$ SELECT '$$ || v || $$'::semver $$,
+    '"' || v || '" is a valid semver'
+)  FROM unnest(ARRAY[
+    '2.3.0+80'
+]) AS v;
+SELECT is(
+    to_semver(dirty),
+    clean::semver,
+    'to_semver(' || dirty || ') should return ' || clean
+) FROM (VALUES
+    ('2.3.0+80', '2.3.0+80')
+) v(dirty, clean);
+SELECT is(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
+  FROM (VALUES
+    ('2.3.0+80'::semver, '2.3.0+80')
+) AS f(lv, rv);
+SELECT isnt(lv::semver > rv::semver, true, '"' || lv || '" > "' || rv || '" (NOT!)')
+  FROM (VALUES
+    ('2.3.0+80', '2.3.0+110')
+) AS f(lv, rv);
+SELECT is(lv::semver > rv::semver, true, '"' || lv || '" > "' || rv || '"')
+  FROM (VALUES
+    ('2.3.0+80', '2.3.0-alpha+110')
+) AS f(lv, rv);
+CREATE TABLE vs23 (
+    version semver
+);
+INSERT INTO vs23 VALUES ('1.0.0-alpha'), ('1.0.0-alpha.1'), ('1.0.0-alpha.beta'), ('1.0.0-beta'), ('1.0.0-beta.2'), ('1.0.0-beta.11'), ('1.0.0-rc.1'), ('1.0.0');
+SELECT results_eq(
+    $$ SELECT version FROM vs23 ORDER BY version USING < $$,
+    $$ VALUES ('1.0.0-alpha'::semver), ('1.0.0-alpha.1'::semver), ('1.0.0-alpha.beta'::semver), ('1.0.0-beta'::semver), ('1.0.0-beta.2'::semver), ('1.0.0-beta.11'::semver), ('1.0.0-rc.1'::semver), ('1.0.0'::semver) $$,
+    'ORDER BY semver USING < should work (section 11)'
+);
+SELECT results_eq(
+    $$ SELECT version FROM vs23 ORDER BY version USING > $$,
+    $$ VALUES ('1.0.0'::semver), ('1.0.0-rc.1'::semver), ('1.0.0-beta.11'::semver), ('1.0.0-beta.2'::semver), ('1.0.0-beta'::semver), ('1.0.0-alpha.beta'::semver), ('1.0.0-alpha.1'::semver), ('1.0.0-alpha'::semver) $$,
+    'ORDER BY semver USING > should work (section 11)'
+);
+SELECT is(lv::semver = rv::semver, true, '"' || lv || '" = "' || rv || '"')
+  FROM (VALUES
+    ('1.0.0', '1.0.0+535')
+) AS f(lv, rv);
+SELECT isnt(lv::semver < rv::semver, true, '"' || lv || '" < "' || rv || '" (NOT!)')
+  FROM (VALUES
+    ('1.0.0', '1.0.0+535')
+) AS f(lv, rv);
+SELECT isnt(lv::semver > rv::semver, true, '"' || lv || '" > "' || rv || '" (NOT!)')
+  FROM (VALUES
+    ('1.0.0', '1.0.0+535')
+) AS f(lv, rv);
 
 SELECT * FROM finish();
 ROLLBACK;

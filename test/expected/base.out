@@ -1,5 +1,5 @@
 \set ECHO none
-1..260
+1..270
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -260,3 +260,13 @@ ok 257 - is_semver(1v.2.2v) should return false
 ok 258 - is_semver(1.2.4b.5) should return false
 ok 259 - is_semver(2016.5.18-MYW-600) should return true
 ok 260 - is_semver(1010.5.0+2016-05-27-1832) should return true
+ok 261 - "2.3.0+80" is a valid semver
+ok 262 - to_semver(2.3.0+80) should return 2.3.0+80
+ok 263 - Should correctly cast "2.3.0+80" to text
+ok 264 - "2.3.0+80" > "2.3.0+110" (NOT!)
+ok 265 - "2.3.0+80" > "2.3.0-alpha+110"
+ok 266 - ORDER BY semver USING < should work (section 11)
+ok 267 - ORDER BY semver USING > should work (section 11)
+ok 268 - "1.0.0" = "1.0.0+535"
+ok 269 - "1.0.0" < "1.0.0+535" (NOT!)
+ok 270 - "1.0.0" > "1.0.0+535" (NOT!)
