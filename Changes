@@ -3,8 +3,8 @@ Revision history for PostgreSQL extension semver.
 0.15.0
       - Fixed incorrect build metadata parsing. Fixed emission of build
         metadata only instances. Implemented pre-release precedence scheme as
-        per semantic versioning 2.0.0 section 11. Thanks to snkozlov for the
-        report (Issue #23).
+        per semantic versioning 2.0.0 section 11. Thanks to Sergey Kozlov for
+        the report (Issue #23).
 
 0.14.0  2016-08-11T05:38:27Z
       - Updated the extension version in `semver.control` to 0.13.0, which
