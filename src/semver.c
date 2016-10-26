@@ -1,11 +1,13 @@
 //  -*- tab-width:4; c-basic-offset:4; indent-tabs-mode:nil;  -*-
 /*
  * PostgreSQL type definitions for semver type
- * Written by Sam Vilain
- * sam@vilain.net
+ * Written by:
+ * + Sam Vilain <sam@vilain.net>
+ * + Tom Davis
+ * + Xavier Caron
  *
- * Copyright 2010-2016, Sam Vilain and David Wheeler. This program is Free
- * Software; see the README.md file for the license conditions.
+ * Copyright 2010-2016 The pg-semver Maintainers. This program is Free
+ * Software; see the LICENSE file for the license conditions.
  */
 
 #include "postgres.h"

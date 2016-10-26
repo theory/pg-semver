@@ -1,4 +1,5 @@
-Copyright (c) 2010-2016 David E. Wheeler and Sam Vilain.
+Copyright (c) 2010-2016 The pg-semver Maintainers: David E. Wheeler and Sam
+Vilain, Tom Davis, and Xavier Caron.
 
 This module is free software; you can redistribute it and/or modify it under
 the [PostgreSQL License](http://www.opensource.org/licenses/postgresql).
@@ -8,14 +9,14 @@ documentation for any purpose, without fee, and without a written agreement is
 hereby granted, provided that the above copyright notice and this paragraph
 and the following two paragraphs appear in all copies.
 
-In no event shall David E. Wheeler or Sam Vilain be liable to any party for
-direct, indirect, special, incidental, or consequential damages, including
-lost profits, arising out of the use of this software and its documentation,
-even if David E. Wheeler or Sam Vilain has been advised of the possibility of
-such damage.
+In no event shall The pg-semver Maintainers be liable to any party for direct,
+indirect, special, incidental, or consequential damages, including lost
+profits, arising out of the use of this software and its documentation, even
+if The pg-semver Maintainers have been advised of the possibility of such
+damage.
 
-David E. Wheeler and Sam Vilain specifically disclaim any warranties,
-including, but not limited to, the implied warranties of merchantability and
-fitness for a particular purpose. The software provided hereunder is on an "as
-is" basis, and David E. Wheeler and Sam Vilain have no obligations to provide
-maintenance, support, updates, enhancements, or modifications.
+The pg-semver Maintainers specifically disclaim any warranties, including, but
+not limited to, the implied warranties of merchantability and fitness for a
+particular purpose. The software provided hereunder is on an "as is" basis,
+and The pg-semver Maintainers no obligations to provide maintenance, support,
+updates, enhancements, or modifications.

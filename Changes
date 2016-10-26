@@ -6,6 +6,7 @@ Revision history for PostgreSQL extension semver.
       - Fixed text foratting of build metadata-only semver values.
       - Implemented pre-release precedence scheme as per semantic versioning
         2.0.0 section 11. Thanks to Sergey Kozlov for the report (Issue #23).
+      - Added Xavier Caron and Tom Davis as maintainers.
 
 0.14.0  2016-08-11T05:38:27Z
       - Updated the extension version in `semver.control` to 0.13.0, which

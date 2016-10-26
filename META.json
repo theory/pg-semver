@@ -5,7 +5,9 @@
    "version": "0.15.0",
    "maintainer": [
       "David E. Wheeler <david@justatheory.com>",
-      "Sam Vilain <sam@vilain.net>"
+      "Sam Vilain <sam@vilain.net>",
+      "Tom Davis",
+      "Xavier Caron"
    ],
    "license": "postgresql",
    "provides": {
