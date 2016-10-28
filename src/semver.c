@@ -3,8 +3,8 @@
  * PostgreSQL type definitions for semver type
  * Written by:
  * + Sam Vilain <sam@vilain.net>
- * + Tom Davis
- * + Xavier Caron
+ * + Tom Davis <tom@recursivedream.com>
+ * + Xavier Caron <xcaron@gmail.com>
  *
  * Copyright 2010-2016 The pg-semver Maintainers. This program is Free
  * Software; see the LICENSE file for the license conditions.

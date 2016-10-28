@@ -6,8 +6,8 @@
    "maintainer": [
       "David E. Wheeler <david@justatheory.com>",
       "Sam Vilain <sam@vilain.net>",
-      "Tom Davis",
-      "Xavier Caron"
+      "Tom Davis <tom@recursivedream.com>",
+      "Xavier Caron <xcaron@gmail.com>"
    ],
    "license": "postgresql",
    "provides": {
