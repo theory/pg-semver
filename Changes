@@ -1,5 +1,7 @@
 Revision history for PostgreSQL extension semver.
 
+0.16.0
+
 0.15.0  2016-10-28T03:38:59Z
       - Fixed incorrect parsing of semver build metadata.
       - Fixed text foratting of build metadata-only semver values.
