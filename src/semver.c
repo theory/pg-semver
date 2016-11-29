@@ -45,6 +45,12 @@ Datum       is_semver(PG_FUNCTION_ARGS);
 Datum       semver_smaller(PG_FUNCTION_ARGS);
 Datum       semver_larger(PG_FUNCTION_ARGS);
 
+/* these functions allow users to access individual parts of the semver */
+Datum       get_semver_major(PG_FUNCTION_ARGS);
+Datum       get_semver_minor(PG_FUNCTION_ARGS);
+Datum       get_semver_patch(PG_FUNCTION_ARGS);
+Datum       get_semver_prerelease(PG_FUNCTION_ARGS);
+
 /* heap format of version numbers */
 typedef int32 vernum;
 
@@ -353,6 +359,44 @@ semver_to_text(PG_FUNCTION_ARGS)
     pfree(xxx);
     PG_RETURN_TEXT_P(res);
 }
+
+PG_FUNCTION_INFO_V1(get_semver_major);
+Datum
+get_semver_major(PG_FUNCTION_ARGS)
+{
+    semver* sv = PG_GETARG_SEMVER_P(0);
+    int major = sv->numbers[0];
+    PG_RETURN_INT32(major);
+}
+
+PG_FUNCTION_INFO_V1(get_semver_minor);
+Datum
+get_semver_minor(PG_FUNCTION_ARGS)
+{
+    semver* sv = PG_GETARG_SEMVER_P(0);
+    int minor = sv->numbers[1];
+    PG_RETURN_INT32(minor);
+}
+
+PG_FUNCTION_INFO_V1(get_semver_patch);
+Datum
+get_semver_patch(PG_FUNCTION_ARGS)
+{
+    semver* sv = PG_GETARG_SEMVER_P(0);
+    int patch = sv->numbers[2];
+    PG_RETURN_INT32(patch);
+}
+
+PG_FUNCTION_INFO_V1(get_semver_prerelease);
+Datum
+get_semver_prerelease(PG_FUNCTION_ARGS)
+{
+    semver* sv = PG_GETARG_SEMVER_P(0);
+    char* prerelease = sv->prerel;
+    text* res = cstring_to_text(prerelease);
+    PG_RETURN_TEXT_P(res);
+}
+
 
 /* Remove everything at and after "+" in a pre-release suffix */
 char* strip_meta(const char *str)

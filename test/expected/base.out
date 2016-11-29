@@ -1,5 +1,5 @@
 \set ECHO none
-1..270
+1..286
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -270,3 +270,19 @@ ok 267 - ORDER BY semver USING > should work (section 11)
 ok 268 - "1.0.0" = "1.0.0+535"
 ok 269 - "1.0.0" < "1.0.0+535" (NOT!)
 ok 270 - "1.0.0" > "1.0.0+535" (NOT!)
+ok 271 - Function get_semver_major() should exist
+ok 272 - semver
+ok 273 - Function get_semver_major() should return integer
+ok 274 - major version check
+ok 275 - Function get_semver_minor() should exist
+ok 276 - semver
+ok 277 - Function get_semver_minor() should return integer
+ok 278 - minor version check
+ok 279 - Function get_semver_patch() should exist
+ok 280 - semver
+ok 281 - Function get_semver_patch() should return integer
+ok 282 - patch version check
+ok 283 - Function get_semver_prerelease() should exist
+ok 284 - semver
+ok 285 - Function get_semver_prerelease() should return text
+ok 286 - prerelease label check
