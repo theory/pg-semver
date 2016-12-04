@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.16.0
+0.16.0  2016-12-04T00:51:19Z
       - Added `get_semver_*` accessor functions to retrieve the individual
         parts of a semver, thanks to Geoff Montee (PR #27).
 
