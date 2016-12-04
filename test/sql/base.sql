@@ -410,25 +410,25 @@ SELECT isnt(lv::semver > rv::semver, true, '"' || lv || '" > "' || rv || '" (NOT
 SELECT has_function('get_semver_major');
 SELECT has_function('get_semver_major', 'semver');
 SELECT function_returns('get_semver_major', 'integer');
-SELECT ok(get_semver_major('2.1.0-alpha'::semver) = 2, 'major version check');
+SELECT is(get_semver_major('2.1.0-alpha'::semver), 2, 'major version check');
 
 -- Test get_semver_minor
 SELECT has_function('get_semver_minor');
 SELECT has_function('get_semver_minor', 'semver');
 SELECT function_returns('get_semver_minor', 'integer');
-SELECT ok(get_semver_minor('2.1.0-alpha'::semver) = 1, 'minor version check');
+SELECT is(get_semver_minor('2.1.0-alpha'::semver), 1, 'minor version check');
 
 -- Test get_semver_patch
 SELECT has_function('get_semver_patch');
 SELECT has_function('get_semver_patch', 'semver');
 SELECT function_returns('get_semver_patch', 'integer');
-SELECT ok(get_semver_patch('2.1.0-alpha'::semver) = 0, 'patch version check');
+SELECT is(get_semver_patch('2.1.0-alpha'::semver), 0, 'patch version check');
 
 -- Test get_semver_prerelease
 SELECT has_function('get_semver_prerelease');
 SELECT has_function('get_semver_prerelease', 'semver');
 SELECT function_returns('get_semver_prerelease', 'text');
-SELECT ok(get_semver_prerelease('2.1.0-alpha'::semver) = 'alpha', 'prerelease label check');
+SELECT is(get_semver_prerelease('2.1.0-alpha'::semver), 'alpha', 'prerelease label check');
 
 SELECT * FROM finish();
 ROLLBACK;
