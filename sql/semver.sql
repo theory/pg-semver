@@ -285,4 +285,3 @@ CREATE OR REPLACE FUNCTION get_semver_prerelease(semver)
         RETURNS text
         AS 'semver'
         LANGUAGE C STRICT IMMUTABLE;
-
