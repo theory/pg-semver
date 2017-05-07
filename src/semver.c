@@ -668,6 +668,7 @@ is_semver(PG_FUNCTION_ARGS)
 {
     text* sv = PG_GETARG_TEXT_PP(0);
     bool bad = false;
-    parse_semver(text_to_cstring(sv), false, false, &bad);
+    semver* rs = parse_semver(text_to_cstring(sv), false, false, &bad);
+    if (rs != NULL) pfree(rs);
     PG_RETURN_BOOL(!bad);
 }
