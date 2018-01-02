@@ -4,24 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
--- Before 8.4, there was no unnest(), so create one.
-CREATE FUNCTION create_unnest(
-) RETURNS SETOF BOOLEAN LANGUAGE PLPGSQL AS $$
-BEGIN
-    IF pg_version_num() < 80400 THEN
-	EXECUTE $F$ CREATE FUNCTION unnest(
-	    anyarray
-	) RETURNS SETOF anyelement LANGUAGE sql AS $_$
-	    SELECT $1[i]
-	      FROM generate_series(array_lower($1, 1), array_upper($1, 1)) AS i;
-	$_$;$F$;
-    END IF;
-END;
-$$;
-
-SELECT * FROM create_unnest();
-
-SELECT plan(286);
+SELECT plan(292);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -429,6 +412,48 @@ SELECT has_function('get_semver_prerelease');
 SELECT has_function('get_semver_prerelease', 'semver');
 SELECT function_returns('get_semver_prerelease', 'text');
 SELECT is(get_semver_prerelease('2.1.0-alpha'::semver), 'alpha', 'prerelease label check');
+
+-- Test range type.
+SELECT ok(
+    '1.0.0'::semver <@ '[1.0.0, 2.0.0]'::semverrange,
+    '1.0.0 should be in range [1.0.0, 2.0.0]'
+);
+SELECT ok(
+    NOT '1.0.0'::semver <@ '[1.0.1, 2.0.0]'::semverrange,
+    '1.0.0 should not be in range [1.0.1, 2.0.0]'
+);
+    
+SELECT ok(
+    NOT semverrange('1.0.0', '2.0.0') @> '2.0.0'::semver,
+    '2.0.0 should not be in range [1.0.1, 2.0.0)'
+);
+SELECT ok(
+    semverrange('1.0.0', '2.0.0') @> '1.9999.9999'::semver,
+    '1.9999.9999 should be in range [1.0.1, 2.0.0)'
+);
+
+SELECT ok(
+    '1000.0.0'::semver <@ '[1.0.0,]'::semverrange,
+    '1000.0.0 should be in range [1.0.0,)'    
+);
+
+SELECT bag_eq($$
+    SELECT version, version <@ ANY(
+        '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[]
+    ) AS valid FROM (VALUES
+        ('1.0.0'::semver), ('1.0.1'), ('1.2.3'), ('1.2.4'), ('1.4.4'), ('1.4.5'),
+        ('1.7.0'), ('2.0.0')
+    ) AS v(version)
+$$, $$ VALUES
+    ('1.0.0'::semver, false),
+    ('1.0.1', true),
+    ('1.2.3', false),
+    ('1.2.4', true),
+    ('1.4.4', true),
+    ('1.4.5', false),
+    ('1.7.0', true),
+    ('2.0.0', false)
+$$, 'Should be able to work with arrays of semverranges');
 
 SELECT * FROM finish();
 ROLLBACK;

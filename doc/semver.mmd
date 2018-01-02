@@ -175,7 +175,7 @@ The examples assume the values inserted into the `extensions` table in the above
 ### Casts ###
 
  From             | To     | Example                         | Result
----------------------------|---------------------------------|---------
+------------------|--------|---------------------------------|---------
  text             | semver | `'1.2.1'::semver`               | `1.2.1`
  numeric          | semver | `1.2::semver`                   | `1.2.0`
  real             | semver | `12.0::real::semver`            | `12.0.0`
@@ -185,8 +185,85 @@ The examples assume the values inserted into the `extensions` table in the above
  smallint         | semver | `2::smallint::semver`           | `2.0.0`
  semver           | text   | `'1.2.54'::semver::text`        | `1.2.54`
 
-Note that numeric casts simply extract an integer from the decimal portion, so that
-`1.20` and `1.02` would both be parsed as `1.2.0`.
+Note that numeric casts simply extract an integer from the decimal portion, so
+that `1.20` and `1.02` would both be parsed as `1.2.0`.
+
+### Range Type ###
+
+As of v0.18.0, the semver extension includes the `semverrange` type, which
+simply builds on the [range type](https://www.postgresql.org/docs/current/static/rangetypes.html) support
+on PostgreSQL 9.2 and higher. This allows for easy specification of ranges of
+semantic versions. Some examples:
+
+ Range                 | Description
+-----------------------|-----------------------------------
+ `['1.0.0', '2.0.0']`  | 1.0.0 inclusive - 2.0.0 inclusive
+ `['1.0.0', '2.0.0')`  | 1.0.0 inclusive - 2.0.0 exclusive
+ `('1.0.0', '2.0.0')`  | 1.0.0 exclusive - 2.0.0 exclusive
+ `['1.0.0',]`.         | 1.0.0 inclusive - infinity
+ 
+The cool thing is that you can use any of the [range operators](https://www.postgresql.org/docs/current/static/functions-range.html),
+including the "contains" operators: For example, to see if `1.0.5` falls falls
+within the range `1.0.0` - `2.0.0` exclusive, run a query like this:
+
+    SELECT '1.0.5'::semver <@ '[1.0.0, 2.0.0)'::semverrange;
+     ?column? 
+    ----------
+     t
+
+The `semverrange` constructor will build the same range, 
+
+    SELECT semverrange('1.0.0', '2.0.0') @> '2.0.0'::semver;
+     ?column? 
+    ----------
+     f
+
+    SELECT semverrange('1.0.0', '2.0.0') @> '1.9999.9999'::semver;
+     ?column? 
+    ----------
+     t
+ 
+Pass the optional third argument to determine the bounds inclusiveness:
+
+    SELECT semverrange('1.0.0', '2.0.0', '[]') @> '2.0.0'::semver;
+     ?column? 
+    ----------
+     t
+
+It works for unlimited bound, as well. For example, this query ensure that
+a semver is greater than or equal `1.0.0`:
+
+    SELECT '1000.0.0'::semver <@ '[1.0.0,]'::semverrange;
+     ?column? 
+    ----------
+     t
+
+If you need to omit some values, you can use an array of semverrange values.
+For example, say you want to check require a version greater than `1.0.0` and
+less than `2.0.0`, but versions `1.2.3` and `1.4.5` have such serious bugs that
+you don't want to include them. We create three ranges that use exclusive
+bounds to omit those versions, like so:
+
+    '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[]
+
+Here's an sample how to query such an array of semverranges.
+
+    SELECT version, version <@ ANY(
+        '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[]
+    ) AS valid FROM (VALUES
+        ('1.0.0'::semver), ('1.0.1'), ('1.2.3'), ('1.2.4'), ('1.4.4'), ('1.4.5'),
+        ('1.7.0'), ('2.0.0')
+    ) AS v(version)
+     version | valid 
+    ---------+-------
+     1.0.0   | f
+     1.0.1   | t
+     1.2.3   | f
+     1.2.4   | t
+     1.4.4   | t
+     1.4.5   | f
+     1.7.0   | t
+     2.0.0   | f
 
 Support
 -------

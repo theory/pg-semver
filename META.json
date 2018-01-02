@@ -2,7 +2,7 @@
    "name": "semver",
    "abstract": "A semantic version data type",
    "description": "Provides a data type the enforces the Semantic Version format and includes support btree and hash indexing.",
-   "version": "0.17.0",
+   "version": "0.18.0",
    "maintainer": [
       "David E. Wheeler <david@justatheory.com>",
       "Sam Vilain <sam@vilain.net>",
@@ -15,13 +15,13 @@
          "abstract": "A semantic version data type",
          "file": "sql/semver.sql",
          "docfile": "doc/semver.mmd",
-         "version": "0.17.0"
+         "version": "0.18.0"
       }
    },
    "prereqs": {
       "runtime": {
          "requires": {
-            "PostgreSQL": "8.4.0"
+            "PostgreSQL": "9.2.0"
          }
       },
       "test": {

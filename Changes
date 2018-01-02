@@ -2,6 +2,9 @@ Revision history for PostgreSQL extension semver.
 
 0.18.0
       - Fixed file name in the v0.17.0 upgrade script.
+      - Added the semverrange type.
+      - Increased the minimum required version of PostgreSQL t0 9.2 for range
+        type support.
 
 0.17.0  2017-05-07T07:15:25Z
       - Fixed potential memory leak in is_semver function. Thanks to
