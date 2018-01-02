@@ -191,9 +191,10 @@ that `1.20` and `1.02` would both be parsed as `1.2.0`.
 ### Range Type ###
 
 As of v0.18.0, the semver extension includes the `semverrange` type, which
-simply builds on the [range type](https://www.postgresql.org/docs/current/static/rangetypes.html) support
-on PostgreSQL 9.2 and higher. This allows for easy specification of ranges of
-semantic versions. Some examples:
+simply builds on the
+[range type](https://www.postgresql.org/docs/current/static/rangetypes.html)
+support on PostgreSQL 9.2 and higher. This allows for easy specification of
+ranges of semantic versions. Some examples:
 
  Range                 | Description
 -----------------------|-----------------------------------
@@ -202,7 +203,8 @@ semantic versions. Some examples:
  `('1.0.0', '2.0.0')`  | 1.0.0 exclusive - 2.0.0 exclusive
  `['1.0.0',]`.         | 1.0.0 inclusive - infinity
  
-The cool thing is that you can use any of the [range operators](https://www.postgresql.org/docs/current/static/functions-range.html),
+The cool thing is that you can use any of the
+[range operators](https://www.postgresql.org/docs/current/static/functions-range.html),
 including the "contains" operators: For example, to see if `1.0.5` falls falls
 within the range `1.0.0` - `2.0.0` exclusive, run a query like this:
 
