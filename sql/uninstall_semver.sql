@@ -1,1 +1,0 @@
-DROP TYPE semver CASCADE;
