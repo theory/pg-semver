@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.18.0
+0.20.0
       - Fixed file name in the v0.17.0 upgrade script.
       - Added the semverrange type.
       - Increased the minimum required version of PostgreSQL to 9.2 for range
