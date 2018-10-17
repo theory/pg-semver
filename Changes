@@ -1,5 +1,7 @@
 Revision history for PostgreSQL extension semver.
 
+0.21.0
+
 0.20.0  2018-10-17T12:59:22Z
       - Fixed file name in the v0.17.0 upgrade script.
       - Added the semverrange type.
