@@ -1,6 +1,8 @@
 Revision history for PostgreSQL extension semver.
 
-0.21.0
+0.20.1  2018-10-18T00:30:04Z
+      - Properly incremented version to v0.20.0 in the spec file and docs.
+        Thanks to @ninjaslikecheese for the report (#32).
 
 0.20.0  2018-10-17T12:59:22Z
       - Fixed file name in the v0.17.0 upgrade script.
