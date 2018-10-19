@@ -1,6 +1,9 @@
 Revision history for PostgreSQL extension semver.
 
-0.21.0
+0.20.2  2018-10-19T02:05:11Z
+      - Fix Makefile bug that installed the version script with the release
+        version instead of the extension version. Thanks again to
+        @ninjaslikecheese for the report (#33).
 
 0.20.1  2018-10-18T00:30:04Z
       - Properly incremented version to v0.20.0 in the spec file and docs.
