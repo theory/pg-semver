@@ -849,7 +849,7 @@ CREATE OR REPLACE VIEW tap_funky
              || p.prorettype::regtype AS returns,
            p.prolang     AS langoid,
            p.proisstrict AS is_strict,
-           p.proisagg    AS is_agg,
+--         p.proisagg    AS is_agg,
            p.prosecdef   AS is_definer,
            p.proretset   AS returns_set,
            p.provolatile::char AS volatility,
@@ -2109,93 +2109,6 @@ $$ LANGUAGE sql;
 CREATE OR REPLACE FUNCTION is_definer( NAME )
 RETURNS TEXT AS $$
     SELECT ok( _definer($1), 'Function ' || quote_ident($1) || '() should be security definer' );
-$$ LANGUAGE sql;
-
-CREATE OR REPLACE FUNCTION _agg ( NAME, NAME, NAME[] )
-RETURNS BOOLEAN AS $$
-    SELECT is_agg
-      FROM tap_funky
-     WHERE schema = $1
-       AND name   = $2
-       AND args   = array_to_string($3, ',')
-$$ LANGUAGE SQL;
-
-CREATE OR REPLACE FUNCTION _agg ( NAME, NAME )
-RETURNS BOOLEAN AS $$
-    SELECT is_agg FROM tap_funky WHERE schema = $1 AND name = $2
-$$ LANGUAGE SQL;
-
-CREATE OR REPLACE FUNCTION _agg ( NAME, NAME[] )
-RETURNS BOOLEAN AS $$
-    SELECT is_agg
-      FROM tap_funky
-     WHERE name = $1
-       AND args = array_to_string($2, ',')
-       AND is_visible;
-$$ LANGUAGE SQL;
-
-CREATE OR REPLACE FUNCTION _agg ( NAME )
-RETURNS BOOLEAN AS $$
-    SELECT is_agg FROM tap_funky WHERE name = $1 AND is_visible;
-$$ LANGUAGE SQL;
-
--- is_aggregate( schema, function, args[], description )
-CREATE OR REPLACE FUNCTION is_aggregate ( NAME, NAME, NAME[], TEXT )
-RETURNS TEXT AS $$
-    SELECT _func_compare($1, $2, $3, _agg($1, $2, $3), $4 );
-$$ LANGUAGE SQL;
-
--- is_aggregate( schema, function, args[] )
-CREATE OR REPLACE FUNCTION is_aggregate( NAME, NAME, NAME[] )
-RETURNS TEXT AS $$
-    SELECT ok(
-        _agg($1, $2, $3),
-        'Function ' || quote_ident($1) || '.' || quote_ident($2) || '(' ||
-        array_to_string($3, ', ') || ') should be an aggregate function'
-    );
-$$ LANGUAGE sql;
-
--- is_aggregate( schema, function, description )
-CREATE OR REPLACE FUNCTION is_aggregate ( NAME, NAME, TEXT )
-RETURNS TEXT AS $$
-    SELECT _func_compare($1, $2, _agg($1, $2), $3 );
-$$ LANGUAGE SQL;
-
--- is_aggregate( schema, function )
-CREATE OR REPLACE FUNCTION is_aggregate( NAME, NAME )
-RETURNS TEXT AS $$
-    SELECT ok(
-        _agg($1, $2),
-        'Function ' || quote_ident($1) || '.' || quote_ident($2) || '() should be an aggregate function'
-    );
-$$ LANGUAGE sql;
-
--- is_aggregate( function, args[], description )
-CREATE OR REPLACE FUNCTION is_aggregate ( NAME, NAME[], TEXT )
-RETURNS TEXT AS $$
-    SELECT _func_compare(NULL, $1, $2, _agg($1, $2), $3 );
-$$ LANGUAGE SQL;
-
--- is_aggregate( function, args[] )
-CREATE OR REPLACE FUNCTION is_aggregate( NAME, NAME[] )
-RETURNS TEXT AS $$
-    SELECT ok(
-        _agg($1, $2),
-        'Function ' || quote_ident($1) || '(' ||
-        array_to_string($2, ', ') || ') should be an aggregate function'
-    );
-$$ LANGUAGE sql;
-
--- is_aggregate( function, description )
-CREATE OR REPLACE FUNCTION is_aggregate( NAME, TEXT )
-RETURNS TEXT AS $$
-    SELECT _func_compare(NULL, $1, _agg($1), $2 );
-$$ LANGUAGE sql;
-
--- is_aggregate( function )
-CREATE OR REPLACE FUNCTION is_aggregate( NAME )
-RETURNS TEXT AS $$
-    SELECT ok( _agg($1), 'Function ' || quote_ident($1) || '() should be an aggregate function' );
 $$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION _strict ( NAME, NAME, NAME[] )
