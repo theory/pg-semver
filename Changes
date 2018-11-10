@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.21.0
+0.20.3
       - Fixed test failure on Postgres 11 due to a renamed column that this
         extension doesn't even use for testing.
 
