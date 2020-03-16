@@ -213,20 +213,20 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 }
             }
             if ((started_prerel || started_meta) && !skip_char) {
-              pred = (i > 1 && patch[i-2] == '.' && patch[i-1] == '0' && next != '.');
-              if (pred && !lax)   {  // Leading zeros
+                pred = (i > 1 && patch[i-2] == '.' && patch[i-1] == '0' && next != '.');
+                if (!started_meta && (pred && !lax))   {  // Leading zeros
                     *bad = true;
                     if (throw)
                         elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
                     else
                         break;
-              } else if (pred && lax)  {  // Swap erroneous leading zero with whatever this is
-                patch[i-1] = next;
-              } else {
-                dotlast = (next == '.');
-                patch[i] = next;
-                i++;
-              }
+                } else if (pred && lax)  {  // Swap erroneous leading zero with whatever this is
+                    patch[i-1] = next;
+                } else {
+                    dotlast = (next == '.');
+                    patch[i] = next;
+                    i++;
+                }
             }
             atchar++;
             ptr++;

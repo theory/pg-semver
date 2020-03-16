@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(292);
+SELECT plan(294);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -245,7 +245,8 @@ SELECT lives_ok(
     '1.0.0-alpha',
     '1.0.0-alpha.1',
     '1.0.0-0.3.7',
-    '1.0.0-x.7.z.92'
+    '1.0.0-x.7.z.92',
+    '0.2.13+1583426134.07de632'
 ]) AS v;
 
 SELECT throws_ok(
@@ -309,31 +310,32 @@ SELECT is(
     expected,
     'is_semver(' || stimulus || ') should return ' || expected::text
 ) FROM (VALUES
-    ('1.2.2',                    true),
-    ('0.2.2',                    true),
-    ('0.0.0',                    true),
-    ('0.1.999',                  true),
-    ('9999.9999999.823823',      true),
-    ('1.0.0-beta1',              true),
-    ('1.0.0-beta2',              true),
-    ('1.0.0',                    true),
-    ('1.0.0-1',                  true),
-    ('1.0.0-alpha+d34dm34t',     true),
-    ('1.0.0+d34dm34t',           true),
-    ('20110204.0.0',             true),
-    ('1.2',                      false),
-    ('1.2.02',                   false),
-    ('1.2.2-',                   false),
-    ('1.2.3b#5',                 false),
-    ('03.3.3',                   false),
-    ('v1.2.2',                   false),
-    ('1.3b',                     false),
-    ('1.4b.0',                   false),
-    ('1v',                       false),
-    ('1v.2.2v',                  false),
-    ('1.2.4b.5',                 false),
-    ('2016.5.18-MYW-600',        true),
-    ('1010.5.0+2016-05-27-1832', true)
+    ('1.2.2',                     true),
+    ('0.2.2',                     true),
+    ('0.0.0',                     true),
+    ('0.1.999',                   true),
+    ('9999.9999999.823823',       true),
+    ('1.0.0-beta1',               true),
+    ('1.0.0-beta2',               true),
+    ('1.0.0',                     true),
+    ('1.0.0-1',                   true),
+    ('1.0.0-alpha+d34dm34t',      true),
+    ('1.0.0+d34dm34t',            true),
+    ('20110204.0.0',              true),
+    ('1.2',                       false),
+    ('1.2.02',                    false),
+    ('1.2.2-',                    false),
+    ('1.2.3b#5',                  false),
+    ('03.3.3',                    false),
+    ('v1.2.2',                    false),
+    ('1.3b',                      false),
+    ('1.4b.0',                    false),
+    ('1v',                        false),
+    ('1v.2.2v',                   false),
+    ('1.2.4b.5',                  false),
+    ('2016.5.18-MYW-600',         true),
+    ('1010.5.0+2016-05-27-1832',  true),
+    ('0.2.13+1583426134.07de632', true)
 ) v(stimulus, expected);
 
 -- issue-gh-23
@@ -422,7 +424,7 @@ SELECT ok(
     NOT '1.0.0'::semver <@ '[1.0.1, 2.0.0]'::semverrange,
     '1.0.0 should not be in range [1.0.1, 2.0.0]'
 );
-    
+
 SELECT ok(
     NOT semverrange('1.0.0', '2.0.0') @> '2.0.0'::semver,
     '2.0.0 should not be in range [1.0.1, 2.0.0)'
@@ -434,7 +436,7 @@ SELECT ok(
 
 SELECT ok(
     '1000.0.0'::semver <@ '[1.0.0,]'::semverrange,
-    '1000.0.0 should be in range [1.0.0,)'    
+    '1000.0.0 should be in range [1.0.0,)'
 );
 
 SELECT bag_eq($$

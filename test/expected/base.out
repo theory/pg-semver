@@ -1,5 +1,5 @@
 \set ECHO none
-1..292
+1..294
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -210,85 +210,87 @@ ok 207 - "1.0.0-alpha" is a valid 2.0.0 semver
 ok 208 - "1.0.0-alpha.1" is a valid 2.0.0 semver
 ok 209 - "1.0.0-0.3.7" is a valid 2.0.0 semver
 ok 210 - "1.0.0-x.7.z.92" is a valid 2.0.0 semver
-ok 211 - "1.0.0-a.." is not a valid 2.0.0 semver
-ok 212 - "1.0.0-a.1." is not a valid 2.0.0 semver
-ok 213 - "1.0.0+1_1" is not a valid 2.0.0 semver
-ok 214 - "1.0.0-1...." is not a valid 2.0.0 semver
-ok 215 - "1.0.0-1_2" is not a valid 2.0.0 semver
-ok 216 - "1.0.0-1.02" is not a valid 2.0.0 semver
-ok 217 - ORDER BY semver (2.0.0) USING < should work
-ok 218 - ORDER BY semver (2.0.0) USING > should work
-ok 219 - semver(1.0.0-1+1, 1.0.0-1+5) should = 0
-ok 220 - v1.0.0-1+1 should = v1.0.0-1+5
-ok 221 - v1.0.0-1+1 should be <= v1.0.0-1+5
-ok 222 - v1.0.0-1+1 should be >= v1.0.0-1+5
-ok 223 - semver(1.0.0-1.1+1, 1.0.0-1.1+5) should = 0
-ok 224 - v1.0.0-1.1+1 should = v1.0.0-1.1+5
-ok 225 - v1.0.0-1.1+1 should be <= v1.0.0-1.1+5
-ok 226 - v1.0.0-1.1+1 should be >= v1.0.0-1.1+5
-ok 227 - Should correctly represent "0.5.0-release1" as "0.5.0-release1"
-ok 228 - Should correctly represent "0.5.0release1" as "0.5.0-release1"
-ok 229 - Should correctly represent "0.5-release1" as "0.5.0-release1"
-ok 230 - Should correctly represent "0.5release1" as "0.5.0-release1"
-ok 231 - Should correctly represent "0.5-1" as "0.5.0-1"
-ok 232 - Should correctly represent "1.2.3-1.02" as "1.2.3-1.2"
-ok 233 - Function is_semver() should exist
-ok 234 - Function is_semver(text) should exist
-ok 235 - Function is_semver() should return boolean
-ok 236 - is_semver(1.2.2) should return true
-ok 237 - is_semver(0.2.2) should return true
-ok 238 - is_semver(0.0.0) should return true
-ok 239 - is_semver(0.1.999) should return true
-ok 240 - is_semver(9999.9999999.823823) should return true
-ok 241 - is_semver(1.0.0-beta1) should return true
-ok 242 - is_semver(1.0.0-beta2) should return true
-ok 243 - is_semver(1.0.0) should return true
-ok 244 - is_semver(1.0.0-1) should return true
-ok 245 - is_semver(1.0.0-alpha+d34dm34t) should return true
-ok 246 - is_semver(1.0.0+d34dm34t) should return true
-ok 247 - is_semver(20110204.0.0) should return true
-ok 248 - is_semver(1.2) should return false
-ok 249 - is_semver(1.2.02) should return false
-ok 250 - is_semver(1.2.2-) should return false
-ok 251 - is_semver(1.2.3b#5) should return false
-ok 252 - is_semver(03.3.3) should return false
-ok 253 - is_semver(v1.2.2) should return false
-ok 254 - is_semver(1.3b) should return false
-ok 255 - is_semver(1.4b.0) should return false
-ok 256 - is_semver(1v) should return false
-ok 257 - is_semver(1v.2.2v) should return false
-ok 258 - is_semver(1.2.4b.5) should return false
-ok 259 - is_semver(2016.5.18-MYW-600) should return true
-ok 260 - is_semver(1010.5.0+2016-05-27-1832) should return true
-ok 261 - "2.3.0+80" is a valid semver
-ok 262 - to_semver(2.3.0+80) should return 2.3.0+80
-ok 263 - Should correctly cast "2.3.0+80" to text
-ok 264 - "2.3.0+80" > "2.3.0+110" (NOT!)
-ok 265 - "2.3.0+80" > "2.3.0-alpha+110"
-ok 266 - ORDER BY semver USING < should work (section 11)
-ok 267 - ORDER BY semver USING > should work (section 11)
-ok 268 - "1.0.0" = "1.0.0+535"
-ok 269 - "1.0.0" < "1.0.0+535" (NOT!)
-ok 270 - "1.0.0" > "1.0.0+535" (NOT!)
-ok 271 - Function get_semver_major() should exist
-ok 272 - semver
-ok 273 - Function get_semver_major() should return integer
-ok 274 - major version check
-ok 275 - Function get_semver_minor() should exist
-ok 276 - semver
-ok 277 - Function get_semver_minor() should return integer
-ok 278 - minor version check
-ok 279 - Function get_semver_patch() should exist
-ok 280 - semver
-ok 281 - Function get_semver_patch() should return integer
-ok 282 - patch version check
-ok 283 - Function get_semver_prerelease() should exist
-ok 284 - semver
-ok 285 - Function get_semver_prerelease() should return text
-ok 286 - prerelease label check
-ok 287 - 1.0.0 should be in range [1.0.0, 2.0.0]
-ok 288 - 1.0.0 should not be in range [1.0.1, 2.0.0]
-ok 289 - 2.0.0 should not be in range [1.0.1, 2.0.0)
-ok 290 - 1.9999.9999 should be in range [1.0.1, 2.0.0)
-ok 291 - 1000.0.0 should be in range [1.0.0,)
-ok 292 - Should be able to work with arrays of semverranges
+ok 211 - "0.2.13+1583426134.07de632" is a valid 2.0.0 semver
+ok 212 - "1.0.0-a.." is not a valid 2.0.0 semver
+ok 213 - "1.0.0-a.1." is not a valid 2.0.0 semver
+ok 214 - "1.0.0+1_1" is not a valid 2.0.0 semver
+ok 215 - "1.0.0-1...." is not a valid 2.0.0 semver
+ok 216 - "1.0.0-1_2" is not a valid 2.0.0 semver
+ok 217 - "1.0.0-1.02" is not a valid 2.0.0 semver
+ok 218 - ORDER BY semver (2.0.0) USING < should work
+ok 219 - ORDER BY semver (2.0.0) USING > should work
+ok 220 - semver(1.0.0-1+1, 1.0.0-1+5) should = 0
+ok 221 - v1.0.0-1+1 should = v1.0.0-1+5
+ok 222 - v1.0.0-1+1 should be <= v1.0.0-1+5
+ok 223 - v1.0.0-1+1 should be >= v1.0.0-1+5
+ok 224 - semver(1.0.0-1.1+1, 1.0.0-1.1+5) should = 0
+ok 225 - v1.0.0-1.1+1 should = v1.0.0-1.1+5
+ok 226 - v1.0.0-1.1+1 should be <= v1.0.0-1.1+5
+ok 227 - v1.0.0-1.1+1 should be >= v1.0.0-1.1+5
+ok 228 - Should correctly represent "0.5.0-release1" as "0.5.0-release1"
+ok 229 - Should correctly represent "0.5.0release1" as "0.5.0-release1"
+ok 230 - Should correctly represent "0.5-release1" as "0.5.0-release1"
+ok 231 - Should correctly represent "0.5release1" as "0.5.0-release1"
+ok 232 - Should correctly represent "0.5-1" as "0.5.0-1"
+ok 233 - Should correctly represent "1.2.3-1.02" as "1.2.3-1.2"
+ok 234 - Function is_semver() should exist
+ok 235 - Function is_semver(text) should exist
+ok 236 - Function is_semver() should return boolean
+ok 237 - is_semver(1.2.2) should return true
+ok 238 - is_semver(0.2.2) should return true
+ok 239 - is_semver(0.0.0) should return true
+ok 240 - is_semver(0.1.999) should return true
+ok 241 - is_semver(9999.9999999.823823) should return true
+ok 242 - is_semver(1.0.0-beta1) should return true
+ok 243 - is_semver(1.0.0-beta2) should return true
+ok 244 - is_semver(1.0.0) should return true
+ok 245 - is_semver(1.0.0-1) should return true
+ok 246 - is_semver(1.0.0-alpha+d34dm34t) should return true
+ok 247 - is_semver(1.0.0+d34dm34t) should return true
+ok 248 - is_semver(20110204.0.0) should return true
+ok 249 - is_semver(1.2) should return false
+ok 250 - is_semver(1.2.02) should return false
+ok 251 - is_semver(1.2.2-) should return false
+ok 252 - is_semver(1.2.3b#5) should return false
+ok 253 - is_semver(03.3.3) should return false
+ok 254 - is_semver(v1.2.2) should return false
+ok 255 - is_semver(1.3b) should return false
+ok 256 - is_semver(1.4b.0) should return false
+ok 257 - is_semver(1v) should return false
+ok 258 - is_semver(1v.2.2v) should return false
+ok 259 - is_semver(1.2.4b.5) should return false
+ok 260 - is_semver(2016.5.18-MYW-600) should return true
+ok 261 - is_semver(1010.5.0+2016-05-27-1832) should return true
+ok 262 - is_semver(0.2.13+1583426134.07de632) should return true
+ok 263 - "2.3.0+80" is a valid semver
+ok 264 - to_semver(2.3.0+80) should return 2.3.0+80
+ok 265 - Should correctly cast "2.3.0+80" to text
+ok 266 - "2.3.0+80" > "2.3.0+110" (NOT!)
+ok 267 - "2.3.0+80" > "2.3.0-alpha+110"
+ok 268 - ORDER BY semver USING < should work (section 11)
+ok 269 - ORDER BY semver USING > should work (section 11)
+ok 270 - "1.0.0" = "1.0.0+535"
+ok 271 - "1.0.0" < "1.0.0+535" (NOT!)
+ok 272 - "1.0.0" > "1.0.0+535" (NOT!)
+ok 273 - Function get_semver_major() should exist
+ok 274 - semver
+ok 275 - Function get_semver_major() should return integer
+ok 276 - major version check
+ok 277 - Function get_semver_minor() should exist
+ok 278 - semver
+ok 279 - Function get_semver_minor() should return integer
+ok 280 - minor version check
+ok 281 - Function get_semver_patch() should exist
+ok 282 - semver
+ok 283 - Function get_semver_patch() should return integer
+ok 284 - patch version check
+ok 285 - Function get_semver_prerelease() should exist
+ok 286 - semver
+ok 287 - Function get_semver_prerelease() should return text
+ok 288 - prerelease label check
+ok 289 - 1.0.0 should be in range [1.0.0, 2.0.0]
+ok 290 - 1.0.0 should not be in range [1.0.1, 2.0.0]
+ok 291 - 2.0.0 should not be in range [1.0.1, 2.0.0)
+ok 292 - 1.9999.9999 should be in range [1.0.1, 2.0.0)
+ok 293 - 1000.0.0 should be in range [1.0.0,)
+ok 294 - Should be able to work with arrays of semverranges
