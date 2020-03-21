@@ -15,7 +15,7 @@
          "abstract": "A semantic version data type",
          "file": "sql/semver.sql",
          "docfile": "doc/semver.mmd",
-         "version": "0.20.0"
+         "version": "0.21.0"
       }
    },
    "prereqs": {
@@ -27,7 +27,7 @@
       "test": {
          "requires": {
             "plpgsql": 0
-        }
+         }
       }
    },
    "resources": {
@@ -35,9 +35,9 @@
          "web": "https://github.com/theory/pg-semver/issues/"
       },
       "repository": {
-        "url":  "git://github.com/theory/pg-semver.git",
-        "web":  "https://github.com/theory/pg-semver/",
-        "type": "git"
+         "url": "git://github.com/theory/pg-semver.git",
+         "web": "https://github.com/theory/pg-semver/",
+         "type": "git"
       }
    },
    "generated_by": "David E. Wheeler",
