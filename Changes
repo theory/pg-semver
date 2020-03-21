@@ -1,5 +1,7 @@
 Revision history for PostgreSQL extension semver.
 
+0.22.0
+
 0.21.0  2020-03-21T21:56:20Z
       - Fixed build metadata part to allow leading zeros. In other words,
         `1.0.0-1.02` is not a legitimate semver, because it has a leading zero
