@@ -1,6 +1,13 @@
 Revision history for PostgreSQL extension semver.
 
 0.21.0
+      - Fixed build metadata part to allow leading zeros. In other words,
+        `1.0.0-1.02` is not a legitimate semver, because it has a leading zero
+        in a numeric part of the prerelease version. `1.0.0-1.2+1.02`, however,
+        is valid, because the leading zero numeric expression is in the build
+        metadata part, which does not evaluate as numeric, and so is allowed.
+        This fix allows source code hashes, for example, to be used in build
+        metadata. Thanks to Artur Troian for the report (#38) and fix (#39)!
 
 0.20.3  2018-11-10T19:32:26Z
       - Fixed test failure on Postgres 11 due to a renamed column that this
