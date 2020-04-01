@@ -1,6 +1,10 @@
 Revision history for PostgreSQL extension semver.
 
 0.22.0
+      - Fixed `get_semver_prerelease()` so that it returns only the
+        prerelease without any build metadata. For example, for
+        `1.0.0-1.2+1.02`, it will now return `1.2`, not `1.2+1.02`. Thanks
+        to Artur Troian for the report (#41) and fix (#42)!
 
 0.21.0  2020-03-21T21:56:20Z
       - Fixed build metadata part to allow leading zeros. In other words,
