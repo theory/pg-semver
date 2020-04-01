@@ -392,7 +392,7 @@ Datum
 get_semver_prerelease(PG_FUNCTION_ARGS)
 {
     semver* sv = PG_GETARG_SEMVER_P(0);
-    char* prerelease = sv->prerel;
+    char* prerelease = strip_meta(sv->prerel);
     text* res = cstring_to_text(prerelease);
     PG_RETURN_TEXT_P(res);
 }
