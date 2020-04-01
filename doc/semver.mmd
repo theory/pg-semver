@@ -118,22 +118,22 @@ Interface
 
 ### Functions ###
 
- Function                        | Description                     | Example                             | Result
----------------------------------|---------------------------------|-------------------------------------|----------
- `to_semver(text)`               | Parse semver from text          | `to_semver('1.02')`                 | `1.2.0`
- `is_semver(text)`               | Test semver text                | `is_semver('1.02')`                 | true
- `semver(text)`                  | Cast text to semver             | `semver('1.2.1')`                   | `1.2.1`
- `semver(numeric)`               | Cast numeric to semver          | `semver(1.2)`                       | `1.2.0`
- `semver(real)`                  | Cast real to semver             | `semver(12.0::real)`                | `12.0.0`
- `semver(double precision)`      | Cast double precision to semver | `semver(9.2::double precision)`     | `9.2.0`
- `semver(integer)`               | Cast integer to semver          | `semver(42::integer)`               | `42.0.0`
- `semver(bigint)`                | Cast bigint to semver           | `semver(19::bigint)`                | `19.0.0`
- `semver(smallint)`              | Cast smallint to semver         | `semver(2::smallint)`               | `2.0.0`
- `text(semver)`                  | Cast semver to text             | `text('1.2.54'::semver)`            | `1.2.54`
- `get_semver_major(semver)`      | Get major version part          | `get_semver_major('4.2.0')`         | `4`
- `get_semver_minor(semver)`      | Get minor version part          | `get_semver_minor('4.2.0')`         | `2`
- `get_semver_patch(semver)`      | Get patch version part          | `get_semver_patch('4.2.0')`         | `0`
- `get_semver_prerelease(semver)` | Get prerelease version part     | `get_semver_prerelease('2.1.0-b2')` | `b2`
+ Function                        | Description                     | Example                                   | Result
+---------------------------------|---------------------------------|-------------------------------------------|----------
+ `to_semver(text)`               | Parse semver from text          | `to_semver('1.02')`                       | `1.2.0`
+ `is_semver(text)`               | Test semver text                | `is_semver('1.02')`                       | true
+ `semver(text)`                  | Cast text to semver             | `semver('1.2.1')`                         | `1.2.1`
+ `semver(numeric)`               | Cast numeric to semver          | `semver(1.2)`                             | `1.2.0`
+ `semver(real)`                  | Cast real to semver             | `semver(12.0::real)`                      | `12.0.0`
+ `semver(double precision)`      | Cast double precision to semver | `semver(9.2::double precision)`           | `9.2.0`
+ `semver(integer)`               | Cast integer to semver          | `semver(42::integer)`                     | `42.0.0`
+ `semver(bigint)`                | Cast bigint to semver           | `semver(19::bigint)`                      | `19.0.0`
+ `semver(smallint)`              | Cast smallint to semver         | `semver(2::smallint)`                     | `2.0.0`
+ `text(semver)`                  | Cast semver to text             | `text('1.2.54'::semver)`                  | `1.2.54`
+ `get_semver_major(semver)`      | Get major version part          | `get_semver_major('4.2.0')`               | `4`
+ `get_semver_minor(semver)`      | Get minor version part          | `get_semver_minor('4.2.0')`               | `2`
+ `get_semver_patch(semver)`      | Get patch version part          | `get_semver_patch('4.2.0')`               | `0`
+ `get_semver_prerelease(semver)` | Get prerelease version part     | `get_semver_prerelease('2.1.0-b2+bfb13')` | `b2`
 
 Numeric casts simply extract an integer from the decimal portion, so that
 `1.20` and `1.02` would both be parsed as `1.2.0`.
