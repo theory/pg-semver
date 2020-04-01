@@ -1,5 +1,5 @@
 \set ECHO none
-1..294
+1..296
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -288,9 +288,11 @@ ok 285 - Function get_semver_prerelease() should exist
 ok 286 - semver
 ok 287 - Function get_semver_prerelease() should return text
 ok 288 - prerelease label check
-ok 289 - 1.0.0 should be in range [1.0.0, 2.0.0]
-ok 290 - 1.0.0 should not be in range [1.0.1, 2.0.0]
-ok 291 - 2.0.0 should not be in range [1.0.1, 2.0.0)
-ok 292 - 1.9999.9999 should be in range [1.0.1, 2.0.0)
-ok 293 - 1000.0.0 should be in range [1.0.0,)
-ok 294 - Should be able to work with arrays of semverranges
+ok 289 - prerelease label check. must return prerelease only
+ok 290 - prerelease label check. must return empty string
+ok 291 - 1.0.0 should be in range [1.0.0, 2.0.0]
+ok 292 - 1.0.0 should not be in range [1.0.1, 2.0.0]
+ok 293 - 2.0.0 should not be in range [1.0.1, 2.0.0)
+ok 294 - 1.9999.9999 should be in range [1.0.1, 2.0.0)
+ok 295 - 1000.0.0 should be in range [1.0.0,)
+ok 296 - Should be able to work with arrays of semverranges
