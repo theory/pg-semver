@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(294);
+SELECT plan(296);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -414,6 +414,8 @@ SELECT has_function('get_semver_prerelease');
 SELECT has_function('get_semver_prerelease', 'semver');
 SELECT function_returns('get_semver_prerelease', 'text');
 SELECT is(get_semver_prerelease('2.1.0-alpha'::semver), 'alpha', 'prerelease label check');
+SELECT is(get_semver_prerelease('2.1.0-alpha+build'::semver), 'alpha', 'prerelease label check. must return prerelease only');
+SELECT is(get_semver_prerelease('2.1.0+build'::semver), '', 'prerelease label check. must return empty string');
 
 -- Test range type.
 SELECT ok(
@@ -429,6 +431,7 @@ SELECT ok(
     NOT semverrange('1.0.0', '2.0.0') @> '2.0.0'::semver,
     '2.0.0 should not be in range [1.0.1, 2.0.0)'
 );
+
 SELECT ok(
     semverrange('1.0.0', '2.0.0') @> '1.9999.9999'::semver,
     '1.9999.9999 should be in range [1.0.1, 2.0.0)'
