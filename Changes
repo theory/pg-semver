@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.22.0
+0.22.0  2020-04-02T14:13:55Z
       - Fixed `get_semver_prerelease()` so that it returns only the
         prerelease without any build metadata. For example, for
         `1.0.0-1.2+1.02`, it will now return `1.2`, not `1.2+1.02`. Thanks
