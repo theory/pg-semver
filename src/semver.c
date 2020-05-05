@@ -283,7 +283,7 @@ char* emit_semver(semver* version) {
             version->numbers[2],
             ((version->prerel)[0] == '+' ? "" : "-"),
             version->prerel
-            );
+        );
     }
 
     /* Should cover the vast majority of cases. */
@@ -300,12 +300,13 @@ char* emit_semver(semver* version) {
     }
     else {
         len = snprintf(
-            buf, len+1,"%d.%d.%d-%s",
+            buf, len+1, "%d.%d.%d%s%s",
             version->numbers[0],
             version->numbers[1],
             version->numbers[2],
+            ((version->prerel)[0] == '+' ? "" : "-"),
             version->prerel
-            );
+        );
     }
     return buf;
 }

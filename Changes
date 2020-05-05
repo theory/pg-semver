@@ -1,6 +1,7 @@
 Revision history for PostgreSQL extension semver.
 0.23.0
-
+      - Fixed an error formatting prerelease parts for semvers longer than
+        32 bytes. Thanks to @Nemo157 for the report and suggested fix (#48).
 
 0.22.0  2020-04-02T14:13:55Z
       - Fixed `get_semver_prerelease()` so that it returns only the

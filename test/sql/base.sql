@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(296);
+SELECT plan(298);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -459,6 +459,19 @@ $$, $$ VALUES
     ('1.7.0', true),
     ('2.0.0', false)
 $$, 'Should be able to work with arrays of semverranges');
+
+-- Test formatting (issue-gh-48)
+SELECT is(
+    '1.0.0+1234567890123456789012345'::semver::text,
+    '1.0.0+1234567890123456789012345',
+    'Should properly format a 32 character semver'
+);
+
+SELECT is(
+    '1.0.0+12345678901234567890123456'::semver::text,
+    '1.0.0+12345678901234567890123456',
+    'Should properly format a 33 character semver'
+);
 
 SELECT * FROM finish();
 ROLLBACK;
