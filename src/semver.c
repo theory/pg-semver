@@ -178,12 +178,6 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
             if (!patch && (started_meta || started_prerel))
                 patch = palloc(len - atchar + 1);
 
-            // NB: This section is here to maintain compatibility with the SEMV 1.0b
-            // version of the library that accepted multiple - (dash) separators.
-            // This is invalid for SEMV 1.0/2.0 so just turn them into . (period)
-            if (started_prerel && next == '-' && !skip_char)
-                next = '.';
-
             if (!skip_char &&
                 (!started_prerel && next != '-') &&
                 (!started_meta && next != '+'))  {  // Didn't start with -/+

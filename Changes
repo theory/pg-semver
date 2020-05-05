@@ -2,6 +2,10 @@ Revision history for PostgreSQL extension semver.
 0.23.0
       - Fixed an error formatting prerelease parts for semvers longer than
         32 bytes. Thanks to @Nemo157 for the report and suggested fix (#48).
+      - Removed code that converted dashes to dots in prerelease parts. It
+        had been doing so on the assumption that dashes were invalid in SemVer
+        1.0 and 2.0 prerelease parts, but that does not turn out to be the case.
+        Thanks to @Nemo157 for the report (#46).
 
 0.22.0  2020-04-02T14:13:55Z
       - Fixed `get_semver_prerelease()` so that it returns only the

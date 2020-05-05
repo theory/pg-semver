@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(298);
+SELECT plan(299);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -471,6 +471,12 @@ SELECT is(
     '1.0.0+12345678901234567890123456'::semver::text,
     '1.0.0+12345678901234567890123456',
     'Should properly format a 33 character semver'
+);
+
+-- issue-gh-46
+SELECT is(
+    '1.0.0-alpha-0'::semver::text, '1.0.0-alpha-0',
+    'Should propery format a prerelease with a hyphen'
 );
 
 SELECT * FROM finish();
