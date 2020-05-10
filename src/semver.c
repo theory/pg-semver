@@ -226,7 +226,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 if (!started_meta && (pred && !lax))   {  // Leading zeros
                     *bad = true;
                     if (throw)
-                        elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
+                        elog(ERROR, "bad semver value '%s': semver prerelease numbers can't start with 0", str);
                     else
                         break;
                 } else if (pred && lax)  {  // Swap erroneous leading zero with whatever this is
@@ -236,6 +236,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                     patch[i] = next;
                     i++;
                 }
+                pred = false;
             }
             atchar++;
             ptr++;
