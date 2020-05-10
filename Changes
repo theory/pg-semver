@@ -13,6 +13,7 @@ Revision history for PostgreSQL extension semver.
         Donahue for the SemVer spec expertise (#45).
       - The metadata part may no longer contain plus signs other than the one
         used to start the metadata part.
+      - The prerelease and metadata parts may no longer start with a dot.
 
 0.22.0  2020-04-02T14:13:55Z
       - Fixed `get_semver_prerelease()` so that it returns only the

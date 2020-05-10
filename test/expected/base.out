@@ -1,5 +1,5 @@
 \set ECHO none
-1..305
+1..307
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -31,277 +31,279 @@ ok 28 - "1v.2.2v" is not a valid semver
 ok 29 - "1.2.4b.5" is not a valid semver
 ok 30 - "1.0.0-alpha.010" is not a valid semver
 ok 31 - "1.0.0-02799" is not a valid semver
-ok 32 - semver(1.2.2, 1.2.2) should = 0
-ok 33 - v1.2.2 should = v1.2.2
-ok 34 - v1.2.2 should be <= v1.2.2
-ok 35 - v1.2.2 should be >= v1.2.2
-ok 36 - semver(1.2.23, 1.2.23) should = 0
-ok 37 - v1.2.23 should = v1.2.23
-ok 38 - v1.2.23 should be <= v1.2.23
-ok 39 - v1.2.23 should be >= v1.2.23
-ok 40 - semver(0.0.0, 0.0.0) should = 0
-ok 41 - v0.0.0 should = v0.0.0
-ok 42 - v0.0.0 should be <= v0.0.0
-ok 43 - v0.0.0 should be >= v0.0.0
-ok 44 - semver(999.888.7777, 999.888.7777) should = 0
-ok 45 - v999.888.7777 should = v999.888.7777
-ok 46 - v999.888.7777 should be <= v999.888.7777
-ok 47 - v999.888.7777 should be >= v999.888.7777
-ok 48 - semver(0.1.2-beta3, 0.1.2-beta3) should = 0
-ok 49 - v0.1.2-beta3 should = v0.1.2-beta3
-ok 50 - v0.1.2-beta3 should be <= v0.1.2-beta3
-ok 51 - v0.1.2-beta3 should be >= v0.1.2-beta3
-ok 52 - semver(1.0.0-rc-1, 1.0.0-RC-1) should = 0
-ok 53 - v1.0.0-rc-1 should = v1.0.0-RC-1
-ok 54 - v1.0.0-rc-1 should be <= v1.0.0-RC-1
-ok 55 - v1.0.0-rc-1 should be >= v1.0.0-RC-1
-ok 56 - semver(1.2.2, 1.2.3) should <> 0
-ok 57 - v1.2.2 should not equal v1.2.3
-ok 58 - semver(0.0.1, 1.0.0) should <> 0
-ok 59 - v0.0.1 should not equal v1.0.0
-ok 60 - semver(1.0.1, 1.1.0) should <> 0
-ok 61 - v1.0.1 should not equal v1.1.0
-ok 62 - semver(1.1.1, 1.1.0) should <> 0
-ok 63 - v1.1.1 should not equal v1.1.0
-ok 64 - semver(1.2.3-b, 1.2.3) should <> 0
-ok 65 - v1.2.3-b should not equal v1.2.3
-ok 66 - semver(1.2.3, 1.2.3-b) should <> 0
-ok 67 - v1.2.3 should not equal v1.2.3-b
-ok 68 - semver(1.2.3-a, 1.2.3-b) should <> 0
-ok 69 - v1.2.3-a should not equal v1.2.3-b
-ok 70 - semver(1.2.3-aaaaaaa1, 1.2.3-aaaaaaa2) should <> 0
-ok 71 - v1.2.3-aaaaaaa1 should not equal v1.2.3-aaaaaaa2
-ok 72 - semver(1.2.3-1.2.3, 1.2.3-1.2.3.4) should <> 0
-ok 73 - v1.2.3-1.2.3 should not equal v1.2.3-1.2.3.4
-ok 74 - semver(2.2.2, 1.1.1) should > 0
-ok 75 - semver(1.1.1, 2.2.2) should < 0
-ok 76 - v2.2.2 should be > v1.1.1
-ok 77 - v2.2.2 should be >= v1.1.1
-ok 78 - v1.1.1 should be < v2.2.2
-ok 79 - v1.1.1 should be <= v2.2.2
-ok 80 - semver(2.2.2, 2.1.1) should > 0
-ok 81 - semver(2.1.1, 2.2.2) should < 0
-ok 82 - v2.2.2 should be > v2.1.1
-ok 83 - v2.2.2 should be >= v2.1.1
-ok 84 - v2.1.1 should be < v2.2.2
-ok 85 - v2.1.1 should be <= v2.2.2
-ok 86 - semver(2.2.2, 2.2.1) should > 0
-ok 87 - semver(2.2.1, 2.2.2) should < 0
-ok 88 - v2.2.2 should be > v2.2.1
-ok 89 - v2.2.2 should be >= v2.2.1
-ok 90 - v2.2.1 should be < v2.2.2
-ok 91 - v2.2.1 should be <= v2.2.2
-ok 92 - semver(2.2.2-b, 2.2.1) should > 0
-ok 93 - semver(2.2.1, 2.2.2-b) should < 0
-ok 94 - v2.2.2-b should be > v2.2.1
-ok 95 - v2.2.2-b should be >= v2.2.1
-ok 96 - v2.2.1 should be < v2.2.2-b
-ok 97 - v2.2.1 should be <= v2.2.2-b
-ok 98 - semver(2.2.2, 2.2.2-b) should > 0
-ok 99 - semver(2.2.2-b, 2.2.2) should < 0
-ok 100 - v2.2.2 should be > v2.2.2-b
-ok 101 - v2.2.2 should be >= v2.2.2-b
-ok 102 - v2.2.2-b should be < v2.2.2
-ok 103 - v2.2.2-b should be <= v2.2.2
-ok 104 - semver(2.2.2-c, 2.2.2-b) should > 0
-ok 105 - semver(2.2.2-b, 2.2.2-c) should < 0
-ok 106 - v2.2.2-c should be > v2.2.2-b
-ok 107 - v2.2.2-c should be >= v2.2.2-b
-ok 108 - v2.2.2-b should be < v2.2.2-c
-ok 109 - v2.2.2-b should be <= v2.2.2-c
-ok 110 - semver(2.2.2-rc-2, 2.2.2-RC-1) should > 0
-ok 111 - semver(2.2.2-RC-1, 2.2.2-rc-2) should < 0
-ok 112 - v2.2.2-rc-2 should be > v2.2.2-RC-1
-ok 113 - v2.2.2-rc-2 should be >= v2.2.2-RC-1
-ok 114 - v2.2.2-RC-1 should be < v2.2.2-rc-2
-ok 115 - v2.2.2-RC-1 should be <= v2.2.2-rc-2
-ok 116 - semver(0.9.10, 0.9.9) should > 0
-ok 117 - semver(0.9.9, 0.9.10) should < 0
-ok 118 - v0.9.10 should be > v0.9.9
-ok 119 - v0.9.10 should be >= v0.9.9
-ok 120 - v0.9.9 should be < v0.9.10
-ok 121 - v0.9.9 should be <= v0.9.10
-ok 122 - semver(1.0.1-1.2.3, 1.0.1-0.9.9.9) should > 0
-ok 123 - semver(1.0.1-0.9.9.9, 1.0.1-1.2.3) should < 0
-ok 124 - v1.0.1-1.2.3 should be > v1.0.1-0.9.9.9
-ok 125 - v1.0.1-1.2.3 should be >= v1.0.1-0.9.9.9
-ok 126 - v1.0.1-0.9.9.9 should be < v1.0.1-1.2.3
-ok 127 - v1.0.1-0.9.9.9 should be <= v1.0.1-1.2.3
-ok 128 - Function to_semver() should exist
-ok 129 - Function to_semver(text) should exist
-ok 130 - Function to_semver() should return semver
-ok 131 - to_semver(1.2.2) should return 1.2.2
-ok 132 - to_semver(01.2.2) should return 1.2.2
-ok 133 - to_semver(1.02.2) should return 1.2.2
-ok 134 - to_semver(1.2.02) should return 1.2.2
-ok 135 - to_semver(1.2.02b) should return 1.2.2-b
-ok 136 - to_semver(1.2.02beta-3  ) should return 1.2.2-beta-3
-ok 137 - to_semver(1.02.02rc1) should return 1.2.2-rc1
-ok 138 - to_semver(1.0) should return 1.0.0
-ok 139 - to_semver(1) should return 1.0.0
-ok 140 - to_semver(.0.02) should return 0.0.2
-ok 141 - to_semver(1..02) should return 1.0.2
-ok 142 - to_semver(1..) should return 1.0.0
-ok 143 - to_semver(1.1) should return 1.1.0
-ok 144 - to_semver(1.2.b1) should return 1.2.0-b1
-ok 145 - to_semver(9.0beta4) should return 9.0.0-beta4
-ok 146 - to_semver(9b) should return 9.0.0-b
-ok 147 - to_semver(rc1) should return 0.0.0-rc1
-ok 148 - to_semver() should return 0.0.0
-ok 149 - to_semver(..2) should return 0.0.2
-ok 150 - to_semver(1.2.3 a) should return 1.2.3-a
-ok 151 - to_semver(..2 b) should return 0.0.2-b
-ok 152 - to_semver(  012.2.2) should return 12.2.2
-ok 153 - to_semver(20110204) should return 20110204.0.0
-ok 154 - to_semver(1.0.0-alpha) should return incoming text
-ok 155 - to_semver(1.0.0-alpha.1) should return incoming text
-ok 156 - to_semver(1.0.0-0.3.7) should return incoming text
-ok 157 - to_semver(1.0.0-x.7.z.92) should return incoming text
-ok 158 - to_semver(1.0.0-alpha+001) should return incoming text
-ok 159 - to_semver(1.0.0+20130313144700) should return incoming text
-ok 160 - to_semver(1.0.0-beta+exp.sha.5114f85) should return incoming text
-ok 161 - "1.2.0 beta 4" is not a valid semver
-ok 162 - "1.2.2-" is not a valid semver
-ok 163 - "1.2.3b#5" is not a valid semver
-ok 164 - "v1.2.2" is not a valid semver
-ok 165 - "1.4b.0" is not a valid semver
-ok 166 - "1v.2.2v" is not a valid semver
-ok 167 - "1.2.4b.5" is not a valid semver
-ok 168 - "1.2.3.4" is not a valid semver
-ok 169 - "1.2.3 4" is not a valid semver
-ok 170 - "1.2000000000000000.3.4" is not a valid semver
-ok 171 - max(semver) should work
-ok 172 - min(semver) should work
-ok 173 - ORDER BY semver USING < should work
-ok 174 - ORDER BY semver USING > should work
-ok 175 - construct to text
-ok 176 - construct from text
-ok 177 - construct from bare number
-ok 178 - construct from numeric
-ok 179 - construct from bare integer
-ok 180 - construct from integer
-ok 181 - construct from bigint
-ok 182 - construct from smallint
-ok 183 - construct from decimal
-ok 184 - construct from real
-ok 185 - construct from double
-ok 186 - construct from float
-ok 187 - cast to text
-ok 188 - cast from text
-ok 189 - Cast from bare integer
-ok 190 - Cast from bare number
-ok 191 - Cast from numeric
-ok 192 - Cast from integer
-ok 193 - Cast from bigint
-ok 194 - Cast from smallint
-ok 195 - Cast from decimal
-ok 196 - Cast from decimal
-ok 197 - Cast from real
-ok 198 - Cast from double precision
-ok 199 - Cast from float
-ok 200 - Should correctly cast "1.0.0-beta" to text
-ok 201 - Should correctly cast "1.0.0-beta1" to text
-ok 202 - Should correctly cast "1.0.0-alpha" to text
-ok 203 - Should correctly cast "1.0.0-alph" to text
-ok 204 - Should correctly cast "1.0.0-food" to text
-ok 205 - Should correctly cast "1.0.0-f111" to text
-ok 206 - Should correctly cast "1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf" to text
-ok 207 - "1.0.0+1" is a valid 2.0.0 semver
-ok 208 - "1.0.0-1+1" is a valid 2.0.0 semver
-ok 209 - "1.0.0-1.1+1" is a valid 2.0.0 semver
-ok 210 - "1.0.0-1.1.1.1.1.1.1.1.1.1.1+1.1.1.1.1.1.1.1" is a valid 2.0.0 semver
-ok 211 - "1.0.0-1.2" is a valid 2.0.0 semver
-ok 212 - "1.0.0-1.0.2" is a valid 2.0.0 semver
-ok 213 - "1.0.0-alpha" is a valid 2.0.0 semver
-ok 214 - "1.0.0-alpha.1" is a valid 2.0.0 semver
-ok 215 - "1.0.0-0.3.7" is a valid 2.0.0 semver
-ok 216 - "1.0.0-x.7.z.92" is a valid 2.0.0 semver
-ok 217 - "0.2.13+1583426134.07de632" is a valid 2.0.0 semver
-ok 218 - "1.0.0-a.." is not a valid 2.0.0 semver
-ok 219 - "1.0.0-a.1." is not a valid 2.0.0 semver
-ok 220 - "1.0.0+1_1" is not a valid 2.0.0 semver
-ok 221 - "1.0.0-1...." is not a valid 2.0.0 semver
-ok 222 - "1.0.0-1_2" is not a valid 2.0.0 semver
-ok 223 - "1.0.0-1.02" is not a valid 2.0.0 semver
-ok 224 - ORDER BY semver (2.0.0) USING < should work
-ok 225 - ORDER BY semver (2.0.0) USING > should work
-ok 226 - semver(1.0.0-1+1, 1.0.0-1+5) should = 0
-ok 227 - v1.0.0-1+1 should = v1.0.0-1+5
-ok 228 - v1.0.0-1+1 should be <= v1.0.0-1+5
-ok 229 - v1.0.0-1+1 should be >= v1.0.0-1+5
-ok 230 - semver(1.0.0-1.1+1, 1.0.0-1.1+5) should = 0
-ok 231 - v1.0.0-1.1+1 should = v1.0.0-1.1+5
-ok 232 - v1.0.0-1.1+1 should be <= v1.0.0-1.1+5
-ok 233 - v1.0.0-1.1+1 should be >= v1.0.0-1.1+5
-ok 234 - Should correctly represent "0.5.0-release1" as "0.5.0-release1"
-ok 235 - Should correctly represent "0.5.0release1" as "0.5.0-release1"
-ok 236 - Should correctly represent "0.5-release1" as "0.5.0-release1"
-ok 237 - Should correctly represent "0.5release1" as "0.5.0-release1"
-ok 238 - Should correctly represent "0.5-1" as "0.5.0-1"
-ok 239 - Should correctly represent "1.2.3-1.02" as "1.2.3-1.2"
-ok 240 - Function is_semver() should exist
-ok 241 - Function is_semver(text) should exist
-ok 242 - Function is_semver() should return boolean
-ok 243 - is_semver(1.2.2) should return true
-ok 244 - is_semver(0.2.2) should return true
-ok 245 - is_semver(0.0.0) should return true
-ok 246 - is_semver(0.1.999) should return true
-ok 247 - is_semver(9999.9999999.823823) should return true
-ok 248 - is_semver(1.0.0-beta1) should return true
-ok 249 - is_semver(1.0.0-beta2) should return true
-ok 250 - is_semver(1.0.0) should return true
-ok 251 - is_semver(1.0.0-1) should return true
-ok 252 - is_semver(1.0.0-alpha+d34dm34t) should return true
-ok 253 - is_semver(1.0.0+d34dm34t) should return true
-ok 254 - is_semver(20110204.0.0) should return true
-ok 255 - is_semver(1.2) should return false
-ok 256 - is_semver(1.2.02) should return false
-ok 257 - is_semver(1.2.2-) should return false
-ok 258 - is_semver(1.2.3b#5) should return false
-ok 259 - is_semver(03.3.3) should return false
-ok 260 - is_semver(v1.2.2) should return false
-ok 261 - is_semver(1.3b) should return false
-ok 262 - is_semver(1.4b.0) should return false
-ok 263 - is_semver(1v) should return false
-ok 264 - is_semver(1v.2.2v) should return false
-ok 265 - is_semver(1.2.4b.5) should return false
-ok 266 - is_semver(2016.5.18-MYW-600) should return true
-ok 267 - is_semver(1010.5.0+2016-05-27-1832) should return true
-ok 268 - is_semver(0.2.13+1583426134.07de632) should return true
-ok 269 - "2.3.0+80" is a valid semver
-ok 270 - to_semver(2.3.0+80) should return 2.3.0+80
-ok 271 - Should correctly cast "2.3.0+80" to text
-ok 272 - "2.3.0+80" > "2.3.0+110" (NOT!)
-ok 273 - "2.3.0+80" > "2.3.0-alpha+110"
-ok 274 - ORDER BY semver USING < should work (section 11)
-ok 275 - ORDER BY semver USING > should work (section 11)
-ok 276 - "1.0.0" = "1.0.0+535"
-ok 277 - "1.0.0" < "1.0.0+535" (NOT!)
-ok 278 - "1.0.0" > "1.0.0+535" (NOT!)
-ok 279 - Function get_semver_major() should exist
-ok 280 - semver
-ok 281 - Function get_semver_major() should return integer
-ok 282 - major version check
-ok 283 - Function get_semver_minor() should exist
-ok 284 - semver
-ok 285 - Function get_semver_minor() should return integer
-ok 286 - minor version check
-ok 287 - Function get_semver_patch() should exist
-ok 288 - semver
-ok 289 - Function get_semver_patch() should return integer
-ok 290 - patch version check
-ok 291 - Function get_semver_prerelease() should exist
-ok 292 - semver
-ok 293 - Function get_semver_prerelease() should return text
-ok 294 - prerelease label check
-ok 295 - prerelease label check. must return prerelease only
-ok 296 - prerelease label check. must return empty string
-ok 297 - 1.0.0 should be in range [1.0.0, 2.0.0]
-ok 298 - 1.0.0 should not be in range [1.0.1, 2.0.0]
-ok 299 - 2.0.0 should not be in range [1.0.1, 2.0.0)
-ok 300 - 1.9999.9999 should be in range [1.0.1, 2.0.0)
-ok 301 - 1000.0.0 should be in range [1.0.0,)
-ok 302 - Should be able to work with arrays of semverranges
-ok 303 - Should properly format a 32 character semver
-ok 304 - Should properly format a 33 character semver
-ok 305 - Should propery format a prerelease with a hyphen
+ok 32 - "1.1.2+.123" is not a valid semver
+ok 33 - "1.1.2-.123" is not a valid semver
+ok 34 - semver(1.2.2, 1.2.2) should = 0
+ok 35 - v1.2.2 should = v1.2.2
+ok 36 - v1.2.2 should be <= v1.2.2
+ok 37 - v1.2.2 should be >= v1.2.2
+ok 38 - semver(1.2.23, 1.2.23) should = 0
+ok 39 - v1.2.23 should = v1.2.23
+ok 40 - v1.2.23 should be <= v1.2.23
+ok 41 - v1.2.23 should be >= v1.2.23
+ok 42 - semver(0.0.0, 0.0.0) should = 0
+ok 43 - v0.0.0 should = v0.0.0
+ok 44 - v0.0.0 should be <= v0.0.0
+ok 45 - v0.0.0 should be >= v0.0.0
+ok 46 - semver(999.888.7777, 999.888.7777) should = 0
+ok 47 - v999.888.7777 should = v999.888.7777
+ok 48 - v999.888.7777 should be <= v999.888.7777
+ok 49 - v999.888.7777 should be >= v999.888.7777
+ok 50 - semver(0.1.2-beta3, 0.1.2-beta3) should = 0
+ok 51 - v0.1.2-beta3 should = v0.1.2-beta3
+ok 52 - v0.1.2-beta3 should be <= v0.1.2-beta3
+ok 53 - v0.1.2-beta3 should be >= v0.1.2-beta3
+ok 54 - semver(1.0.0-rc-1, 1.0.0-RC-1) should = 0
+ok 55 - v1.0.0-rc-1 should = v1.0.0-RC-1
+ok 56 - v1.0.0-rc-1 should be <= v1.0.0-RC-1
+ok 57 - v1.0.0-rc-1 should be >= v1.0.0-RC-1
+ok 58 - semver(1.2.2, 1.2.3) should <> 0
+ok 59 - v1.2.2 should not equal v1.2.3
+ok 60 - semver(0.0.1, 1.0.0) should <> 0
+ok 61 - v0.0.1 should not equal v1.0.0
+ok 62 - semver(1.0.1, 1.1.0) should <> 0
+ok 63 - v1.0.1 should not equal v1.1.0
+ok 64 - semver(1.1.1, 1.1.0) should <> 0
+ok 65 - v1.1.1 should not equal v1.1.0
+ok 66 - semver(1.2.3-b, 1.2.3) should <> 0
+ok 67 - v1.2.3-b should not equal v1.2.3
+ok 68 - semver(1.2.3, 1.2.3-b) should <> 0
+ok 69 - v1.2.3 should not equal v1.2.3-b
+ok 70 - semver(1.2.3-a, 1.2.3-b) should <> 0
+ok 71 - v1.2.3-a should not equal v1.2.3-b
+ok 72 - semver(1.2.3-aaaaaaa1, 1.2.3-aaaaaaa2) should <> 0
+ok 73 - v1.2.3-aaaaaaa1 should not equal v1.2.3-aaaaaaa2
+ok 74 - semver(1.2.3-1.2.3, 1.2.3-1.2.3.4) should <> 0
+ok 75 - v1.2.3-1.2.3 should not equal v1.2.3-1.2.3.4
+ok 76 - semver(2.2.2, 1.1.1) should > 0
+ok 77 - semver(1.1.1, 2.2.2) should < 0
+ok 78 - v2.2.2 should be > v1.1.1
+ok 79 - v2.2.2 should be >= v1.1.1
+ok 80 - v1.1.1 should be < v2.2.2
+ok 81 - v1.1.1 should be <= v2.2.2
+ok 82 - semver(2.2.2, 2.1.1) should > 0
+ok 83 - semver(2.1.1, 2.2.2) should < 0
+ok 84 - v2.2.2 should be > v2.1.1
+ok 85 - v2.2.2 should be >= v2.1.1
+ok 86 - v2.1.1 should be < v2.2.2
+ok 87 - v2.1.1 should be <= v2.2.2
+ok 88 - semver(2.2.2, 2.2.1) should > 0
+ok 89 - semver(2.2.1, 2.2.2) should < 0
+ok 90 - v2.2.2 should be > v2.2.1
+ok 91 - v2.2.2 should be >= v2.2.1
+ok 92 - v2.2.1 should be < v2.2.2
+ok 93 - v2.2.1 should be <= v2.2.2
+ok 94 - semver(2.2.2-b, 2.2.1) should > 0
+ok 95 - semver(2.2.1, 2.2.2-b) should < 0
+ok 96 - v2.2.2-b should be > v2.2.1
+ok 97 - v2.2.2-b should be >= v2.2.1
+ok 98 - v2.2.1 should be < v2.2.2-b
+ok 99 - v2.2.1 should be <= v2.2.2-b
+ok 100 - semver(2.2.2, 2.2.2-b) should > 0
+ok 101 - semver(2.2.2-b, 2.2.2) should < 0
+ok 102 - v2.2.2 should be > v2.2.2-b
+ok 103 - v2.2.2 should be >= v2.2.2-b
+ok 104 - v2.2.2-b should be < v2.2.2
+ok 105 - v2.2.2-b should be <= v2.2.2
+ok 106 - semver(2.2.2-c, 2.2.2-b) should > 0
+ok 107 - semver(2.2.2-b, 2.2.2-c) should < 0
+ok 108 - v2.2.2-c should be > v2.2.2-b
+ok 109 - v2.2.2-c should be >= v2.2.2-b
+ok 110 - v2.2.2-b should be < v2.2.2-c
+ok 111 - v2.2.2-b should be <= v2.2.2-c
+ok 112 - semver(2.2.2-rc-2, 2.2.2-RC-1) should > 0
+ok 113 - semver(2.2.2-RC-1, 2.2.2-rc-2) should < 0
+ok 114 - v2.2.2-rc-2 should be > v2.2.2-RC-1
+ok 115 - v2.2.2-rc-2 should be >= v2.2.2-RC-1
+ok 116 - v2.2.2-RC-1 should be < v2.2.2-rc-2
+ok 117 - v2.2.2-RC-1 should be <= v2.2.2-rc-2
+ok 118 - semver(0.9.10, 0.9.9) should > 0
+ok 119 - semver(0.9.9, 0.9.10) should < 0
+ok 120 - v0.9.10 should be > v0.9.9
+ok 121 - v0.9.10 should be >= v0.9.9
+ok 122 - v0.9.9 should be < v0.9.10
+ok 123 - v0.9.9 should be <= v0.9.10
+ok 124 - semver(1.0.1-1.2.3, 1.0.1-0.9.9.9) should > 0
+ok 125 - semver(1.0.1-0.9.9.9, 1.0.1-1.2.3) should < 0
+ok 126 - v1.0.1-1.2.3 should be > v1.0.1-0.9.9.9
+ok 127 - v1.0.1-1.2.3 should be >= v1.0.1-0.9.9.9
+ok 128 - v1.0.1-0.9.9.9 should be < v1.0.1-1.2.3
+ok 129 - v1.0.1-0.9.9.9 should be <= v1.0.1-1.2.3
+ok 130 - Function to_semver() should exist
+ok 131 - Function to_semver(text) should exist
+ok 132 - Function to_semver() should return semver
+ok 133 - to_semver(1.2.2) should return 1.2.2
+ok 134 - to_semver(01.2.2) should return 1.2.2
+ok 135 - to_semver(1.02.2) should return 1.2.2
+ok 136 - to_semver(1.2.02) should return 1.2.2
+ok 137 - to_semver(1.2.02b) should return 1.2.2-b
+ok 138 - to_semver(1.2.02beta-3  ) should return 1.2.2-beta-3
+ok 139 - to_semver(1.02.02rc1) should return 1.2.2-rc1
+ok 140 - to_semver(1.0) should return 1.0.0
+ok 141 - to_semver(1) should return 1.0.0
+ok 142 - to_semver(.0.02) should return 0.0.2
+ok 143 - to_semver(1..02) should return 1.0.2
+ok 144 - to_semver(1..) should return 1.0.0
+ok 145 - to_semver(1.1) should return 1.1.0
+ok 146 - to_semver(1.2.b1) should return 1.2.0-b1
+ok 147 - to_semver(9.0beta4) should return 9.0.0-beta4
+ok 148 - to_semver(9b) should return 9.0.0-b
+ok 149 - to_semver(rc1) should return 0.0.0-rc1
+ok 150 - to_semver() should return 0.0.0
+ok 151 - to_semver(..2) should return 0.0.2
+ok 152 - to_semver(1.2.3 a) should return 1.2.3-a
+ok 153 - to_semver(..2 b) should return 0.0.2-b
+ok 154 - to_semver(  012.2.2) should return 12.2.2
+ok 155 - to_semver(20110204) should return 20110204.0.0
+ok 156 - to_semver(1.0.0-alpha) should return incoming text
+ok 157 - to_semver(1.0.0-alpha.1) should return incoming text
+ok 158 - to_semver(1.0.0-0.3.7) should return incoming text
+ok 159 - to_semver(1.0.0-x.7.z.92) should return incoming text
+ok 160 - to_semver(1.0.0-alpha+001) should return incoming text
+ok 161 - to_semver(1.0.0+20130313144700) should return incoming text
+ok 162 - to_semver(1.0.0-beta+exp.sha.5114f85) should return incoming text
+ok 163 - "1.2.0 beta 4" is not a valid semver
+ok 164 - "1.2.2-" is not a valid semver
+ok 165 - "1.2.3b#5" is not a valid semver
+ok 166 - "v1.2.2" is not a valid semver
+ok 167 - "1.4b.0" is not a valid semver
+ok 168 - "1v.2.2v" is not a valid semver
+ok 169 - "1.2.4b.5" is not a valid semver
+ok 170 - "1.2.3.4" is not a valid semver
+ok 171 - "1.2.3 4" is not a valid semver
+ok 172 - "1.2000000000000000.3.4" is not a valid semver
+ok 173 - max(semver) should work
+ok 174 - min(semver) should work
+ok 175 - ORDER BY semver USING < should work
+ok 176 - ORDER BY semver USING > should work
+ok 177 - construct to text
+ok 178 - construct from text
+ok 179 - construct from bare number
+ok 180 - construct from numeric
+ok 181 - construct from bare integer
+ok 182 - construct from integer
+ok 183 - construct from bigint
+ok 184 - construct from smallint
+ok 185 - construct from decimal
+ok 186 - construct from real
+ok 187 - construct from double
+ok 188 - construct from float
+ok 189 - cast to text
+ok 190 - cast from text
+ok 191 - Cast from bare integer
+ok 192 - Cast from bare number
+ok 193 - Cast from numeric
+ok 194 - Cast from integer
+ok 195 - Cast from bigint
+ok 196 - Cast from smallint
+ok 197 - Cast from decimal
+ok 198 - Cast from decimal
+ok 199 - Cast from real
+ok 200 - Cast from double precision
+ok 201 - Cast from float
+ok 202 - Should correctly cast "1.0.0-beta" to text
+ok 203 - Should correctly cast "1.0.0-beta1" to text
+ok 204 - Should correctly cast "1.0.0-alpha" to text
+ok 205 - Should correctly cast "1.0.0-alph" to text
+ok 206 - Should correctly cast "1.0.0-food" to text
+ok 207 - Should correctly cast "1.0.0-f111" to text
+ok 208 - Should correctly cast "1.0.0-f111asbcdasdfasdfasdfasdfasdfasdffasdfadsf" to text
+ok 209 - "1.0.0+1" is a valid 2.0.0 semver
+ok 210 - "1.0.0-1+1" is a valid 2.0.0 semver
+ok 211 - "1.0.0-1.1+1" is a valid 2.0.0 semver
+ok 212 - "1.0.0-1.1.1.1.1.1.1.1.1.1.1+1.1.1.1.1.1.1.1" is a valid 2.0.0 semver
+ok 213 - "1.0.0-1.2" is a valid 2.0.0 semver
+ok 214 - "1.0.0-1.0.2" is a valid 2.0.0 semver
+ok 215 - "1.0.0-alpha" is a valid 2.0.0 semver
+ok 216 - "1.0.0-alpha.1" is a valid 2.0.0 semver
+ok 217 - "1.0.0-0.3.7" is a valid 2.0.0 semver
+ok 218 - "1.0.0-x.7.z.92" is a valid 2.0.0 semver
+ok 219 - "0.2.13+1583426134.07de632" is a valid 2.0.0 semver
+ok 220 - "1.0.0-a.." is not a valid 2.0.0 semver
+ok 221 - "1.0.0-a.1." is not a valid 2.0.0 semver
+ok 222 - "1.0.0+1_1" is not a valid 2.0.0 semver
+ok 223 - "1.0.0-1...." is not a valid 2.0.0 semver
+ok 224 - "1.0.0-1_2" is not a valid 2.0.0 semver
+ok 225 - "1.0.0-1.02" is not a valid 2.0.0 semver
+ok 226 - ORDER BY semver (2.0.0) USING < should work
+ok 227 - ORDER BY semver (2.0.0) USING > should work
+ok 228 - semver(1.0.0-1+1, 1.0.0-1+5) should = 0
+ok 229 - v1.0.0-1+1 should = v1.0.0-1+5
+ok 230 - v1.0.0-1+1 should be <= v1.0.0-1+5
+ok 231 - v1.0.0-1+1 should be >= v1.0.0-1+5
+ok 232 - semver(1.0.0-1.1+1, 1.0.0-1.1+5) should = 0
+ok 233 - v1.0.0-1.1+1 should = v1.0.0-1.1+5
+ok 234 - v1.0.0-1.1+1 should be <= v1.0.0-1.1+5
+ok 235 - v1.0.0-1.1+1 should be >= v1.0.0-1.1+5
+ok 236 - Should correctly represent "0.5.0-release1" as "0.5.0-release1"
+ok 237 - Should correctly represent "0.5.0release1" as "0.5.0-release1"
+ok 238 - Should correctly represent "0.5-release1" as "0.5.0-release1"
+ok 239 - Should correctly represent "0.5release1" as "0.5.0-release1"
+ok 240 - Should correctly represent "0.5-1" as "0.5.0-1"
+ok 241 - Should correctly represent "1.2.3-1.02" as "1.2.3-1.2"
+ok 242 - Function is_semver() should exist
+ok 243 - Function is_semver(text) should exist
+ok 244 - Function is_semver() should return boolean
+ok 245 - is_semver(1.2.2) should return true
+ok 246 - is_semver(0.2.2) should return true
+ok 247 - is_semver(0.0.0) should return true
+ok 248 - is_semver(0.1.999) should return true
+ok 249 - is_semver(9999.9999999.823823) should return true
+ok 250 - is_semver(1.0.0-beta1) should return true
+ok 251 - is_semver(1.0.0-beta2) should return true
+ok 252 - is_semver(1.0.0) should return true
+ok 253 - is_semver(1.0.0-1) should return true
+ok 254 - is_semver(1.0.0-alpha+d34dm34t) should return true
+ok 255 - is_semver(1.0.0+d34dm34t) should return true
+ok 256 - is_semver(20110204.0.0) should return true
+ok 257 - is_semver(1.2) should return false
+ok 258 - is_semver(1.2.02) should return false
+ok 259 - is_semver(1.2.2-) should return false
+ok 260 - is_semver(1.2.3b#5) should return false
+ok 261 - is_semver(03.3.3) should return false
+ok 262 - is_semver(v1.2.2) should return false
+ok 263 - is_semver(1.3b) should return false
+ok 264 - is_semver(1.4b.0) should return false
+ok 265 - is_semver(1v) should return false
+ok 266 - is_semver(1v.2.2v) should return false
+ok 267 - is_semver(1.2.4b.5) should return false
+ok 268 - is_semver(2016.5.18-MYW-600) should return true
+ok 269 - is_semver(1010.5.0+2016-05-27-1832) should return true
+ok 270 - is_semver(0.2.13+1583426134.07de632) should return true
+ok 271 - "2.3.0+80" is a valid semver
+ok 272 - to_semver(2.3.0+80) should return 2.3.0+80
+ok 273 - Should correctly cast "2.3.0+80" to text
+ok 274 - "2.3.0+80" > "2.3.0+110" (NOT!)
+ok 275 - "2.3.0+80" > "2.3.0-alpha+110"
+ok 276 - ORDER BY semver USING < should work (section 11)
+ok 277 - ORDER BY semver USING > should work (section 11)
+ok 278 - "1.0.0" = "1.0.0+535"
+ok 279 - "1.0.0" < "1.0.0+535" (NOT!)
+ok 280 - "1.0.0" > "1.0.0+535" (NOT!)
+ok 281 - Function get_semver_major() should exist
+ok 282 - semver
+ok 283 - Function get_semver_major() should return integer
+ok 284 - major version check
+ok 285 - Function get_semver_minor() should exist
+ok 286 - semver
+ok 287 - Function get_semver_minor() should return integer
+ok 288 - minor version check
+ok 289 - Function get_semver_patch() should exist
+ok 290 - semver
+ok 291 - Function get_semver_patch() should return integer
+ok 292 - patch version check
+ok 293 - Function get_semver_prerelease() should exist
+ok 294 - semver
+ok 295 - Function get_semver_prerelease() should return text
+ok 296 - prerelease label check
+ok 297 - prerelease label check. must return prerelease only
+ok 298 - prerelease label check. must return empty string
+ok 299 - 1.0.0 should be in range [1.0.0, 2.0.0]
+ok 300 - 1.0.0 should not be in range [1.0.1, 2.0.0]
+ok 301 - 2.0.0 should not be in range [1.0.1, 2.0.0)
+ok 302 - 1.9999.9999 should be in range [1.0.1, 2.0.0)
+ok 303 - 1000.0.0 should be in range [1.0.0,)
+ok 304 - Should be able to work with arrays of semverranges
+ok 305 - Should properly format a 32 character semver
+ok 306 - Should properly format a 33 character semver
+ok 307 - Should propery format a prerelease with a hyphen

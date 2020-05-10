@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(305);
+SELECT plan(307);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -49,7 +49,9 @@ SELECT throws_ok(
     '1v.2.2v',
     '1.2.4b.5',
     '1.0.0-alpha.010',
-    '1.0.0-02799'
+    '1.0.0-02799',
+    '1.1.2+.123',
+    '1.1.2-.123'
 ]) AS v;
 
 -- Test =, <=, and >=.

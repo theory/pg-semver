@@ -192,7 +192,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 else
                     break;
             }
-            if (next == '.' && (dotlast || (atchar + 1) == len)) {
+            if (next == '.' && (dotlast || (atchar + 1) == len || i == 0 || (i > 0 && patch[i-1] == '+'))) {
                 *bad = true;
                 if (throw)
                     elog(ERROR, "bad semver value '%s': empty pre-release section at char %d", str, atchar);
