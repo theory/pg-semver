@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(299);
+SELECT plan(303);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -25,7 +25,9 @@ SELECT lives_ok(
     '1.0.0-1',
     '1.0.0-alpha+d34dm34t',
     '1.0.0+d34dm34t',
-    '20110204.0.0'
+    '20110204.0.0',
+    '1.0.0-alpha.0a',
+    '1.0.0-0AEF'
 ]) AS v;
 
 SELECT throws_ok(
@@ -33,17 +35,19 @@ SELECT throws_ok(
     NULL,
     '"' || v || '" is not a valid semver'
 )  FROM unnest(ARRAY[
-   '1.2',
-   '1.2.02',
-   '1.2.2-',
-   '1.2.3b#5',
-   '03.3.3',
-   'v1.2.2',
-   '1.3b',
-   '1.4b.0',
-   '1v',
-   '1v.2.2v',
-   '1.2.4b.5'
+    '1.2',
+    '1.2.02',
+    '1.2.2-',
+    '1.2.3b#5',
+    '03.3.3',
+    'v1.2.2',
+    '1.3b',
+    '1.4b.0',
+    '1v',
+    '1v.2.2v',
+    '1.2.4b.5',
+    '1.0.0-alpha.010',
+    '1.0.0-02799'
 ]) AS v;
 
 -- Test =, <=, and >=.

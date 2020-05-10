@@ -207,7 +207,22 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 }
             }
             if ((started_prerel || started_meta) && !skip_char) {
-                pred = (i > 1 && patch[i-2] == '.' && patch[i-1] == '0' && next != '.');
+                if ((i == 1 || patch[i-2] == '.') && patch[i-1] == '0' && isdigit(next)) {
+                    pred = true;
+                    // Scan ahead.
+                    for (p = len - atchar; p < len; p++) {
+                        if (str[p] == '.') {
+                            // We got to the end of this bit.
+                            break;
+                        }
+                        if (isalpha(str[p])) {
+                            // If there is a letter, it's okay to start with a leading 0.
+                            pred = false;
+                            break;
+                        }
+                    }
+                }
+
                 if (!started_meta && (pred && !lax))   {  // Leading zeros
                     *bad = true;
                     if (throw)

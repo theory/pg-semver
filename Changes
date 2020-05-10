@@ -6,6 +6,11 @@ Revision history for PostgreSQL extension semver.
         had been doing so on the assumption that dashes were invalid in SemVer
         1.0 and 2.0 prerelease parts, but that does not turn out to be the case.
         Thanks to @Nemo157 for the report (#46).
+      - Fixed the parsing of prerelease and metadata parts to allow leading
+        zeros for parts with non-numeric characters, e.g., `1.0.0-alpha.0a`, and
+        to disallow parts with leading zeros and only numeric characters, e.g.,
+        `1.0.0-02799`. Thanks to @Nemo157 for the bug report, and to Joseph
+        Donahue for the SemVer spec expertise (#45).
 
 0.22.0  2020-04-02T14:13:55Z
       - Fixed `get_semver_prerelease()` so that it returns only the
