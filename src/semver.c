@@ -171,8 +171,13 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 if (next == '-') {
                     skip_char = true;
                 }
-            } else if (!started_meta && next == '+') {  // Starts with +
-                started_meta = true;
+            } else if (next == '+') {
+                if (started_meta) {
+                    *bad = true;
+                    elog(ERROR, "bad semver value '%s': cannot have multiple + (plus) characters in metadata", str);
+                } else {
+                    started_meta = true;
+                }
             }
 
             if (!patch && (started_meta || started_prerel))

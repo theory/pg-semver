@@ -11,6 +11,8 @@ Revision history for PostgreSQL extension semver.
         to disallow parts with leading zeros and only numeric characters, e.g.,
         `1.0.0-02799`. Thanks to @Nemo157 for the bug report, and to Joseph
         Donahue for the SemVer spec expertise (#45).
+      - The metadata part may no longer contain plus signs other than the one
+        used to start the metadata part.
 
 0.22.0  2020-04-02T14:13:55Z
       - Fixed `get_semver_prerelease()` so that it returns only the
