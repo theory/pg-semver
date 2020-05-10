@@ -11,7 +11,7 @@ Synopsis
     --------
      1.2.1
 
-    SELECT '1.2.0'::semver > '1.2.0b1'::semver;
+    SELECT '1.2.0'::semver > '1.2.0-b1'::semver;
      ?column?
     ----------
      t
@@ -22,32 +22,63 @@ Description
 This library contains a single PostgreSQL extension, a semantic version data
 type called `semver`. It's an implementation of the version number format
 specified by the [Semantic Versioning 2.0.0
-Specification](http://semver.org/spec/v2.0.0.html).
+Specification](https://semver.org/spec/v2.0.0.html).
 
-The two important points describing the structure of a semantic version and
-how two versions compare are these, from [the spec](http://semver.org/):
+The salient points of [the spec](https://semver.org/), for the purposes of
+a data type and comparison operators, are:
 
-> 2. A normal version number MUST take the form X.Y.Z where X, Y, and Z are
-> non-negative integers, and MUST NOT contain leading zeroes. X is the
-> major version, Y is the minor version, and Z is the patch
-> version. Each element MUST increase numerically. For instance: 1.9.0
-> -> 1.10.0 -> 1.11.0.
+1. A normal version number MUST take the form X.Y.Z where X, Y, and Z are
+   non-negative integers, and MUST NOT contain leading zeroes. X is the major
+   version, Y is the minor version, and Z is the patch version. Each element
+   MUST increase numerically.
+   For instance: `1.9.0 < 1.10.0 < 1.11.0`.
 
-> 9. A pre-release version MAY be denoted by appending a hyphen and a
-> series of dot separated identifiers immediately following the patch
-> version. Identifiers MUST comprise only ASCII alphanumerics and hyphen
-> [0-9A-Za-z-]. Identifiers MUST NOT be empty. Numeric identifiers MUST
-> NOT include leading zeroes. Pre-release versions have a lower
-> precedence than the associated normal version. A pre-release version
-> indicates that the version is unstable and might not satisfy the
-> intended compatibility requirements as denoted by its associated
-> normal version. Examples: 1.0.0-alpha, 1.0.0-alpha.1, 1.0.0-0.3.7,
-> 1.0.0-x.7.z.92.
+2. A pre-release version MAY be denoted by appending a hyphen and a series
+   of dot separated identifiers immediately following the patch version.
+   Identifiers MUST comprise only ASCII alphanumerics and hyphen [0-9A-Za-z-].
+   Identifiers MUST NOT be empty. Numeric identifiers MUST NOT include leading
+   zeroes. Pre-release versions have a lower precedence than the associated
+   normal version. A pre-release version indicates that the version is
+   unstable and might not satisfy the intended compatibility requirements
+   as denoted by its associated normal version.
+   Examples: `1.0.0-alpha, 1.0.0-alpha.1, 1.0.0-0.3.7, 1.0.0-x.7.z.92`.
+
+3. Build metadata MAY be denoted by appending a plus sign and a series of
+   dot separated identifiers immediately following the patch or pre-release
+   version. Identifiers MUST comprise only ASCII alphanumerics and hyphen
+   [0-9A-Za-z-]. Identifiers MUST NOT be empty. Build metadata SHOULD be
+   ignored when determining version precedence. Thus two versions that differ
+   only in the build metadata, have the same precedence.
+   Examples: `1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85`.
+
+4. Precedence refers to how versions are compared to each other when ordered.
+   Precedence MUST be calculated by separating the version into major, minor,
+   patch and pre-release identifiers in that order (Build metadata does not
+   figure into precedence). Precedence is determined by the first difference
+   when comparing each of these identifiers from left to right as follows:
+   Major, minor, and patch versions are always compared numerically.
+   Example: `1.0.0 < 2.0.0 < 2.1.0 < 2.1.1`.
+   When major, minor, and patch are equal, a pre-release version has lower
+   precedence than a normal version.
+   Example: `1.0.0-alpha < 1.0.0`.
+   Precedence for two pre-release versions with the same major, minor, and
+   patch version MUST be determined by comparing each dot separated identifier
+   from left to right until a difference is found as follows: identifiers
+   consisting of only digits are compared numerically and identifiers with
+   letters or hyphens are compared lexically in ASCII sort order. Numeric
+   identifiers always have lower precedence than non-numeric identifiers. A
+   larger set of pre-release fields has a higher precedence than a smaller
+   set, if all of the preceding identifiers are equal.
+   Example: `1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-alpha.beta < 1.0.0-beta < 1.0.0-beta.2 < 1.0.0-beta.11 < 1.0.0-rc.1 < 1.0.0`.
 
 Usage
 -----
 
-Use like any other data type. Here's an example in a table:
+Add the extension to a database:
+
+    CREATE EXTENSION semver;
+
+Now, use it like any other data type. Here's an example in a table:
 
     CREATE TABLE extensions (
         name        TEXT,
@@ -121,7 +152,7 @@ Interface
  Function                        | Description                     | Example                                   | Result
 ---------------------------------|---------------------------------|-------------------------------------------|----------
  `to_semver(text)`               | Parse semver from text          | `to_semver('1.02')`                       | `1.2.0`
- `is_semver(text)`               | Test semver text                | `is_semver('1.02')`                       | true
+ `is_semver(text)`               | Test semver text                | `is_semver('1.2.0')`                       | true
  `semver(text)`                  | Cast text to semver             | `semver('1.2.1')`                         | `1.2.1`
  `semver(numeric)`               | Cast numeric to semver          | `semver(1.2)`                             | `1.2.0`
  `semver(real)`                  | Cast real to semver             | `semver(12.0::real)`                      | `12.0.0`
@@ -135,13 +166,14 @@ Interface
  `get_semver_patch(semver)`      | Get patch version part          | `get_semver_patch('4.2.0')`               | `0`
  `get_semver_prerelease(semver)` | Get prerelease version part     | `get_semver_prerelease('2.1.0-b2+bfb13')` | `b2`
 
-Numeric casts simply extract an integer from the decimal portion, so that
-`1.20` and `1.02` would both be parsed as `1.2.0`.
+Numeric casts simply extract an integer from the decimal portion, so that `1.20`
+and `1.02` would both be parsed as `1.2.0` (but their string equivalents would
+not).
 
 The difference between `semver()` and `to_semver()` is that the former
 requires a valid semver format, while the latter is a bit more permissive,
 doing its best to convert other version number formats (including the older
-[semver 1.0.0-beta](http://semver.org/spec/v1.0.0-beta.html) prerelease
+[semver 1.0.0-beta](https://semver.org/spec/v1.0.0-beta.html) prerelease
 format) to semantic versions:
 
     # select to_semver('1.0');
@@ -165,7 +197,8 @@ And finally, the `get_semver_*` functions all return integers except for
 
 ### Aggregate Functions ###
 
-The examples assume the values inserted into the `extensions` table in the above examples.
+The examples assume the values inserted into the `extensions` table in the above
+examples.
 
  Function      | Return Type | Description               | Example                                | Result
 ---------------|-------------|---------------------------|----------------------------------------|--------
@@ -186,7 +219,8 @@ The examples assume the values inserted into the `extensions` table in the above
  semver           | text   | `'1.2.54'::semver::text`        | `1.2.54`
 
 Note that numeric casts simply extract an integer from the decimal portion, so
-that `1.20` and `1.02` would both be parsed as `1.2.0`.
+that `1.20` and `1.02` would both be parsed as `1.2.0`  (but their string
+equivalents would not).
 
 ### Range Type ###
 
@@ -278,19 +312,19 @@ and contribute! Please file bug reports via
 Authors
 -------
 
-* [David E. Wheeler](http://theory.pm/)
-* [Sam Vilain](http://sam.vilain.net/)
-* [Tom Davis](http://stacktory.com/)
+* [David E. Wheeler](https://theory.pm/)
+* [Sam Vilain](https://sam.vilain.net/)
+* [Tom Davis](https://stacktory.com/)
 * [Xavier Caron](https://github.com/maspalio)
 
 Copyright and License
 ---------------------
 
-Copyright (c) 2010-2018 The pg-semver Maintainers: David E. Wheeler, Sam
+Copyright (c) 2010-2020 The pg-semver Maintainers: David E. Wheeler, Sam
 Vilain, Tom Davis, and Xavier Caron.
 
 This module is free software; you can redistribute it and/or modify it under
-the [PostgreSQL License](http://www.opensource.org/licenses/postgresql).
+the [PostgreSQL License](https://www.opensource.org/licenses/postgresql).
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is
