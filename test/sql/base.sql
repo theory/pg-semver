@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(303);
+SELECT plan(305);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -27,6 +27,8 @@ SELECT lives_ok(
     '1.0.0+d34dm34t',
     '20110204.0.0',
     '1.0.0-alpha.0a',
+    '1.0.0+010',
+    '1.0.0+alpha.010',
     '1.0.0-0AEF'
 ]) AS v;
 
