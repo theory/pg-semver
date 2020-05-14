@@ -10,7 +10,7 @@ Revision history for PostgreSQL extension semver.
         SELECT name, version FROM packages
          WHERE version::text !~ '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$';
 
-        If not row are returned, you should be good to go. If there are results,
+        If no rows are returned, you should be good to go. If there are results,
         here are Examples of invalid semantic versions and how they should be
         repaired.
 
