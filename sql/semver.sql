@@ -3,7 +3,7 @@ SET log_min_messages    TO warning;
 
 -- Create a semantic version data type.
 --
--- http://semver.org/.
+-- https://semver.org/.
 --
 
 -- 1. A normal version number MUST take the form X.Y.Z where X, Y, and Z are

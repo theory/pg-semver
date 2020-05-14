@@ -5,7 +5,7 @@
 -- project is:
 
 --
--- http://pgtap.org/
+-- https://pgtap.org/
 --
 
 \pset format unaligned
@@ -839,7 +839,7 @@ RETURNS text AS $$
     ), $2);
 $$ LANGUAGE SQL immutable;
 
--- Borrowed from newsysviews: http://pgfoundry.org/projects/newsysviews/
+-- Borrowed from newsysviews.
 CREATE OR REPLACE VIEW tap_funky
  AS SELECT p.oid         AS oid,
            n.nspname     AS schema,

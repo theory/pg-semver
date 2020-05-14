@@ -6,7 +6,7 @@ semver 0.22.0
 
 This library contains a single PostgreSQL extension, a data type called
 "semver". It's an implementation of the version number format specified by the
-[Semantic Versioning 2.0.0 Specification](http://semver.org/spec/v2.0.0.html).
+[Semantic Versioning 2.0.0 Specification](https://semver.org/spec/v2.0.0.html).
 
 Installation
 ------------
@@ -77,11 +77,11 @@ The `semver` data type has no dependencies other than PostgreSQL and PL/pgSQL.
 Copyright and License
 ---------------------
 
-Copyright (c) 2010-2018 The pg-semver Maintainers: David E. Wheeler, Sam
+Copyright (c) 2010-2020 The pg-semver Maintainers: David E. Wheeler, Sam
 Vilain, Tom Davis, and Xavier Caron.
 
 This module is free software; you can redistribute it and/or modify it under
-the [PostgreSQL License](http://www.opensource.org/licenses/postgresql).
+the [PostgreSQL License](https://www.opensource.org/licenses/postgresql).
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is

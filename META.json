@@ -43,7 +43,7 @@
    "generated_by": "David E. Wheeler",
    "meta-spec": {
       "version": "1.0.0",
-      "url": "http://pgxn.org/meta/spec.txt"
+      "url": "https://pgxn.org/meta/spec.txt"
    },
    "tags": [
       "semantic version",

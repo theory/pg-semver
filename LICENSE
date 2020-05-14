@@ -1,8 +1,8 @@
-Copyright (c) 2010-2018 The pg-semver Maintainers: David E. Wheeler, Sam
+Copyright (c) 2010-2020 The pg-semver Maintainers: David E. Wheeler, Sam
 Vilain, Tom Davis, and Xavier Caron.
 
 This module is free software; you can redistribute it and/or modify it under
-the [PostgreSQL License](http://www.opensource.org/licenses/postgresql).
+the [PostgreSQL License](https://www.opensource.org/licenses/postgresql).
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is

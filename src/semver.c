@@ -6,7 +6,7 @@
  * + Tom Davis <tom@recursivedream.com>
  * + Xavier Caron <xcaron@gmail.com>
  *
- * Copyright 2010-2018 The pg-semver Maintainers. This program is Free
+ * Copyright 2010-2020 The pg-semver Maintainers. This program is Free
  * Software; see the LICENSE file for the license conditions.
  */
 
@@ -436,7 +436,7 @@ char* strip_meta(const char *str)
     return copy;
 }
 
-// http://semver.org/#spec-item-11:
+// https://semver.org/#spec-item-11:
 // Precedence for two pre-release versions with the same major, minor, and patch version MUST be determined
 // by comparing each dot separated identifier from left to right until a difference is found as follows:
 // identifiers consisting of only digits are compared numerically and identifiers with letters or hyphens
