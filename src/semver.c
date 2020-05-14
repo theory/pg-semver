@@ -207,11 +207,26 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 }
             }
             if ((started_prerel || started_meta) && !skip_char) {
-                pred = (i > 1 && patch[i-2] == '.' && patch[i-1] == '0' && next != '.');
+                if ((i == 1 || patch[i-2] == '.') && patch[i-1] == '0' && isdigit(next)) {
+                    pred = true;
+                    // Scan ahead.
+                    for (p = len - atchar; p < len; p++) {
+                        if (str[p] == '.') {
+                            // We got to the end of this bit.
+                            break;
+                        }
+                        if (isalpha(str[p])) {
+                            // If there is a letter, it's okay to start with a leading 0.
+                            pred = false;
+                            break;
+                        }
+                    }
+                }
+
                 if (!started_meta && (pred && !lax))   {  // Leading zeros
                     *bad = true;
                     if (throw)
-                        elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
+                        elog(ERROR, "bad semver value '%s': semver prerelease numbers can't start with 0", str);
                     else
                         break;
                 } else if (pred && lax)  {  // Swap erroneous leading zero with whatever this is
@@ -221,6 +236,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                     patch[i] = next;
                     i++;
                 }
+                pred = false;
             }
             atchar++;
             ptr++;
