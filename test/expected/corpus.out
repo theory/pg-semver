@@ -1,0 +1,75 @@
+\set ECHO none
+1..71
+ok 1 - "0.0.4" is a valid semver
+ok 2 - "1.2.3" is a valid semver
+ok 3 - "10.20.30" is a valid semver
+ok 4 - "1.1.2-prerelease+meta" is a valid semver
+ok 5 - "1.1.2+meta" is a valid semver
+ok 6 - "1.1.2+meta-valid" is a valid semver
+ok 7 - "1.0.0-alpha" is a valid semver
+ok 8 - "1.0.0-beta" is a valid semver
+ok 9 - "1.0.0-alpha.beta" is a valid semver
+ok 10 - "1.0.0-alpha.beta.1" is a valid semver
+ok 11 - "1.0.0-alpha.1" is a valid semver
+ok 12 - "1.0.0-alpha0.valid" is a valid semver
+ok 13 - "1.0.0-alpha.0valid" is a valid semver
+ok 14 - "1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay" is a valid semver
+ok 15 - "1.0.0-rc.1+build.1" is a valid semver
+ok 16 - "2.0.0-rc.1+build.123" is a valid semver
+ok 17 - "1.2.3-beta" is a valid semver
+ok 18 - "10.2.3-DEV-SNAPSHOT" is a valid semver
+ok 19 - "1.2.3-SNAPSHOT-123" is a valid semver
+ok 20 - "1.0.0" is a valid semver
+ok 21 - "2.0.0" is a valid semver
+ok 22 - "1.1.7" is a valid semver
+ok 23 - "2.0.0+build.1848" is a valid semver
+ok 24 - "2.0.1-alpha.1227" is a valid semver
+ok 25 - "1.0.0-alpha+beta" is a valid semver
+ok 26 - "1.2.3----RC-SNAPSHOT.12.9.1--.12+788" is a valid semver
+ok 27 - "1.2.3----R-S.12.9.1--.12+meta" is a valid semver
+ok 28 - "1.2.3----RC-SNAPSHOT.12.9.1--.12" is a valid semver
+ok 29 - "1.0.0+0.build.1-rc.10000aaa-kk-0.1" is a valid semver
+ok 30 - "1.0.0-0A.is.legal" is a valid semver
+not ok 31 - "99999999999999999999999.999999999999999999.99999999999999999" is a valid semver # TODO Large versions overflow integer bounds
+# Failed (TODO) test 31: ""99999999999999999999999.999999999999999999.99999999999999999" is a valid semver"
+#         died: XX000: bad semver value '99999999999999999999999.999999999999999999.99999999999999999': version number exceeds 31-bit range
+ok 32 - "1" is not a valid semver
+ok 33 - "1.2" is not a valid semver
+ok 34 - "1.2.3-0123" is not a valid semver
+ok 35 - "1.2.3-0123.0123" is not a valid semver
+ok 36 - "1.1.2+.123" is not a valid semver
+ok 37 - "+invalid" is not a valid semver
+ok 38 - "-invalid" is not a valid semver
+ok 39 - "-invalid+invalid" is not a valid semver
+ok 40 - "-invalid.01" is not a valid semver
+ok 41 - "alpha" is not a valid semver
+ok 42 - "alpha.beta" is not a valid semver
+ok 43 - "alpha.beta.1" is not a valid semver
+ok 44 - "alpha.1" is not a valid semver
+ok 45 - "alpha+beta" is not a valid semver
+ok 46 - "alpha_beta" is not a valid semver
+ok 47 - "alpha." is not a valid semver
+ok 48 - "alpha.." is not a valid semver
+ok 49 - "beta" is not a valid semver
+ok 50 - "1.0.0-alpha_beta" is not a valid semver
+ok 51 - "-alpha." is not a valid semver
+ok 52 - "1.0.0-alpha.." is not a valid semver
+ok 53 - "1.0.0-alpha..1" is not a valid semver
+ok 54 - "1.0.0-alpha...1" is not a valid semver
+ok 55 - "1.0.0-alpha....1" is not a valid semver
+ok 56 - "1.0.0-alpha.....1" is not a valid semver
+ok 57 - "1.0.0-alpha......1" is not a valid semver
+ok 58 - "1.0.0-alpha.......1" is not a valid semver
+ok 59 - "01.1.1" is not a valid semver
+ok 60 - "1.01.1" is not a valid semver
+ok 61 - "1.1.01" is not a valid semver
+ok 62 - "1.2" is not a valid semver
+ok 63 - "1.2.3.DEV" is not a valid semver
+ok 64 - "1.2-SNAPSHOT" is not a valid semver
+ok 65 - "1.2.31.2.3----RC-SNAPSHOT.12.09.1--..12+788" is not a valid semver
+ok 66 - "1.2-RC-SNAPSHOT" is not a valid semver
+ok 67 - "-1.0.3-gamma+b7718" is not a valid semver
+ok 68 - "+justmeta" is not a valid semver
+ok 69 - "9.8.7+meta+meta" is not a valid semver
+ok 70 - "9.8.7-whatever+meta+meta" is not a valid semver
+ok 71 - "99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12" is not a valid semver
