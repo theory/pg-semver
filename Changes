@@ -1,5 +1,27 @@
 Revision history for PostgreSQL extension semver.
 0.23.0
+      - ***** WARNING: This release breaks compatibility with previous versions! ******
+        Previous versions of the semver extension incorrectly allowed some
+        invalid prerelease and build metadata values. Details below, but *BEFORE
+        YOU UPGRADE* we strongly recommend that you check for and repair any
+        invalid semvers. You can find them using the official [SemVer regular
+        expression](https://regex101.com/r/vkijKf/1/) like so:
+
+        SELECT name, version FROM packages
+         WHERE version::text !~ '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$';
+
+        If not row are returned, you should be good to go. If there are results,
+        here are Examples of invalid semantic versions and how they should be
+        repaired.
+
+            1.0.0-02799   ->   1.0.0-2799
+            1.0.0-0.02    ->   1.0.0-0.2
+            1.0.0-.20     ->   1.0.0-0.20
+            1.0.0+0+20    ->   1.0.0+0-20  or  1.0.0+0.20
+            1.0.0+.af     ->   1.0.0+0.af  or  1.0.0+af
+
+        And now, back to your regularly-scheduled changes.
+
       - Fixed an error formatting prerelease parts for semvers longer than
         32 bytes. Thanks to @Nemo157 for the report and suggested fix (#48).
       - Removed code that converted dashes to dots in prerelease parts. It
