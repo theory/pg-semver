@@ -1,5 +1,6 @@
 Revision history for PostgreSQL extension semver.
-0.23.0
+
+0.30.0  2020-05-16T19:28:36Z
       - ***** WARNING: This release breaks compatibility with previous versions! ******
         Previous versions of the semver extension incorrectly allowed some
         invalid prerelease and build metadata values. Details below, but *BEFORE
