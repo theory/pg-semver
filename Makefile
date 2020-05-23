@@ -7,7 +7,7 @@ DATA         = $(wildcard sql/*.sql)
 DOCS         = $(wildcard doc/*.mmd)
 TESTS        = $(wildcard test/sql/*.sql)
 REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
-REGRESS_OPTS = --inputdir=test --load-language=plpgsql
+REGRESS_OPTS = --inputdir=test
 MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
 PG_CONFIG   ?= pg_config
 EXTRA_CLEAN  = sql/$(EXTENSION)--$(EXTVERSION).sql
