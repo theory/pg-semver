@@ -1,0 +1,19 @@
+name: CI
+on: [push]
+jobs:
+  build:
+    strategy:
+      matrix:
+        pg: [13, 12, 11, 10, 9.6, 9.5, 9.4, 9.3, 9.2]
+    name: 🐘 PostgreSQL ${{ matrix.pg }}
+    runs-on: ubuntu-latest
+    container: postgres:${{ matrix.pg }}
+    steps:
+      - uses: actions/checkout@v1
+      - run: su -m postgres -c '/usr/lib/postgresql/${{ matrix.pg }}/bin/initdb -U postgres --locale en_US.UTF-8 --encoding UNICODE -D $PGDATA'
+      - run: su -m postgres -m -c '/usr/lib/postgresql/${{ matrix.pg }}/bin/pg_ctl start -D $PGDATA -l $PGDATA/server.log'
+      - run: apt-get -qq update && apt-get -qq install build-essential postgresql-server-dev-${{ matrix.pg }}
+      - run: make
+      - run: make install
+      # - run: pg_isready
+      - run: make installcheck PGUSER=postgres
