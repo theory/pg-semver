@@ -2,7 +2,7 @@ semver 0.22.0
 =============
 
 [![PGXN version](https://badge.fury.io/pg/semver.svg)](https://badge.fury.io/pg/semver)
-[![Build Status](https://travis-ci.org/theory/pg-semver.png)](https://travis-ci.org/theory/pg-semver)
+[![Build Status](https://github.com/theory/pg-semver/workflows/CI/badge.svg)](https://github.com/theory/pg-semver/actions)
 
 This library contains a single PostgreSQL extension, a data type called
 "semver". It's an implementation of the version number format specified by the
