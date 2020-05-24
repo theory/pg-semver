@@ -1,5 +1,11 @@
 name: CI
-on: [push]
+on:
+  push:
+    branches: ['*']
+  pull_request:
+    branches: ['*']
+  schedule:
+    - cron:  '0 12 5 * *' # Monthly at noon on the fifth
 jobs:
   build:
     strategy:
