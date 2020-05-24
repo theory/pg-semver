@@ -7,13 +7,11 @@ jobs:
         pg: [13, 12, 11, 10, 9.6, 9.5, 9.4, 9.3, 9.2]
     name: 🐘 PostgreSQL ${{ matrix.pg }}
     runs-on: ubuntu-latest
-    container:
-      image: postgres:${{ matrix.pg }}
-      options: -u postgres
+    container: postgres:${{ matrix.pg }}
     steps:
       - uses: actions/checkout@v1
-      - run: initdb
-      - run: pg_ctl start -l /tmp/server.log
+      - run: echo ENV_PATH PATH=$PATH > /etc/login.defs
+      - run: su postgres -c 'initdb --locale en_US.UTF-8 -E UNICODE && pg_ctl start -l /tmp/server.log'
       - run: apt-get -qq update && apt-get -qq install build-essential postgresql-server-dev-${{ matrix.pg }}
       - run: make
       - run: make install
