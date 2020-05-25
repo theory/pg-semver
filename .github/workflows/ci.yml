@@ -18,7 +18,7 @@ jobs:
       env:
         INTDB_OPTS: --locale en_US.UTF-8 --encoding UTF8
     steps:
-      - run: su postgres -c "$(which initdb) $INITDB_OPTS"; "$(which pg_ctl) start -l $PGDATA/server.log"
+      - run: su postgres -c "$(which initdb) $INITDB_OPTS; $(which pg_ctl) start -l $PGDATA/server.log"
       - uses: actions/checkout@v2
       - run: apt-get -qq update && apt-get -qq install build-essential postgresql-server-dev-$PG_MAJOR
       - run: make
