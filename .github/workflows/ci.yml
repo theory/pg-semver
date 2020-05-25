@@ -13,9 +13,12 @@ jobs:
         pg: [13, 12, 11, 10, 9.6, 9.5, 9.4, 9.3, 9.2]
     name: 🐘 PostgreSQL ${{ matrix.pg }}
     runs-on: ubuntu-latest
-    container: postgres:${{ matrix.pg }}
+    container:
+      image: postgres:${{ matrix.pg }}
+      env:
+        INTDB_OPTS: --locale en_US.UTF-8 --encoding UTF8
     steps:
-      - run: su postgres -c "$(which initdb) --locale en_US.UTF-8 -E UNICODE && $(which pg_ctl) start -l /tmp/server.log"
+      - run: su postgres -c "$(which initdb) $INITDB_OPTS"; "$(which pg_ctl) start -l $PGDATA/server.log"
       - uses: actions/checkout@v2
       - run: apt-get -qq update && apt-get -qq install build-essential postgresql-server-dev-$PG_MAJOR
       - run: make
