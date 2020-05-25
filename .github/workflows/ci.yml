@@ -15,9 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     container: postgres:${{ matrix.pg }}
     steps:
-      - uses: actions/checkout@v2
       - run: su postgres -c "$(which initdb) --locale en_US.UTF-8 -E UNICODE && $(which pg_ctl) start -l /tmp/server.log"
-      - run: apt-get -qq update && apt-get -qq install build-essential postgresql-server-dev-${{ matrix.pg }}
+      - uses: actions/checkout@v2
+      - run: apt-get -qq update && apt-get -qq install build-essential postgresql-server-dev-$PG_MAJOR
       - run: make
       - run: make install
       # - run: pg_isready
