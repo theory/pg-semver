@@ -33,3 +33,10 @@ dist:
 	$(eval DISTVERSION = $(shell grep -m 1 '[[:space:]]\{3\}"version":' META.json | \
                sed -e 's/[[:space:]]*"version":[[:space:]]*"\([^"]*\)",\{0,1\}/\1/'))
 	git archive --format zip --prefix=$(EXTENSION)-$(DISTVERSION)/ -o $(EXTENSION)-$(DISTVERSION).zip HEAD
+
+# Temporary fix for PostgreSQL compilation chain / llvm bug, see
+# https://github.com/rdkit/rdkit/issues/2192
+COMPILE.cxx.bc = $(CLANG) -xc++ -Wno-ignored-attributes $(BITCODE_CPPFLAGS) $(CPPFLAGS) -emit-llvm -c
+%.bc : %.cpp
+	$(COMPILE.cxx.bc) -o $@ $<
+	$(LLVM_BINPATH)/opt -module-summary -f $@ -o $@
