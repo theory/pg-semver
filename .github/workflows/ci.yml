@@ -13,8 +13,7 @@ jobs:
         pg: [12, 11, 10, 9.6, 9.5, 9.4, 9.3, 9.2]
     name: 🐘 PostgreSQL ${{ matrix.pg }}
     runs-on: ubuntu-latest
-    container:
-      image: pgxn/pgxn-tools
+    container: pgxn/pgxn-tools
     steps:
       - run: pg-start ${{ matrix.pg }}
       - uses: actions/checkout@v2
