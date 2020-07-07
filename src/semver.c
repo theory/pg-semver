@@ -15,6 +15,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include "utils/builtins.h"
+#include "catalog/pg_collation.h"
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
@@ -628,7 +629,7 @@ hash_semver(PG_FUNCTION_ARGS)
 
     if (*version->prerel != '\0') {
         prerel = CStringGetTextDatum(version->prerel);
-        hash = OidFunctionCall1(hashtext, prerel);
+        hash = OidFunctionCall1Coll(hashtext, DEFAULT_COLLATION_OID, prerel);
     }
     for (i = 0; i < 3; i++) {
         hash = (hash << (7+(i<<1))) & (hash >> (25-(i<<1)));
