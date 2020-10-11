@@ -3,6 +3,11 @@ Revision history for PostgreSQL extension semver.
 0.30.1
       - Added a workaround for an LLVM bitcode compile error. Thanks to
         @mark-s-a for the report (#40).
+      - Removed `--load-language` from the options for running the tests,
+        as it has not been needed since 9.1, we support 9.2 and higher,
+        and it has been removed from Postgres 13.
+      - Update the version in the control file to v0.30.1; it was not
+        properly updated in in the previous release.
 
 0.30.0  2020-05-16T19:28:36Z
       - ***** WARNING: This release breaks compatibility with previous versions! ******
