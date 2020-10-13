@@ -72,7 +72,8 @@ schema, like so:
 
 Dependencies
 ------------
-The `semver` data type has no dependencies other than PostgreSQL and PL/pgSQL.
+The `semver` data type has no dependencies other than PostgreSQL and,
+for testing, PL/pgSQL.
 
 Copyright and License
 ---------------------
