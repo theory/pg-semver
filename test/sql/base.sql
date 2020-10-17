@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(309);
+SELECT plan(311);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -67,8 +67,7 @@ SELECT collect_tap(ARRAY[
     ('1.2.23', '1.2.23'),
     ('0.0.0', '0.0.0'),
     ('999.888.7777', '999.888.7777'),
-    ('0.1.2-beta3', '0.1.2-beta3'),
-    ('1.0.0-rc-1', '1.0.0-RC-1')
+    ('0.1.2-beta3', '0.1.2-beta3')
  ) AS f(lv, rv);
 
 -- Test semver <> semver
@@ -103,6 +102,7 @@ SELECT collect_tap(ARRAY[
     ('2.2.2', '2.2.2-b'),
     ('2.2.2-c', '2.2.2-b'),
     ('2.2.2-rc-2', '2.2.2-RC-1'),
+    ('2.2.2-rc-1', '2.2.2-RC-1'),
     ('0.9.10', '0.9.9'),
     ('1.0.1-1.2.3', '1.0.1-0.9.9.9')
   ) AS f(lv, rv);

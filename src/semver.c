@@ -15,6 +15,8 @@
 #include <ctype.h>
 #include <limits.h>
 #include "utils/builtins.h"
+#include "catalog/pg_collation.h"
+#include "access/hash.h"
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
@@ -451,7 +453,7 @@ char* strip_meta(const char *str)
 #define TAIL_CMP_KO  9
 
 int tail_cmp ( char *lhs, char *rhs ) {
-  if ( !strcasecmp ( lhs, rhs ) ) return TAIL_CMP_EQ;
+  if ( !strcmp ( lhs, rhs ) ) return TAIL_CMP_EQ;
 
   char *dot = ".";
   char *l_last, *r_last;
@@ -481,7 +483,7 @@ int tail_cmp ( char *lhs, char *rhs ) {
         return TAIL_CMP_GT;
       }
       else {
-        int cmp = strcasecmp ( l_token, r_token );
+        int cmp = strcmp ( l_token, r_token );
 
         if ( cmp ) return cmp > 0 ? TAIL_CMP_GT : TAIL_CMP_LT;
       }
@@ -612,10 +614,6 @@ semver_cmp(PG_FUNCTION_ARGS)
     PG_RETURN_INT32(diff);
 }
 
-/* from catalog/pg_proc.h */
-#define hashtext 400
-#define hashint2 449
-
 /* so the '=' function can be 'hashes' */
 PG_FUNCTION_INFO_V1(hash_semver);
 Datum
@@ -628,11 +626,11 @@ hash_semver(PG_FUNCTION_ARGS)
 
     if (*version->prerel != '\0') {
         prerel = CStringGetTextDatum(version->prerel);
-        hash = OidFunctionCall1(hashtext, prerel);
+        hash = DirectFunctionCall1Coll(hashtext, C_COLLATION_OID, prerel);
     }
     for (i = 0; i < 3; i++) {
         hash = (hash << (7+(i<<1))) & (hash >> (25-(i<<1)));
-        hash ^= OidFunctionCall1(hashint2, version->numbers[i]);
+        hash ^= DirectFunctionCall1Coll(hashint2, C_COLLATION_OID, version->numbers[i]);
     }
 
     PG_RETURN_INT32(hash);
