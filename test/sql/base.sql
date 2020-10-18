@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(311);
+SELECT plan(312);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -487,6 +487,31 @@ SELECT is(
 SELECT is(
     '1.0.0-alpha-0'::semver::text, '1.0.0-alpha-0',
     'Should propery format a prerelease with a hyphen'
+);
+
+-- Make sure hashing works by forcing a hash aggregation. Also confirms
+-- that prerelease strings are compared case-sensitively.
+SET enable_sort=false;
+SELECT bag_eq(
+    $$
+        SELECT DISTINCT v FROM (VALUES
+            ('1.2.1'::SEMVER),
+            ('1.2.1-RC1'),
+            ('2.0.0-alph'),
+            ('2.0.0-ALPH'),
+            ('1.2.1'),
+            ('9.20.30-OMG-1.23')
+        ) v(v)
+    $$, $$
+        (VALUES
+            ('1.2.1'::SEMVER),
+            ('1.2.1-RC1'),
+            ('2.0.0-alph'),
+            ('2.0.0-ALPH'),
+            ('9.20.30-OMG-1.23')
+        )
+    $$,
+    'Should get distinct values via hash aggregation'
 );
 
 SELECT * FROM finish();

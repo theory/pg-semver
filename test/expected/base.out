@@ -1,5 +1,5 @@
 \set ECHO none
-1..311
+1..312
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -311,3 +311,4 @@ ok 308 - Should be able to work with arrays of semverranges
 ok 309 - Should properly format a 32 character semver
 ok 310 - Should properly format a 33 character semver
 ok 311 - Should propery format a prerelease with a hyphen
+ok 312 - Should get distinct values via hash aggregation
