@@ -1,5 +1,9 @@
 Revision history for PostgreSQL extension semver.
 
+0.31.1
+      - Updated the C code to pass the correct number of arguments to
+        `hashint2()`. Thanks to Andrew Gierth for the spot.
+
 0.31.0  2020-10-17T22:30:00Z
       - Added a workaround for an LLVM bitcode compile error. Thanks to
         @mark-s-a for the report (#40).
@@ -9,10 +13,10 @@ Revision history for PostgreSQL extension semver.
       - Fixed an a collation error on Postgres 12 and higher. Thanks to
         Andrew for Marc Munro for the report and to Andrew Gierth for the
         fix (pgxn/pgxn-manager#67).
-      - Prerelease parts are now compared in ASCII sort order as specified by
-        the spec, no longer case-insensitively. This is a breaking change in
-        the sense that `1.0.0-rc1` will now be considered greater than
-        `1.0.0-RC1` rather than equivalent, but they're both still valid. See
+      - Prerelease parts are no longer compared compared case-insensitively,
+        but in ASCII sort order, as required by the spec. This is a breaking
+        change in the sense that `1.0.0-rc1` will now be considered greater than
+        `1.0.0-RC1`, rather than equivalent, but they're both still valid. See
         https://github.com/semver/semver/issues/176 for the relevant
         discussion. Thanks to Andrew Gierth for the spot!
 

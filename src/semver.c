@@ -630,7 +630,7 @@ hash_semver(PG_FUNCTION_ARGS)
     }
     for (i = 0; i < 3; i++) {
         hash = (hash << (7+(i<<1))) & (hash >> (25-(i<<1)));
-        hash ^= DirectFunctionCall1Coll(hashint2, C_COLLATION_OID, version->numbers[i]);
+        hash ^= DirectFunctionCall1(hashint2, version->numbers[i]);
     }
 
     PG_RETURN_INT32(hash);
