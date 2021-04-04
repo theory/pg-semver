@@ -1,4 +1,3 @@
 .gitignore export-ignore
 .gitattributes export-ignore
-test.sh export-ignore
 .github export-ignore
