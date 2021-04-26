@@ -3,6 +3,9 @@ Revision history for PostgreSQL extension semver.
 0.31.1
       - Updated the C code to pass the correct number of arguments to
         `hashint2()`. Thanks to Andrew Gierth for the spot.
+      - Fixed an error in processing the prerelease where it could sometimes
+        incorrectly report throw an error saying "prerelease numbers can't
+        start with 0" for prereleases with no such leading zero.
 
 0.31.0  2020-10-17T22:30:00Z
       - Added a workaround for an LLVM bitcode compile error. Thanks to

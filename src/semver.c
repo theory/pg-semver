@@ -109,7 +109,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
     bool started_prerel = false;
     bool started_meta = false;
     bool skip_char = false;
-    bool pred;
+    bool pred = false;
     semver* newval;
 
     *bad = false;
@@ -214,7 +214,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 }
             }
             if ((started_prerel || started_meta) && !skip_char) {
-                if ((i == 1 || patch[i-2] == '.') && patch[i-1] == '0' && isdigit(next)) {
+                if (i >= 1 && (i == 1 || patch[i-2] == '.') && patch[i-1] == '0' && isdigit(next)) {
                     pred = true;
                     // Scan ahead.
                     for (p = len - atchar; p < len; p++) {
