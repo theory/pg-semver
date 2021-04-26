@@ -1,4 +1,4 @@
-semver 0.31.0
+semver 0.31.1
 =============
 
 [![PGXN version](https://badge.fury.io/pg/semver.svg)](https://badge.fury.io/pg/semver)
@@ -78,7 +78,7 @@ for testing, PL/pgSQL.
 Copyright and License
 ---------------------
 
-Copyright (c) 2010-2020 The pg-semver Maintainers: David E. Wheeler, Sam
+Copyright (c) 2010-2021 The pg-semver Maintainers: David E. Wheeler, Sam
 Vilain, Tom Davis, and Xavier Caron.
 
 This module is free software; you can redistribute it and/or modify it under
