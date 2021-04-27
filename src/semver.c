@@ -57,11 +57,10 @@ Datum       get_semver_prerelease(PG_FUNCTION_ARGS);
 typedef int32 vernum;
 
 /* memory/heap structure (not for binary marshalling) */
-typedef struct semver
-{
-    int32 vl_len_;  /* varlena header */
+typedef struct semver {
+    int32  vl_len_;  /* varlena header */
     vernum numbers[3];
-    char prerel[]; /* pre-release, including the null byte for convenience */
+    char   prerel[]; /* pre-release, including the null byte for convenience */
 } semver;
 
 #define PG_GETARG_SEMVER_P(n) (semver *)PG_GETARG_POINTER(n)
@@ -86,15 +85,13 @@ semver* make_semver(const int *numbers, const char* prerel) {
     }
     if (prerel) {
         strcpy(rv->prerel, prerel);
-    }
-    else {
+    } else {
         rv->prerel[0] = '\0';
     }
     return rv;
 }
 
-semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
-{
+semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
     int parts[] = {-1, -1, -1};
     long int num;
     int len;
@@ -141,26 +138,20 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                         continue;
                     } else {
                         *bad = true;
-                        if (throw)
-                            elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
-                        else
-                            break;
+                        if (!throw) break;
+                        elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
                     }
                 }
                 if (num > INT_MAX) {  // Too big
                     *bad = true;
-                    if (throw)
-                        elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
-                    else
-                        break;
+                    if (!throw) break;
+                    elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
                 }
 
                 if (!started_meta && next == '0' && num != 0 && !lax) {  // Leading zeros
                     *bad = true;
-                    if (throw)
-                        elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
-                    else
-                        break;
+                    if (!throw) break;
+                    elog(ERROR, "bad semver value '%s': semver version numbers can't start with 0", str);
                 }
 
                 parts[curpart] = num;
@@ -182,35 +173,32 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                 }
             }
 
-            if (!patch && (started_meta || started_prerel))
+            if (!patch && (started_meta || started_prerel)) {
                 patch = palloc(len - atchar + 1);
+            }
 
-            if (!skip_char &&
+            if (
+                !skip_char &&
                 (!started_prerel && next != '-') &&
-                (!started_meta && next != '+'))  {  // Didn't start with -/+
+                (!started_meta && next != '+')
+            ) { // Didn't start with -/+
                 *bad = true;
-                if (throw)
-                    elog(ERROR, "bad semver value '%s': expected - (dash) or + (plus) at char %d", str, atchar);
-                else
-                    break;
+                if (!throw) break;
+                elog(ERROR, "bad semver value '%s': expected - (dash) or + (plus) at char %d", str, atchar);
             }
             if (next == '.' && (dotlast || (atchar + 1) == len || i == 0 || (i > 0 && patch[i-1] == '+'))) {
                 *bad = true;
-                if (throw)
-                    elog(ERROR, "bad semver value '%s': empty pre-release section at char %d", str, atchar);
-                else
-                    break;
+                if (!throw) break;
+                elog(ERROR, "bad semver value '%s': empty pre-release section at char %d", str, atchar);
             }
 
             if (!skip_char && (next != '.' && next != '+' && next != '-' && !isalpha(next) && !isdigit(next))) {
-                if (lax && isspace(next))  // In lax mode, ignore whitespace
+                if (lax && isspace(next)) { // In lax mode, ignore whitespace
                     skip_char = true;
-                else {
+                } else {
                     *bad = true;
-                    if (throw)
-                        elog(ERROR, "bad semver value '%s': non-alphanumeric pre-release at char %d", str, atchar);
-                    else
-                        break;
+                    if (!throw) break;
+                    elog(ERROR, "bad semver value '%s': non-alphanumeric pre-release at char %d", str, atchar);
                 }
             }
             if ((started_prerel || started_meta) && !skip_char) {
@@ -230,12 +218,10 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
                     }
                 }
 
-                if (!started_meta && (pred && !lax))   {  // Leading zeros
+                if (!started_meta && (pred && !lax)) {  // Leading zeros
                     *bad = true;
-                    if (throw)
-                        elog(ERROR, "bad semver value '%s': semver prerelease numbers can't start with 0", str);
-                    else
-                        break;
+                    if (!throw) break;
+                    elog(ERROR, "bad semver value '%s': semver prerelease numbers can't start with 0", str);
                 } else if (pred && lax)  {  // Swap erroneous leading zero with whatever this is
                     patch[i-1] = next;
                 } else {
@@ -252,30 +238,29 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad)
 
     for (p=0; p < 3; p++) {
         if (parts[p] == -1) {
-            if (lax)
+            if (lax) {
                 parts[p] = 0;
-            else {
+            } else {
                 *bad = true;
-                if (throw)
-                    elog(ERROR, "bad semver value '%s': missing major, minor, or patch version", str);
-                else
-                    break;
+                if (!throw) break;
+                elog(ERROR, "bad semver value '%s': missing major, minor, or patch version", str);
             }
         }
     }
 
     if ((started_prerel || started_meta) && i == 0) {  // No pre-release value after -
         *bad = true;
-        if (throw)
+        if (throw) {
             elog(ERROR, "bad semver value '%s': expected alphanumeric at char %d", str, atchar);
+        }
     }
 
-    if (started_prerel || started_meta)
+    if (started_prerel || started_meta) {
         patch[i] = '\0';
+    }
 
     newval = make_semver(parts, patch);
-    if (patch)
-        pfree(patch);
+    if (patch) pfree(patch);
 
     return newval;
 }
@@ -286,13 +271,13 @@ char* emit_semver(semver* version) {
     char *buf;
 
     if (*version->prerel == '\0') {
-        len = snprintf(tmpbuf, sizeof(tmpbuf), "%d.%d.%d",
-                       version->numbers[0],
-                       version->numbers[1],
-                       version->numbers[2]
-            );
-    }
-    else {
+        len = snprintf(
+            tmpbuf, sizeof(tmpbuf), "%d.%d.%d",
+            version->numbers[0],
+            version->numbers[1],
+            version->numbers[2]
+        );
+    } else {
         len = snprintf(
             tmpbuf, sizeof(tmpbuf),"%d.%d.%d%s%s",
             version->numbers[0],
@@ -309,13 +294,13 @@ char* emit_semver(semver* version) {
     /* Try again, this time with the known length. */
     buf = palloc(len+1);
     if (*version->prerel == '\0') {
-        len = snprintf(buf, len+1, "%d.%d.%d",
-                       version->numbers[0],
-                       version->numbers[1],
-                       version->numbers[2]
-            );
-    }
-    else {
+        len = snprintf(
+            buf, len+1, "%d.%d.%d",
+            version->numbers[0],
+            version->numbers[1],
+            version->numbers[2]
+        );
+    } else {
         len = snprintf(
             buf, len+1, "%d.%d.%d%s%s",
             version->numbers[0],
@@ -335,32 +320,27 @@ char* emit_semver(semver* version) {
 /* input function: C string */
 PG_FUNCTION_INFO_V1(semver_in);
 Datum
-semver_in(PG_FUNCTION_ARGS)
-{
+semver_in(PG_FUNCTION_ARGS) {
     char *str = PG_GETARG_CSTRING(0);
     bool bad = false;
     semver *result = parse_semver(str, false, true, &bad);
-    if (!result)
-        PG_RETURN_NULL();
+    if (!result) PG_RETURN_NULL();
 
     PG_RETURN_POINTER(result);
 }/* output function: C string */
 
 PG_FUNCTION_INFO_V1(semver_out);
 Datum
-semver_out(PG_FUNCTION_ARGS)
-{
+semver_out(PG_FUNCTION_ARGS) {
     semver* amount = PG_GETARG_SEMVER_P(0);
     char *result;
     result = emit_semver(amount);
-
     PG_RETURN_CSTRING(result);
 }
 
 PG_FUNCTION_INFO_V1(text_to_semver);
 Datum
-text_to_semver(PG_FUNCTION_ARGS)
-{
+text_to_semver(PG_FUNCTION_ARGS) {
     text* sv = PG_GETARG_TEXT_PP(0);
     bool bad = false;
     semver* rs = parse_semver(text_to_cstring(sv), false, true, &bad);
@@ -369,8 +349,7 @@ text_to_semver(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(semver_to_text);
 Datum
-semver_to_text(PG_FUNCTION_ARGS)
-{
+semver_to_text(PG_FUNCTION_ARGS) {
     semver* sv = PG_GETARG_SEMVER_P(0);
     char* xxx = emit_semver(sv);
     text* res = cstring_to_text(xxx);
@@ -380,8 +359,7 @@ semver_to_text(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(get_semver_major);
 Datum
-get_semver_major(PG_FUNCTION_ARGS)
-{
+get_semver_major(PG_FUNCTION_ARGS) {
     semver* sv = PG_GETARG_SEMVER_P(0);
     int major = sv->numbers[0];
     PG_RETURN_INT32(major);
@@ -389,8 +367,7 @@ get_semver_major(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(get_semver_minor);
 Datum
-get_semver_minor(PG_FUNCTION_ARGS)
-{
+get_semver_minor(PG_FUNCTION_ARGS) {
     semver* sv = PG_GETARG_SEMVER_P(0);
     int minor = sv->numbers[1];
     PG_RETURN_INT32(minor);
@@ -398,8 +375,7 @@ get_semver_minor(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(get_semver_patch);
 Datum
-get_semver_patch(PG_FUNCTION_ARGS)
-{
+get_semver_patch(PG_FUNCTION_ARGS) {
     semver* sv = PG_GETARG_SEMVER_P(0);
     int patch = sv->numbers[2];
     PG_RETURN_INT32(patch);
@@ -407,25 +383,21 @@ get_semver_patch(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(get_semver_prerelease);
 Datum
-get_semver_prerelease(PG_FUNCTION_ARGS)
-{
+get_semver_prerelease(PG_FUNCTION_ARGS) {
     semver* sv = PG_GETARG_SEMVER_P(0);
     char* prerelease = strip_meta(sv->prerel);
     text* res = cstring_to_text(prerelease);
     PG_RETURN_TEXT_P(res);
 }
 
-
 /* Remove everything at and after "+" in a pre-release suffix */
-char* strip_meta(const char *str)
-{
+char* strip_meta(const char *str) {
     int n = strlen(str);
     char *copy = palloc(n + 1);
     int j = 0;   // current character
     strcpy(copy, str);
 
-    while (j < n)
-    {
+    while (j < n) {
         /* if current character is b */
         if (str[j] == '+') {
             break;
@@ -453,57 +425,49 @@ char* strip_meta(const char *str)
 #define TAIL_CMP_KO  9
 
 int tail_cmp ( char *lhs, char *rhs ) {
-  if ( !strcmp ( lhs, rhs ) ) return TAIL_CMP_EQ;
+    if (!strcmp(lhs, rhs)) return TAIL_CMP_EQ;
 
-  char *dot = ".";
-  char *l_last, *r_last;
+    char *dot = ".";
+    char *l_last, *r_last;
 
-  char *l_token = strtok_r ( lhs, dot, &l_last );
-  char *r_token = strtok_r ( rhs, dot, &r_last );
+    char *l_token = strtok_r(lhs, dot, &l_last);
+    char *r_token = strtok_r(rhs, dot, &r_last);
 
-  if (  l_token && !r_token ) return TAIL_CMP_LT;
-  if ( !l_token &&  r_token ) return TAIL_CMP_GT;
+    if ( l_token && !r_token) return TAIL_CMP_LT;
+    if (!l_token &&  r_token) return TAIL_CMP_GT;
 
-  while ( l_token || r_token ) {
-    if ( l_token && r_token ) {
-      int l_numeric = isdigit ( l_token[0] );
-      int r_numeric = isdigit ( r_token[0] );
+    while (l_token || r_token) {
+        if (l_token && r_token) {
+            int l_numeric = isdigit (l_token[0]);
+            int r_numeric = isdigit (r_token[0]);
 
-      if ( l_numeric && r_numeric ) {
-        int l_int = atoi ( l_token );
-        int r_int = atoi ( r_token );
+            if (l_numeric && r_numeric) {
+                int l_int = atoi (l_token);
+                int r_int = atoi (r_token);
+                if (l_int < r_int) return TAIL_CMP_LT;
+                if (l_int > r_int) return TAIL_CMP_GT;
+            } else if (l_numeric) {
+                return TAIL_CMP_LT;
+            } else if (r_numeric) {
+                return TAIL_CMP_GT;
+            } else {
+                int cmp = strcmp(l_token, r_token);
+                if (cmp) return cmp > 0 ? TAIL_CMP_GT : TAIL_CMP_LT;
+            }
+        }  else if (l_token) {
+            return TAIL_CMP_GT;
+        } else if (r_token) {
+            return TAIL_CMP_LT;
+        }
 
-        if ( l_int < r_int ) return TAIL_CMP_LT;
-        if ( l_int > r_int ) return TAIL_CMP_GT;
-      }
-      else if ( l_numeric ) {
-        return TAIL_CMP_LT;
-      }
-      else if ( r_numeric ) {
-        return TAIL_CMP_GT;
-      }
-      else {
-        int cmp = strcmp ( l_token, r_token );
-
-        if ( cmp ) return cmp > 0 ? TAIL_CMP_GT : TAIL_CMP_LT;
-      }
-    }
-    else if ( l_token ) {
-      return TAIL_CMP_GT;
-    }
-    else if ( r_token ) {
-      return TAIL_CMP_LT;
+        l_token = strtok_r(NULL, dot, &l_last);
+        r_token = strtok_r(NULL, dot, &r_last);
     }
 
-    l_token = strtok_r ( NULL, dot, &l_last );
-    r_token = strtok_r ( NULL, dot, &r_last );
-  }
-
-  return TAIL_CMP_KO;
+    return TAIL_CMP_KO;
 }
 
-int prerelcmp(const char* a, const char* b)
-{
+int prerelcmp(const char* a, const char* b) {
     int res;
     char *ac, *bc;
 
@@ -522,8 +486,7 @@ int prerelcmp(const char* a, const char* b)
 }
 
 /* comparisons */
-int _semver_cmp(semver* a, semver* b)
-{
+int _semver_cmp(semver* a, semver* b) {
     int rv, i, a_x, b_x;
     rv = 0;
     for (i = 0; i < 3; i++) {
@@ -546,8 +509,7 @@ int _semver_cmp(semver* a, semver* b)
 
 PG_FUNCTION_INFO_V1(semver_eq);
 Datum
-semver_eq(PG_FUNCTION_ARGS)
-{
+semver_eq(PG_FUNCTION_ARGS) {
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
@@ -556,8 +518,7 @@ semver_eq(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(semver_ne);
 Datum
-semver_ne(PG_FUNCTION_ARGS)
-{
+semver_ne(PG_FUNCTION_ARGS) {
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
@@ -566,8 +527,7 @@ semver_ne(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(semver_le);
 Datum
-semver_le(PG_FUNCTION_ARGS)
-{
+semver_le(PG_FUNCTION_ARGS) {
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
@@ -576,8 +536,7 @@ semver_le(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(semver_lt);
 Datum
-semver_lt(PG_FUNCTION_ARGS)
-{
+semver_lt(PG_FUNCTION_ARGS) {
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
@@ -586,8 +545,7 @@ semver_lt(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(semver_ge);
 Datum
-semver_ge(PG_FUNCTION_ARGS)
-{
+semver_ge(PG_FUNCTION_ARGS) {
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
@@ -596,8 +554,7 @@ semver_ge(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(semver_gt);
 Datum
-semver_gt(PG_FUNCTION_ARGS)
-{
+semver_gt(PG_FUNCTION_ARGS) {
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
@@ -606,8 +563,7 @@ semver_gt(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(semver_cmp);
 Datum
-semver_cmp(PG_FUNCTION_ARGS)
-{
+semver_cmp(PG_FUNCTION_ARGS) {
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
@@ -617,8 +573,7 @@ semver_cmp(PG_FUNCTION_ARGS)
 /* so the '=' function can be 'hashes' */
 PG_FUNCTION_INFO_V1(hash_semver);
 Datum
-hash_semver(PG_FUNCTION_ARGS)
-{
+hash_semver(PG_FUNCTION_ARGS) {
     semver* version = PG_GETARG_SEMVER_P(0);
     uint32 hash = 0;
     int i;
@@ -638,38 +593,27 @@ hash_semver(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(semver_larger);
 Datum
-semver_larger(PG_FUNCTION_ARGS)
-{
+semver_larger(PG_FUNCTION_ARGS) {
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
-    if (diff >= 0) {
-        PG_RETURN_POINTER(a);
-    }
-    else {
-        PG_RETURN_POINTER(b);
-    }
+    if (diff >= 0) PG_RETURN_POINTER(a);
+    PG_RETURN_POINTER(b);
 }
 
 PG_FUNCTION_INFO_V1(semver_smaller);
 Datum
-semver_smaller(PG_FUNCTION_ARGS)
-{
+semver_smaller(PG_FUNCTION_ARGS) {
     semver* a = PG_GETARG_SEMVER_P(0);
     semver* b = PG_GETARG_SEMVER_P(1);
     int diff = _semver_cmp(a, b);
-    if (diff <= 0) {
-        PG_RETURN_POINTER(a);
-    }
-    else {
-        PG_RETURN_POINTER(b);
-    }
+    if (diff <= 0) PG_RETURN_POINTER(a);
+    PG_RETURN_POINTER(b);
 }
 
 PG_FUNCTION_INFO_V1(to_semver);
 Datum
-to_semver(PG_FUNCTION_ARGS)
-{
+to_semver(PG_FUNCTION_ARGS) {
     text* sv = PG_GETARG_TEXT_PP(0);
     bool bad = false;
     semver* rs = parse_semver(text_to_cstring(sv), true, true, &bad);
@@ -678,8 +622,7 @@ to_semver(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(is_semver);
 Datum
-is_semver(PG_FUNCTION_ARGS)
-{
+is_semver(PG_FUNCTION_ARGS) {
     text* sv = PG_GETARG_TEXT_PP(0);
     bool bad = false;
     semver* rs = parse_semver(text_to_cstring(sv), false, false, &bad);
