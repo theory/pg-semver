@@ -1,5 +1,7 @@
 Revision history for PostgreSQL extension semver.
 
+0.31.2
+
 0.31.1  2021-04-27T00:10:07Z
       - Updated the C code to pass the correct number of arguments to
         `hashint2()`. Thanks to Andrew Gierth for the spot.
