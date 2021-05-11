@@ -79,23 +79,19 @@ invalid semvers. You can find them using the official
 [SemVer regular expression](https://regex101.com/r/vkijKf/1/) like so
 (replace `name`, `version`, and `packages` as appropriate for your database):
 
-``` sql
-SELECT name, version FROM packages
- WHERE version::text !~ '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$';
- ```
+    SELECT name, version FROM packages
+    WHERE version::text !~ '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$';
 
 If no rows are returned, you should be good to go. If there are results, here are
 Examples of invalid semantic versions and how they should be repaired.
 
-```
-Invalid             Valid SemVer
------------         ----------------------------
-1.0.0-02799    ->   1.0.0-2799
-1.0.0-0.02     ->   1.0.0-0.2
-1.0.0-.20      ->   1.0.0-0.20
-1.0.0+0+20     ->   1.0.0+0-20  or  1.0.0+0.20
-1.0.0+.af      ->   1.0.0+0.af  or  1.0.0+af
-```
+    Invalid             Valid SemVer
+    -----------         ----------------------------
+    1.0.0-02799    ->   1.0.0-2799
+    1.0.0-0.02     ->   1.0.0-0.2
+    1.0.0-.20      ->   1.0.0-0.20
+    1.0.0+0+20     ->   1.0.0+0-20  or  1.0.0+0.20
+    1.0.0+.af      ->   1.0.0+0.af  or  1.0.0+af
 
 Usage
 -----
