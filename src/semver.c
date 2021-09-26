@@ -142,7 +142,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
                         elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
                     }
                 }
-                if (num > INT_MAX) {  // Too big
+                if (num > INT32_MAX) {  // Too big
                     *bad = true;
                     if (!throw) break;
                     elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
