@@ -123,6 +123,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
                 atchar++;
                 curpart++;
             } else {  // OK, it should be a version part number then
+                errno = 0;
                 num = strtol(ptr, &endptr, 10);
                 // N.B. According to strtol(3), a valid number may be preceded
                 // by a single +/-, so a value like 0.1-1 will end up being
@@ -142,7 +143,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
                         elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
                     }
                 }
-                if (num > INT32_MAX) {  // Too big
+                if (errno != 0 || num > INT32_MAX) { // Invalid or too big
                     *bad = true;
                     if (!throw) break;
                     elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);

@@ -1,8 +1,9 @@
 Revision history for PostgreSQL extension semver.
 
 0.31.2
-      - Fix an overflow check to properly compare the max size of INT32
-        rather than INT. Thanks to Felix Lechner for the report (#58).
+      - Add an overflow check and properly compare the max size of INT32
+        rather than INT. Thanks to Felix Lechner for the report and Tom Lane
+        for the C lesson (#58).
 
 0.31.1  2021-04-27T00:10:07Z
       - Updated the C code to pass the correct number of arguments to
