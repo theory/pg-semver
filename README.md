@@ -1,4 +1,4 @@
-semver 0.31.1
+semver 0.31.2
 =============
 
 [![PGXN version](https://badge.fury.io/pg/semver.svg)](https://badge.fury.io/pg/semver)
