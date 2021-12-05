@@ -427,13 +427,15 @@ char* strip_meta(const char *str) {
 
 int tail_cmp ( char *lhs, char *rhs ) {
     char *dot = ".";
-    char *l_last, *r_last;
-    char *l_token = strtok_r(lhs, dot, &l_last);
-    char *r_token = strtok_r(rhs, dot, &r_last);
+    char *l_last, *r_last, *l_token, *r_token;
 
-    if ( !strcmp(lhs, rhs)    ) return TAIL_CMP_EQ;
-    if ( l_token && !r_token  ) return TAIL_CMP_LT;
-    if ( !l_token &&  r_token ) return TAIL_CMP_GT;
+    if (!strcmp(lhs, rhs)) return TAIL_CMP_EQ;
+
+    l_token = strtok_r(lhs, dot, &l_last);
+    r_token = strtok_r(rhs, dot, &r_last);
+
+    if (l_token  && !r_token) return TAIL_CMP_LT;
+    if (!l_token &&  r_token) return TAIL_CMP_GT;
 
     while (l_token || r_token) {
         if (l_token && r_token) {
