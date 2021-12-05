@@ -7,3 +7,4 @@ regression.out
 /sql/semver--?.??.?.sql
 /semver-*
 /latest-changes.md
+/src/*.bc
