@@ -1,6 +1,7 @@
 name: CI
 on:
   push:
+    branches: ['*']
   pull_request:
   schedule:
     - cron:  '0 12 5 * *' # Monthly at noon on the fifth
