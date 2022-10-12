@@ -17,6 +17,8 @@
 #include "utils/builtins.h"
 #include "catalog/pg_collation.h"
 #include "access/hash.h"
+#include "lib/stringinfo.h"
+#include "libpq/pqformat.h"
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
@@ -25,6 +27,8 @@ PG_MODULE_MAGIC;
 /* IO methods */
 Datum       semver_in(PG_FUNCTION_ARGS);
 Datum       semver_out(PG_FUNCTION_ARGS);
+Datum       semver_recv(PG_FUNCTION_ARGS);
+Datum       semver_send(PG_FUNCTION_ARGS);
 
 Datum       semver_eq(PG_FUNCTION_ARGS);
 Datum       hash_semver(PG_FUNCTION_ARGS);
@@ -337,6 +341,44 @@ semver_out(PG_FUNCTION_ARGS) {
     char *result;
     result = emit_semver(amount);
     PG_RETURN_CSTRING(result);
+}
+
+PG_FUNCTION_INFO_V1(semver_recv);
+Datum
+semver_recv(PG_FUNCTION_ARGS) {
+    StringInfo buf = (StringInfo) PG_GETARG_POINTER(0);
+    const int len = buf->len - buf->cursor;
+    char* str = palloc(len + 1);
+    bool bad = false;
+    semver* result;
+
+    pq_copymsgbytes(buf, str, len);
+    str[len] = 0;
+
+    result = parse_semver(str, false, true, &bad);
+    pfree(str);
+    if (!result) PG_RETURN_NULL();
+
+    PG_RETURN_POINTER(result);
+}
+
+PG_FUNCTION_INFO_V1(semver_send);
+Datum
+semver_send(PG_FUNCTION_ARGS) {
+    bytea* output;
+
+    semver* version = PG_GETARG_SEMVER_P(0);
+    char* str = emit_semver(version);
+    int len = strlen(str);
+
+    output = palloc(VARHDRSZ + len);
+
+    memcpy(VARDATA(output), str, len);
+    SET_VARSIZE(output, VARHDRSZ + len);
+
+    pfree(str);
+
+    PG_RETURN_BYTEA_P(output);
 }
 
 PG_FUNCTION_INFO_V1(text_to_semver);

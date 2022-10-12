@@ -34,6 +34,16 @@ CREATE OR REPLACE FUNCTION semver_out(semver)
 	AS 'semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
+CREATE OR REPLACE FUNCTION semver_recv(internal)
+    RETURNS semver
+    AS 'semver'
+    LANGUAGE C STRICT IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION semver_send(semver)
+    RETURNS bytea
+    AS 'semver'
+    LANGUAGE C STRICT IMMUTABLE;
+
 --
 --  The type itself.
 --
@@ -41,6 +51,8 @@ CREATE OR REPLACE FUNCTION semver_out(semver)
 CREATE TYPE semver (
 	INPUT = semver_in,
 	OUTPUT = semver_out,
+	RECEIVE = semver_recv,
+	SEND = semver_send,
 	-- values of passedbyvalue and alignment are copied from the named type.
     STORAGE = plain,
 	INTERNALLENGTH = variable,
