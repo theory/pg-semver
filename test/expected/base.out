@@ -1,5 +1,5 @@
 \set ECHO none
-1..312
+1..334
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -312,3 +312,25 @@ ok 309 - Should properly format a 32 character semver
 ok 310 - Should properly format a 33 character semver
 ok 311 - Should propery format a prerelease with a hyphen
 ok 312 - Should get distinct values via hash aggregation
+ok 313 - Function semver_send() should exist
+ok 314 - Function semver_send(semver) should exist
+ok 315 - Function semver_send() should return bytea
+ok 316 - Function semver_recv() should exist
+ok 317 - Function semver_recv(internal) should exist
+ok 318 - Function semver_recv() should return semver
+ok 319 - semver_send('0.9.9-a1.1+1234')
+ok 320 - semver_send('0.9.9-a1.2.3')
+ok 321 - semver_send('0.9.9-a1.2')
+ok 322 - semver_send('0.9.9')
+ok 323 - semver_send('1.0.0+99')
+ok 324 - semver_send('1.0.0-1')
+ok 325 - semver_send('1.2.2')
+ok 326 - semver_send('9999.9999999.823823')
+ok 327 - semver_send('1.0.0-beta1')
+ok 328 - semver_send('1.0.0-1')
+ok 329 - semver_send('1.0.0-alpha+d34dm34t')
+ok 330 - semver_send('1.0.0+d34dm34t')
+ok 331 - semver_send('20110204.0.0')
+ok 332 - semver_send('1.0.0-0AEF')
+ok 333 - semver_send(NULL)
+ok 334 - Should have binary copied all of the semvers

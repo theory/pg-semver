@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 \i sql/semver.sql
 
-SELECT plan(312);
+SELECT plan(334);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -512,6 +512,44 @@ SELECT bag_eq(
         )
     $$,
     'Should get distinct values via hash aggregation'
+);
+
+-- Test send and receive.
+SELECT has_function('semver_send');
+SELECT has_function('semver_send', ARRAY['semver']);
+SELECT function_returns('semver_send', 'bytea');
+SELECT has_function('semver_recv');
+SELECT has_function('semver_recv', ARRAY['internal']);
+SELECT function_returns('semver_recv', 'semver');
+
+-- Set up some values to copy.
+INSERT INTO vs VALUES
+    ('1.2.2'::semver),
+    ('9999.9999999.823823'),
+    ('1.0.0-beta1'),
+    ('1.0.0-1'),
+    ('1.0.0-alpha+d34dm34t'),
+    ('1.0.0+d34dm34t'),
+    ('20110204.0.0'),
+    ('1.0.0-0AEF'),
+    (NULL)
+;
+
+-- Test semver_send().
+SELECT is(
+    semver_send(version), '\x01' || version::bytea,
+    'semver_send(' || COALESCE(quote_literal(version::text), 'NULL') || ')'
+) FROM vs;
+
+-- Cannot test semver_recv() directly, so instead copy to a file and back into
+-- another table.
+CREATE TABLE vs_recv(version semver);
+\copy vs TO semver_binary_copy.bin WITH BINARY;
+\copy vs_recv from semver_binary_copy.bin with binary;
+SELECT bag_eq(
+    'SELECT * FROM vs',
+    'SELECT * FROM vs_recv',
+    'Should have binary copied all of the semvers'
 );
 
 SELECT * FROM finish();

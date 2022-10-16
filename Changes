@@ -1,6 +1,8 @@
 Revision history for PostgreSQL extension semver.
 
-0.31.3
+0.32.0
+      - Add support for binary input (receive) and output (send) functions.
+        Thanks to Anna Clemens for the pull request (#61)!
 
 0.31.2  2021-09-28T02:03:35Z
       - Add an overflow check and properly compare the max size of INT32

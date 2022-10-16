@@ -6,7 +6,7 @@
  * + Tom Davis <tom@recursivedream.com>
  * + Xavier Caron <xcaron@gmail.com>
  *
- * Copyright 2010-2021 The pg-semver Maintainers. This program is Free
+ * Copyright 2010-2022 The pg-semver Maintainers. This program is Free
  * Software; see the LICENSE file for the license conditions.
  */
 
@@ -343,42 +343,58 @@ semver_out(PG_FUNCTION_ARGS) {
     PG_RETURN_CSTRING(result);
 }
 
-PG_FUNCTION_INFO_V1(semver_recv);
-Datum
-semver_recv(PG_FUNCTION_ARGS) {
-    StringInfo buf = (StringInfo) PG_GETARG_POINTER(0);
-    const int len = buf->len - buf->cursor;
-    char* str = palloc(len + 1);
-    bool bad = false;
-    semver* result;
-
-    pq_copymsgbytes(buf, str, len);
-    str[len] = 0;
-
-    result = parse_semver(str, false, true, &bad);
-    pfree(str);
-    if (!result) PG_RETURN_NULL();
-
-    PG_RETURN_POINTER(result);
-}
-
+/*
+ * semver type send function
+ *
+ * The type is sent as text in binary mode, so this is almost the same as the
+ * output function, but it's prefixed with a version number so we can change the
+ * binary format sent in future if necessary. For now, only version 1 is
+ * supported.
+ */
 PG_FUNCTION_INFO_V1(semver_send);
 Datum
 semver_send(PG_FUNCTION_ARGS) {
-    bytea* output;
+    semver *result = PG_GETARG_SEMVER_P(0);
+    char   *str = emit_semver(result);
+    char    version = 1;
 
-    semver* version = PG_GETARG_SEMVER_P(0);
-    char* str = emit_semver(version);
-    int len = strlen(str);
-
-    output = palloc(VARHDRSZ + len);
-
-    memcpy(VARDATA(output), str, len);
-    SET_VARSIZE(output, VARHDRSZ + len);
-
+    StringInfoData buf;
+    pq_begintypsend(&buf);
+    pq_sendbyte(&buf, version);
+    pq_sendtext(&buf, str, strlen(str));
     pfree(str);
 
-    PG_RETURN_BYTEA_P(output);
+    PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
+}
+
+/*
+ * semver type recv function
+ *
+ * The type is sent as text in binary mode, so this is almost the same as the
+ * input function, but it's prefixed with a version number so we can change the
+ * binary format sent in future if necessary. For now, only version 1 is
+ * supported.
+ */
+PG_FUNCTION_INFO_V1(semver_recv);
+Datum
+semver_recv(PG_FUNCTION_ARGS) {
+    StringInfo  buf = (StringInfo) PG_GETARG_POINTER(0);
+    char        version = pq_getmsgbyte(buf);
+    char       *str;
+    int         nbytes;
+    bool        bad = false;
+    semver     *result;
+
+    if (version != 1) {
+        elog(ERROR, "unsupported semver type version number %d", version);
+    }
+
+    str = pq_getmsgtext(buf, buf->len - buf->cursor, &nbytes);
+    result = parse_semver(str, false, true, &bad);
+    pfree(str);
+
+    if (!result) PG_RETURN_NULL();
+    PG_RETURN_POINTER(result);
 }
 
 PG_FUNCTION_INFO_V1(text_to_semver);
