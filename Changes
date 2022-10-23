@@ -1,5 +1,7 @@
 Revision history for PostgreSQL extension semver.
 
+0.32.1
+
 0.32.0  2022-10-23T21:53:54Z
       - Add support for binary input (receive) and output (send) functions.
         Thanks to Anna Clemens for the pull request (#61)!
