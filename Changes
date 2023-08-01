@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.32.1
+0.32.1  2023-08-01T23:20:31Z
       - Fixed compilation issue on Postgres 16.
 
 0.32.0  2022-10-23T21:53:54Z
