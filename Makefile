@@ -5,6 +5,7 @@ EXTVERSION   = $(shell grep -m 1 '[[:space:]]\{8\}"version":' META.json | \
 DISTVERSION  = $(shell grep -m 1 '[[:space:]]\{3\}"version":' META.json | \
                sed -e 's/[[:space:]]*"version":[[:space:]]*"\([^"]*\)",\{0,1\}/\1/')
 
+MODULEDIR    = semver
 DATA         = $(wildcard sql/*.sql)
 DOCS         = $(wildcard doc/*.mmd)
 TESTS        = $(wildcard test/sql/*.sql)
