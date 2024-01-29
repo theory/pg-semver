@@ -1,6 +1,11 @@
 Revision history for PostgreSQL extension semver.
 
 0.32.2
+      - Updated the installation configuration to install the SQL and
+        documentation files into `semver` subdirectories.
+      - Changed the tests to use `CREATE EXTENSION` instead of loading the
+        SQL source file directory. The latter was required for Postgres 9.0
+        and lower, which have not been supported since v0.20.0 back in 2018.
 
 0.32.1  2023-08-01T23:20:31Z
       - Fixed compilation issue on Postgres 16.

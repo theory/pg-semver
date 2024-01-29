@@ -1,11 +1,11 @@
 CREATE OR REPLACE FUNCTION semver_recv(internal)
     RETURNS semver
-    AS 'semver'
+    AS 'MODULE_PATHNAME'
     LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver_send(semver)
     RETURNS bytea
-    AS 'semver'
+    AS 'MODULE_PATHNAME'
     LANGUAGE C STRICT IMMUTABLE;
 
 ALTER TYPE semver SET

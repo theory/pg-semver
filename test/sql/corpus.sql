@@ -4,7 +4,7 @@ BEGIN;
 -- Test the SemVer corpus from https://regex101.com/r/Ly7O1x/3/.
 
 \i test/pgtap-core.sql
-\i sql/semver.sql
+CREATE EXTENSION semver;
 
 SELECT plan(71);
 --SELECT * FROM no_plan();

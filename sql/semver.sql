@@ -26,22 +26,22 @@ CREATE TYPE semver;
 --
 CREATE OR REPLACE FUNCTION semver_in(cstring)
 	RETURNS semver
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver_out(semver)
 	RETURNS cstring
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver_recv(internal)
     RETURNS semver
-    AS 'semver'
+    AS 'MODULE_PATHNAME'
     LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver_send(semver)
     RETURNS bytea
-    AS 'semver'
+    AS 'MODULE_PATHNAME'
     LANGUAGE C STRICT IMMUTABLE;
 
 --
@@ -67,7 +67,7 @@ CREATE TYPE semver (
 
 CREATE OR REPLACE FUNCTION to_semver(text)
 	RETURNS semver
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 --
@@ -76,12 +76,12 @@ CREATE OR REPLACE FUNCTION to_semver(text)
 
 CREATE OR REPLACE FUNCTION semver(text)
 	RETURNS semver
-    AS 'semver', 'text_to_semver'
+    AS 'MODULE_PATHNAME', 'text_to_semver'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION text(semver)
 	RETURNS text
-    AS 'semver', 'semver_to_text'
+    AS 'MODULE_PATHNAME', 'semver_to_text'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION semver(numeric)
@@ -127,7 +127,7 @@ CREATE CAST (bigint AS semver)           WITH FUNCTION semver(bigint);
 
 CREATE OR REPLACE FUNCTION semver_eq(semver, semver)
 	RETURNS bool
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR = (
@@ -143,7 +143,7 @@ CREATE OPERATOR = (
 
 CREATE OR REPLACE FUNCTION semver_ne(semver, semver)
 	RETURNS bool
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR <> (
@@ -157,7 +157,7 @@ CREATE OPERATOR <> (
 
 CREATE OR REPLACE FUNCTION semver_le(semver, semver)
 	RETURNS bool
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR <= (
@@ -169,7 +169,7 @@ CREATE OPERATOR <= (
 
 CREATE OR REPLACE FUNCTION semver_lt(semver, semver)
 	RETURNS bool
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR < (
@@ -181,7 +181,7 @@ CREATE OPERATOR < (
 
 CREATE OR REPLACE FUNCTION semver_ge(semver, semver)
 	RETURNS bool
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR >= (
@@ -193,7 +193,7 @@ CREATE OPERATOR >= (
 
 CREATE OR REPLACE FUNCTION semver_gt(semver, semver)
 	RETURNS bool
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OPERATOR > (
@@ -209,12 +209,12 @@ CREATE OPERATOR > (
 
 CREATE OR REPLACE FUNCTION semver_cmp(semver, semver)
 	RETURNS int4
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION hash_semver(semver)
 	RETURNS int4
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 --
@@ -245,7 +245,7 @@ DEFAULT FOR TYPE semver USING hash AS
 
 CREATE OR REPLACE FUNCTION semver_smaller(semver, semver)
 	RETURNS semver
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE AGGREGATE min(semver)  (
@@ -256,7 +256,7 @@ CREATE AGGREGATE min(semver)  (
 
 CREATE OR REPLACE FUNCTION semver_larger(semver, semver)
 	RETURNS semver
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE AGGREGATE max(semver)  (
@@ -271,7 +271,7 @@ CREATE AGGREGATE max(semver)  (
 
 CREATE OR REPLACE FUNCTION is_semver(text)
 	RETURNS bool
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 --
@@ -280,22 +280,22 @@ CREATE OR REPLACE FUNCTION is_semver(text)
 
 CREATE OR REPLACE FUNCTION get_semver_major(semver)
 	RETURNS int4
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION get_semver_minor(semver)
 	RETURNS int4
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION get_semver_patch(semver)
 	RETURNS int4
-	AS 'semver'
+	AS 'MODULE_PATHNAME'
 	LANGUAGE C STRICT IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION get_semver_prerelease(semver)
         RETURNS text
-        AS 'semver'
+        AS 'MODULE_PATHNAME'
         LANGUAGE C STRICT IMMUTABLE;
 
 CREATE TYPE semverrange AS RANGE (SUBTYPE = semver);

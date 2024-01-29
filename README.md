@@ -78,7 +78,7 @@ for testing, PL/pgSQL.
 Copyright and License
 ---------------------
 
-Copyright (c) 2010-2023 The pg-semver Maintainers: David E. Wheeler, Sam
+Copyright (c) 2010-2024 The pg-semver Maintainers: David E. Wheeler, Sam
 Vilain, Tom Davis, and Xavier Caron.
 
 This module is free software; you can redistribute it and/or modify it under
