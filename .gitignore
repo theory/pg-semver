@@ -5,7 +5,7 @@ tmp/
 *.o
 regression.diffs
 regression.out
-/sql/semver--?.??.?.sql
+/sql/github.com+theory+pg-semver--?.??.?.sql
 /semver-*
 /latest-changes.md
 /src/*.bc

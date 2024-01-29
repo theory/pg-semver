@@ -1,6 +1,12 @@
 semver 0.32.0
 =============
 
+Namespace Experiment
+--------------------
+
+Experimental branch to try naming an extension with a source code repository URL
+similar to Go packages.
+
 [![PGXN version](https://badge.fury.io/pg/semver.svg)](https://badge.fury.io/pg/semver)
 [![Build Status](https://github.com/theory/pg-semver/workflows/CI/badge.svg)](https://github.com/theory/pg-semver/actions)
 

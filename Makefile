@@ -1,3 +1,4 @@
+NAME         = semver
 EXTENSION    = $(shell grep -m 1 '"name":' META.json | \
                sed -e 's/[[:space:]]*"name":[[:space:]]*"\([^"]*\)",/\1/')
 EXTVERSION   = $(shell grep -m 1 '[[:space:]]\{8\}"version":' META.json | \
@@ -25,7 +26,7 @@ include $(PGXS)
 
 all: sql/$(EXTENSION)--$(EXTVERSION).sql
 
-sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
+sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(NAME).sql
 	cp $< $@
 
 .PHONY: results

@@ -1,7 +1,0 @@
-# semver extension
-comment = 'Semantic version data type'
-default_version = '0.32.1'
-
-directory = 'semver'
-module_pathname = '$libdir/semver'
-relocatable = true

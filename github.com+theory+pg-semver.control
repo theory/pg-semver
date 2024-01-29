@@ -1,0 +1,6 @@
+# github.com+theory+pg-semver extension
+comment = 'Semantic version data type'
+default_version = '0.32.1'
+directory = 'github.com+theory+pg-semver'
+module_pathname = '$libdir/github.com+theory+pg-semver'
+relocatable = true

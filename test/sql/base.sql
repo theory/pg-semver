@@ -2,7 +2,7 @@
 BEGIN;
 
 \i test/pgtap-core.sql
-CREATE EXTENSION semver;
+CREATE EXTENSION "github.com+theory+pg-semver";
 
 SELECT plan(334);
 --SELECT * FROM no_plan();

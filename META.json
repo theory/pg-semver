@@ -1,5 +1,5 @@
 {
-   "name": "semver",
+   "name": "github.com+theory+pg-semver",
    "abstract": "A semantic version data type",
    "description": "A Postgres data type for the Semantic Version format with support for btree and hash indexing.",
    "version": "0.32.1",
@@ -11,7 +11,7 @@
    ],
    "license": "postgresql",
    "provides": {
-      "semver": {
+      "github.com+theory+pg-semver": {
          "abstract": "A semantic version data type",
          "file": "sql/semver.sql",
          "docfile": "doc/semver.mmd",
