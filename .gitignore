@@ -1,6 +1,7 @@
 results/
 *.so
 *.dylib
+*.dll
 tmp/
 *.o
 regression.diffs
