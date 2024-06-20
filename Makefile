@@ -6,7 +6,7 @@ DISTVERSION  = $(shell grep -m 1 '[[:space:]]\{3\}"version":' META.json | \
                sed -e 's/[[:space:]]*"version":[[:space:]]*"\([^"]*\)",\{0,1\}/\1/')
 
 MODULEDIR    = $(EXTENSION)
-DATA         = $(wildcard sql/*.sql)
+DATA         = $(wildcard sql/*--*.sql)
 DOCS         = $(wildcard doc/*.mmd)
 TESTS        = $(wildcard test/sql/*.sql)
 REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
@@ -22,6 +22,7 @@ endif
 
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
+include ./trunk.mk
 
 all: sql/$(EXTENSION)--$(EXTVERSION).sql
 

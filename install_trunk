@@ -1,0 +1,144 @@
+#!/bin/bash
+
+# POC for installing Trunk format binaries created with trunk.mk. Requires:
+#
+# * bash
+# * tar
+# * shasum
+# * jq
+# * uname
+# * pg_config
+# * rsync
+
+trap 'exit' ERR
+set -E
+
+install_trunk() {
+    local trunk=$1
+
+    if [ -z "$trunk" ]; then
+        printf "Usage:\n\n  %s PACKAGE_PATH\n" "$0"
+        exit 1
+    fi
+
+    # Determine the platform.
+    local my_os my_osv my_arch
+    my_os=$(uname | tr '[:upper:]' '[:lower:]')
+    my_osv=$(uname -r)
+    my_arch="$(uname -m)"
+    if [ "$my_arch" == "x86_64" ]; then my_arch=amd64; fi
+
+    # Unpack.
+    printf "Unpacking %s\n" "$trunk"
+    tar zxf "$trunk"
+
+    # Go into the directory
+    local dir="${trunk%.*}"
+    cd "$dir" || exit
+
+    # Verify the checksums.
+    printf "Verifying all checksums..."
+    # XXX This does not fail if a file isn't present in digests.
+    shasum --check -b --strict digests
+    printf "Done!\n"
+
+    # Verify the Trunk version
+    printf "Verifying compatibility with Trunk package 0.1.0\n" 
+    local tv
+    tv=$(jq -r .trunk trunk.json)
+    if [ "$tv" != "0.1.0" ]; then
+        printf "Unsupported Trunk format version %s\n" "$tv"
+        exit 1
+    fi
+
+    # Verify the Postgres version.
+    local pkg_pg my_pg
+    my_pg=$(pg_config --version | sed -E 's/^[^ ]+ ([^ ]+).*$/\1/')
+    printf "Verifying compatibility with PostgreSQL %s\n" "$my_pg"
+    pkg_pg=$(jq -r .postgres.version trunk.json)
+    if [ "$pkg_pg" != "$my_pg" ]; then
+        printf "Trunk package contains binaries for Postgres %s but this host runs Postgres %s\n" "$pkg_pg" "$my_pg"
+        exit 1
+    fi
+
+    printf "Verifying compatibility with %s/%s:%s\n" "$my_os" "$my_arch" "$my_osv"
+    local pkg_os
+    pkg_os=$(jq -r .platform.os trunk.json)
+    if [ "$pkg_os" != "any" ]; then
+        # Verify the OS
+        if [ "$pkg_os" != "$my_os" ]; then
+            printf "Trunk package contains %s binaries but this host runs %s\n" "$pkg_os" "$my_os"
+            exit 1
+        fi
+
+        # Verify the architecture.
+        local pkg_arch
+        pkg_arch=$(jq -r .platform.arch trunk.json)
+        if [ "$pkg_arch" != "$my_arch" ]; then
+            printf "Trunk package contains %s binaries but this host runs %s\n" "$pkg_arch" "$my_arch"
+            exit 1
+        fi
+    fi
+    
+    # Make sure we have pgsql directory.
+    if [ ! -d 'pgsql' ]; then
+        printf "Package contains no install files; exiting\n"
+        exit 1
+    fi
+
+    cd 'pgsql' || exit
+    for subdir in *; do
+        [[ -d "$subdir" ]] || continue
+        case $subdir in
+            share)
+                install_dir "$subdir" "$(pg_config --sharedir)"
+                ;;
+            pkglib)
+                install_dir "$subdir" "$(pg_config --pkglibdir)"
+                ;;
+            pkginclude)
+                install_dir "$subdir" "$(pg_config --pkgincludedir)"
+                ;;
+            lib)
+                install_dir "$subdir" "$(pg_config --libdir)"
+                ;;
+            include)
+                install_dir "$subdir" "$(pg_config --includedir)"
+                ;;
+            bin)
+                install_dir "$subdir" "$(pg_config --bindir)"
+                ;;
+            doc)
+                install_dir "$subdir" "$(pg_config --docdir)"
+                ;;
+            man)
+                install_dir "$subdir" "$(pg_config --mandir)"
+                ;;
+            html)
+                install_dir "$subdir" "$(pg_config --htmldir)"
+                ;;
+            locale)
+                install_dir "$subdir" "$(pg_config --localedir)"
+                ;;
+            sysconf)
+                install_dir "$subdir" "$(pg_config --sysconfdir)"
+                ;;
+            *)
+                printf "Unknown install directory %s; skipping\n" "$subdir"
+                ;;
+        esac
+    done
+
+}
+
+install_dir() {
+    local src="$1"
+    local dst="$2"
+    printf "Installing %s into %s..." "$src" "$dst"
+    cd "$src" || exit
+    rsync -q -a -v . "$dst" || exit
+    printf "Done\n"
+    cd ..
+}
+
+install_trunk "$@"
