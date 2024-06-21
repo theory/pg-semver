@@ -9,6 +9,7 @@ regression.diffs
 regression.out
 /sql/semver--?.??.?.sql
 /semver-*
+/semver_annotations.json
 /latest-changes.md
 /semver_binary_copy.bin
 /.vscode

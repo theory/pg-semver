@@ -22,18 +22,27 @@ install_trunk() {
     fi
 
     # Determine the platform.
-    local my_os my_osv my_arch
+    local my_os my_osv my_arch platform
     my_os=$(uname | tr '[:upper:]' '[:lower:]')
     my_osv=$(uname -r)
     my_arch="$(uname -m)"
     if [ "$my_arch" == "x86_64" ]; then my_arch=amd64; fi
+    if [ "$my_os" == "darwin" ]; then
+        platform="$my_os/$my_arch:$my_osv"
+    else
+        platform="$my_os/$my_arch"
+    fi
+
+    # Download.
+    local file
+    file=$(basename "$(oras pull --no-tty --plain-http --format 'go-template={{(first .files).path}}' --platform "$platform" "$trunk")")
 
     # Unpack.
-    printf "Unpacking %s\n" "$trunk"
-    tar zxf "$trunk"
+    printf "Unpacking %s\n" "$file"
+    tar zxf "$file"
 
     # Go into the directory
-    local dir="${trunk%.*}"
+    local dir="${file%.*}"
     cd "$dir" || exit
 
     # Verify the checksums.
@@ -61,7 +70,7 @@ install_trunk() {
         exit 1
     fi
 
-    printf "Verifying compatibility with %s/%s:%s\n" "$my_os" "$my_arch" "$my_osv"
+    printf "Verifying compatibility with %s\n" "$platform"
     local pkg_os
     pkg_os=$(jq -r .platform.os trunk.json)
     if [ "$pkg_os" != "any" ]; then
