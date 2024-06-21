@@ -1,0 +1,57 @@
+version: "3.9"
+name: trunking
+
+# Start a Zot service for pushing and pulling OCI images, and a
+# pgxn/pgxn-tools image for building and testing Linux/AMD binaries.
+#
+# docker compose up -d
+# docker compose exec linux bash
+# make clean && make && make trunk
+#
+# On macOS:
+#   make clean && make && make trunk
+#   ./push_trunk localhost:5000/theory/semver:0.32.1 semver-0.32.1+pg16-darwin-23.5.0-arm64 semver-0.32.1+pg16-linux-amd64
+#   clean -dfx --exclude=.vscode
+#   find "$(pg_config --sharedir)" "$(pg_config --pkglibdir)" "$(pg_config --docdir)" -name '*semver*'  -exec rm -rf "{}" \;
+#
+#   ./install_trunk localhost:5000/theory/semver:0.32.1
+#   find "$(pg_config --sharedir)" "$(pg_config --pkglibdir)" "$(pg_config --docdir)" -name '*semver*'
+#
+# Back on Linux
+#   ./install_trunk zot:5000/theory/semver:0.32.1
+#   find "$(pg_config --sharedir)" "$(pg_config --pkglibdir)" "$(pg_config --docdir)" -name '*semver*'
+
+# Name the network for all of the services to join.
+networks:
+  default:
+    name: pgxnnet
+
+services:
+  zot:
+    image: ghcr.io/project-zot/zot-linux-arm64:latest
+    container_name: zot
+    ports:
+      - 5000:5000
+    hostname: zot
+
+  linux:
+    image: pgxn/pgxn-tools
+    platform: "linux/amd64"
+    container_name: linux
+    hostname: linux
+    working_dir: /work
+    volumes:
+      - ".:/work"
+    # Install oras, then start Postgres 16 and install rsync and jq
+    entrypoint:
+      - "/bin/sh"
+      - -ecx
+      - |
+          cd /tmp
+          curl -LO "https://github.com/oras-project/oras/releases/download/v1.2.0/oras_1.2.0_linux_amd64.tar.gz"
+          mkdir -p oras-install/
+          tar -zxf oras_1.2.0_*.tar.gz -C oras-install/
+          sudo mv oras-install/oras /usr/local/bin/
+          rm -rf oras_1.2.0_*.tar.gz oras-install/
+          pg-start 16 rsync jq
+          tail -f /dev/null
