@@ -6,7 +6,7 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(71);
+SELECT plan(76);
 --SELECT * FROM no_plan();
 
 -- Valid Semantic Versions
@@ -43,7 +43,12 @@ SELECT lives_ok(
     '1.2.3----R-S.12.9.1--.12+meta',
     '1.2.3----RC-SNAPSHOT.12.9.1--.12',
     '1.0.0+0.build.1-rc.10000aaa-kk-0.1',
-    '1.0.0-0A.is.legal'
+    '1.0.0-0A.is.legal',
+    '1.0.0-0010-1234',
+    '1.0.0-1.2.3-1234',
+    '1.0.0-1234',
+    '1.0.0-4321',
+    '0.0.0-00010101000000-000000000000'
     -- 
 ]) AS v;
 

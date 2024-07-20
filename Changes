@@ -6,6 +6,16 @@ Revision history for PostgreSQL extension semver.
       - Changed the tests to use `CREATE EXTENSION` instead of loading the
         SQL source file directory. The latter was required for Postgres 9.0
         and lower, which have not been supported since v0.20.0 back in 2018.
+      - Fixed a bug that rejected pre-releases starting with a zero but
+        eventually include a dash, e.g., `1.2.3-02-3`. Thanks to Dylan
+        Bourque for the pull request (#70)!
+      - ***** WARNING: This release breaks compatibility with previous versions! ******
+        Fixed a bug in the scanning of pre-releases that start with a zero.
+        It now properly scans the rest of the pre-release string. As a result,
+        existing semvers with pre-releases the start with a zero may have been
+        incorrectly interpreted as valid. See the v0.30.0 changes below for
+        instructions for finding such invalid semvers. Discovered while
+        debugging unexpected test failures in #70.
 
 0.32.1  2023-08-01T23:20:31Z
       - Fixed compilation issue on Postgres 16.

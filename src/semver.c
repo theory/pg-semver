@@ -5,6 +5,7 @@
  * + Sam Vilain <sam@vilain.net>
  * + Tom Davis <tom@recursivedream.com>
  * + Xavier Caron <xcaron@gmail.com>
+ * + David Wheeler <david@justatheory.com>
  *
  * Copyright 2010-2024 The pg-semver Maintainers. This program is Free
  * Software; see the LICENSE file for the license conditions.
@@ -212,14 +213,14 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
             if ((started_prerel || started_meta) && !skip_char) {
                 if (i >= 1 && (i == 1 || patch[i-2] == '.') && patch[i-1] == '0' && isdigit(next)) {
                     pred = true;
-                    // Scan ahead.
-                    for (p = len - atchar; p < len; p++) {
+                    // Numeric identifiers must not include a leading 0. Scan ahead.
+                    for (p = atchar; p < len; p++) {
                         if (str[p] == '.') {
                             // We got to the end of this bit.
                             break;
                         }
-                        if (isalpha(str[p])) {
-                            // If there is a letter, it's okay to start with a leading 0.
+                        if (isalpha(str[p]) || str[p] == '-') {
+                            // If there is a letter or a dash, it's okay to start with a leading 0.
                             pred = false;
                             break;
                         }
