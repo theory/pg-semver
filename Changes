@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.32.2
+0.40.0  2024-07-20T20:35:03Z
       - Updated the installation configuration to install the SQL and
         documentation files into `semver` subdirectories.
       - Changed the tests to use `CREATE EXTENSION` instead of loading the

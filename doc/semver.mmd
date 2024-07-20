@@ -1,17 +1,18 @@
-semver 0.32.1
+semver 0.40.0
 =============
 
 Synopsis
 --------
 
-    CREATE EXTENSION semver;
+    =% CREATE EXTENSION semver;
+    CREATE EXTENSION
 
-    SELECT '1.2.1'::semver;
+    =% SELECT '1.2.1'::semver;
      semver
     --------
      1.2.1
 
-    SELECT '1.2.0'::semver > '1.2.0-b1'::semver;
+    =% SELECT '1.2.0'::semver > '1.2.0-b1'::semver;
      ?column?
     ----------
      t
@@ -21,11 +22,10 @@ Description
 
 This library contains a single PostgreSQL extension, a semantic version data
 type called `semver`. It's an implementation of the version number format
-specified by the
-[Semantic Versioning 2.0.0 Specification](https://semver.org/spec/v2.0.0.html).
+specified by the [Semantic Versioning 2.0.0 Specification].
 
-The salient points of [the spec](https://semver.org/), for the purposes of
-a data type and comparison operators, are:
+The salient points of [the spec], for the purposes of a data type and
+comparison operators, are:
 
 1. A normal version number MUST take the form X.Y.Z where X, Y, and Z are
    non-negative integers, and MUST NOT contain leading zeroes. X is the major
@@ -34,7 +34,7 @@ a data type and comparison operators, are:
 
 2. A pre-release version MAY be denoted by appending a hyphen and a series
    of dot separated identifiers immediately following the patch version.
-   Identifiers MUST comprise only ASCII alphanumerics and hyphen [0-9A-Za-z-].
+   Identifiers MUST comprise only ASCII alphanumerics and hyphen `[0-9A-Za-z-]`.
    Identifiers MUST NOT be empty. Numeric identifiers MUST NOT include leading
    zeroes. Pre-release versions have a lower precedence than the associated
    normal version. A pre-release version indicates that the version is
@@ -45,7 +45,7 @@ a data type and comparison operators, are:
 3. Build metadata MAY be denoted by appending a plus sign and a series of
    dot separated identifiers immediately following the patch or pre-release
    version. Identifiers MUST comprise only ASCII alphanumerics and hyphen
-   [0-9A-Za-z-]. Identifiers MUST NOT be empty. Build metadata SHOULD be
+   `[0-9A-Za-z-]`. Identifiers MUST NOT be empty. Build metadata SHOULD be
    ignored when determining version precedence. Thus two versions that differ
    only in the build metadata, have the same precedence. Examples:
    `1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85`.
@@ -69,15 +69,15 @@ a data type and comparison operators, are:
    `1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-alpha.beta < 1.0.0-beta < 1.0.0-beta.2 <
    1.0.0-beta.11 < 1.0.0-rc.1 < 1.0.0`.
 
-🚨 v0.30.0 Upgrade Compatibility Warning 🚨
+🚨 v0.40.0 Upgrade Compatibility Warning 🚨
 -------------------------------------------
 
-Prior to v0.30.0, the semver extension incorrectly allowed some invalid
+Prior to v0.40.0, the semver extension incorrectly allowed some invalid
 prerelease and build metadata values. Details below, but *BEFORE YOU UPGRADE*
-from an earlier version, we strongly recommend that you check for and repair any
-invalid semvers. You can find them using the official
-[SemVer regular expression](https://regex101.com/r/vkijKf/1/) like so
-(replace `name`, `version`, and `packages` as appropriate for your database):
+from an earlier version, we strongly recommend that you check for and repair
+any invalid semvers. You can find them using the official [SemVer regular
+expression] like so (replace `name`, `version`, and `packages` as appropriate
+for your database):
 
     SELECT name, version FROM packages
     WHERE version::text !~ '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$';
@@ -119,18 +119,18 @@ aggregates in query optimizations.
 
 And some sample usage:
 
-    INSERT INTO extensions
-    VALUES ('pgtap', '0.35.0',    'PostgreSQL unit testing'),
-           ('pgtap', '0.35.0-b1', 'PostgreSQL unit testing.'),
-           ('pair',  '0.1.0',     'Key/value pair data type'),
-           ('PostGIS', '1.5.0',   'Gelocation data types');
+    =% INSERT INTO extensions
+    -% VALUES ('pgtap', '0.35.0',    'PostgreSQL unit testing'),
+              ('pgtap', '0.35.0-b1', 'PostgreSQL unit testing.'),
+              ('pair',  '0.1.0',     'Key/value pair data type'),
+              ('PostGIS', '1.5.0',   'Gelocation data types');
 
-    SELECT * FROM extensions WHERE VERSION = '1.5.0';
+    =% SELECT * FROM extensions WHERE VERSION = '1.5.0';
       name   │ version │      description
     ---------+---------+-----------------------
      PostGIS │ 1.5.0   │ Gelocation data types
 
-    SELECT * FROM extensions WHERE VERSION < '0.35.0';
+    =% SELECT * FROM extensions WHERE VERSION < '0.35.0';
      name  │ version   │       description
     -------+-----------+--------------------------
      pgtap │ 0.35.0-b1 │ PostgreSQL unit testing.
@@ -139,21 +139,21 @@ And some sample usage:
 Note that "0.35.0-b1" is less than "0.35.0", as required by the specification.
 Use `ORDER BY` to get more of a feel for semantic version ordering rules:
 
-    SELECT version FROM extensions ORDER BY version;
-     version
-    -----------
-     0.1.0
-     0.35.0-b1
-     0.35.0
-     1.5.0
+    =% SELECT version FROM extensions ORDER BY version;
+        version
+       -----------
+        0.1.0
+        0.35.0-b1
+        0.35.0
+        1.5.0
 
-    SELECT version FROM extensions ORDER BY version DESC;
-     version
-    -----------
-     1.5.0
-     0.35.0
-     0.35.0-b1
-     0.1.0
+    =% SELECT version FROM extensions ORDER BY version DESC;
+        version
+       -----------
+        1.5.0
+        0.35.0
+        0.35.0-b1
+        0.1.0
 
 Interface
 ---------
@@ -195,20 +195,17 @@ not).
 The difference between `semver()` and `to_semver()` is that the former
 requires a valid semver format, while the latter is a bit more permissive,
 doing its best to convert other version number formats (including the older
-[semver 1.0.0-beta](https://semver.org/spec/v1.0.0-beta.html) prerelease
-format) to semantic versions:
+[semver 1.0.0-beta] prerelease format) to semantic versions:
 
-    # select to_semver('1.0');
+    =% select to_semver('1.0');
      to_semver
     -----------
      1.0.0
-    (1 row)
 
-    # select to_semver('1.0beta1');
+    =% select to_semver('1.0beta1');
      to_semver
     -----------
      1.0.0-beta1
-    (1 row)
 
 As for `is_semver()`, it returns true for a valid semver format, and false for
 anything else, including formats that `semver()` would convert to valid
@@ -247,10 +244,8 @@ equivalents would not).
 ### Range Type ###
 
 As of v0.20.0, the semver extension includes the `semverrange` type, which
-simply builds on the
-[range type](https://www.postgresql.org/docs/current/static/rangetypes.html)
-support on PostgreSQL 9.2 and higher. This allows for easy specification of
-ranges of semantic versions. Some examples:
+simply builds on the [range type] support on PostgreSQL 9.2 and higher. This
+allows for easy specification of ranges of semantic versions. Some examples:
 
  Range                 | Description
 -----------------------|-----------------------------------
@@ -258,61 +253,58 @@ ranges of semantic versions. Some examples:
  `['1.0.0', '2.0.0')`  | 1.0.0 inclusive - 2.0.0 exclusive
  `('1.0.0', '2.0.0')`  | 1.0.0 exclusive - 2.0.0 exclusive
  `['1.0.0',]`.         | 1.0.0 inclusive - infinity
- 
-The cool thing is that you can use any of the
-[range operators](https://www.postgresql.org/docs/current/static/functions-range.html),
-including the "contains" operators: For example, to see if `1.0.5` falls falls
-within the range `1.0.0` - `2.0.0` exclusive, run a query like this:
 
-    SELECT '1.0.5'::semver <@ '[1.0.0, 2.0.0)'::semverrange;
-     ?column? 
+The cool thing is that you can use any of the [range operators], including the
+"contains" operators: For example, to see if `1.0.5` falls falls within the
+range `1.0.0` - `2.0.0` exclusive, run a query like this:
+
+    =% SELECT '1.0.5'::semver <@ '[1.0.0, 2.0.0)'::semverrange;
+     ?column?
     ----------
      t
 
-The `semverrange` constructor will build the same range, 
+The `semverrange` constructor will build the same range,
 
-    SELECT semverrange('1.0.0', '2.0.0') @> '2.0.0'::semver;
-     ?column? 
+    =% SELECT semverrange('1.0.0', '2.0.0') @> '2.0.0'::semver;
+     ?column?
     ----------
      f
-
-    SELECT semverrange('1.0.0', '2.0.0') @> '1.9999.9999'::semver;
-     ?column? 
+    =% SELECT semverrange('1.0.0', '2.0.0') @> '1.9999.9999'::semver;
+     ?column?
     ----------
      t
- 
+
 Pass the optional third argument to determine the bounds inclusiveness:
 
-    SELECT semverrange('1.0.0', '2.0.0', '[]') @> '2.0.0'::semver;
-     ?column? 
+    =% SELECT semverrange('1.0.0', '2.0.0', '[]') @> '2.0.0'::semver;
+     ?column?
     ----------
      t
 
 It works for unlimited bound, as well. For example, this query ensure that
 a semver is greater than or equal `1.0.0`:
 
-    SELECT '1000.0.0'::semver <@ '[1.0.0,]'::semverrange;
-     ?column? 
+    =% SELECT '1000.0.0'::semver <@ '[1.0.0,]'::semverrange;
+     ?column?
     ----------
      t
 
 If you need to omit some values, you can use an array of semverrange values.
-For example, say you want to check require a version greater than `1.0.0` and
-less than `2.0.0`, but versions `1.2.3` and `1.4.5` have such serious bugs that
-you don't want to include them. We create three ranges that use exclusive
-bounds to omit those versions, like so:
+For example, say you want to require a version greater than `1.0.0` and less
+than `2.0.0`, but versions `1.2.3` and `1.4.5` have such serious bugs that you
+don't want to include them. We create three ranges that use exclusive bounds
+to omit those versions, like so:
 
-    '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[]
-
+    SELECT '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[];
 Here's an sample how to query such an array of semverranges.
 
-    SELECT version, version <@ ANY(
-        '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[]
-    ) AS valid FROM (VALUES
-        ('1.0.0'::semver), ('1.0.1'), ('1.2.3'), ('1.2.4'), ('1.4.4'), ('1.4.5'),
-        ('1.7.0'), ('2.0.0')
-    ) AS v(version)
-     version | valid 
+    =% SELECT version, version <@ ANY(
+    -%     '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[]
+    -% ) AS valid FROM (VALUES
+    -%     ('1.0.0'::semver), ('1.0.1'), ('1.2.3'), ('1.2.4'), ('1.4.4'), ('1.4.5'),
+    -%     ('1.7.0'), ('2.0.0')
+    -% ) AS v(version)
+     version | valid
     ---------+-------
      1.0.0   | f
      1.0.1   | t
@@ -326,10 +318,8 @@ Here's an sample how to query such an array of semverranges.
 Support
 -------
 
-This library is stored in an open
-[GitHub repository](https://github.com/theory/pg-semver). Feel free to fork
-and contribute! Please file bug reports via
-[GitHub Issues](https://github.com/theory/pg-semver/issues/).
+The source code for pgTAP is available on [GitHub]. Please feel free to fork
+and contribute! Please file bug reports via [GitHub Issues].
 
 Authors
 -------
@@ -346,7 +336,7 @@ Copyright (c) 2010-2024 The pg-semver Maintainers: David E. Wheeler, Sam
 Vilain, Tom Davis, and Xavier Caron.
 
 This module is free software; you can redistribute it and/or modify it under
-the [PostgreSQL License](https://www.opensource.org/licenses/postgresql).
+the [PostgreSQL License].
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is
@@ -364,3 +354,13 @@ not limited to, the implied warranties of merchantability and fitness for a
 particular purpose. The software provided hereunder is on an "as is" basis,
 and The pg-semver Maintainers no obligations to provide maintenance, support,
 updates, enhancements, or modifications.
+
+  [Semantic Versioning 2.0.0 Specification]: https://semver.org/spec/v2.0.0.html
+  [the spec]: https://semver.org/
+  [SemVer regular expression]: https://regex101.com/r/vkijKf/1/
+  [semver 1.0.0-beta]: https://semver.org/spec/v1.0.0-beta.html
+  [range type]: https://www.postgresql.org/docs/current/static/rangetypes.html
+  [range operators]: https://www.postgresql.org/docs/current/static/functions-range.html
+  [GitHub]: https://github.com/theory/pgtap/
+  [GitHub Issues]: https://github.com/theory/pg-semver/issues/
+  [PostgreSQL License]: https://www.opensource.org/licenses/postgresql
