@@ -85,7 +85,7 @@ for your database):
 If no rows are returned, you should be good to go. If there are results, here are
 Examples of invalid semantic versions and how they should be repaired.
 
-    Invalid             Valid SemVer
+     Invalid             Valid SemVer
     -----------         ----------------------------
     1.0.0-02799    ->   1.0.0-2799
     1.0.0-0.02     ->   1.0.0-0.2
@@ -140,20 +140,20 @@ Note that "0.35.0-b1" is less than "0.35.0", as required by the specification.
 Use `ORDER BY` to get more of a feel for semantic version ordering rules:
 
     =% SELECT version FROM extensions ORDER BY version;
-        version
-       -----------
-        0.1.0
-        0.35.0-b1
-        0.35.0
-        1.5.0
+     version
+    -----------
+     0.1.0
+     0.35.0-b1
+     0.35.0
+     1.5.0
 
     =% SELECT version FROM extensions ORDER BY version DESC;
-        version
-       -----------
-        1.5.0
-        0.35.0
-        0.35.0-b1
-        0.1.0
+     version
+    -----------
+     1.5.0
+     0.35.0
+     0.35.0-b1
+     0.1.0
 
 Interface
 ---------
