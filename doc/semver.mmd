@@ -73,6 +73,20 @@ comparison operators, are:
 -------------------------------------------
 
 Prior to v0.40.0, the semver extension incorrectly allowed some invalid
+prerelease values. *BEFORE YOU UPGRADE*, we strongly recommend that you check
+for and repair semvers. Use this query to find semvers with invalid
+pre-release values:
+
+    SELECT name, version FROM packages
+     WHERE get_semver_prerelease(version) ~ '^0\[0-9]+($|\+)';
+
+For any results returned, update them by removing the leading `0` from the
+pre-release, or appending an alphbetic value.
+
+🚨 v0.30.0 Upgrade Compatibility Warning 🚨
+-------------------------------------------
+
+Prior to v0.30.0, the semver extension incorrectly allowed some invalid
 prerelease and build metadata values. Details below, but *BEFORE YOU UPGRADE*
 from an earlier version, we strongly recommend that you check for and repair
 any invalid semvers. You can find them using the official [SemVer regular

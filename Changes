@@ -13,9 +13,10 @@ Revision history for PostgreSQL extension semver.
         Fixed a bug in the scanning of pre-releases that start with a zero.
         It now properly scans the rest of the pre-release string. As a result,
         existing semvers with pre-releases the start with a zero may have been
-        incorrectly interpreted as valid. See the v0.30.0 changes below for
-        instructions for finding such invalid semvers. Discovered while
-        debugging unexpected test failures in #70.
+        incorrectly interpreted as valid. Any versions returned by this query
+        will need the leading 0 removed from the pre-release before upgrading:
+        `SELECT version FROM pkg WHERE get_semver_prerelease(version) ~ '^0\[0-9]+($|\+)'`
+        Discovered while debugging unexpected test failures in #70.
 
 0.32.1  2023-08-01T23:20:31Z
       - Fixed compilation issue on Postgres 16.
