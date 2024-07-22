@@ -17,8 +17,8 @@ jobs:
     - name: Bundle the Release
       id: bundle
       run: pgxn-bundle
-    # - name: Release on PGXN
-    #   run: pgxn-release
+    - name: Release on PGXN
+      run: pgxn-release
     - name: Generate Release Changes
       run: make latest-changes.md
     - name: Create GitHub Release
