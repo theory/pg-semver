@@ -6,6 +6,8 @@ DISTVERSION  = $(shell grep -m 1 '[[:space:]]\{3\}"version":' META.json | \
                sed -e 's/[[:space:]]*"version":[[:space:]]*"\([^"]*\)",\{0,1\}/\1/')
 
 MODULEDIR    = $(EXTENSION)
+DESCRIPTION  = A Postgres data type for the Semantic Version format with support for btree and hash indexing.
+REPO_URL     = https://github.com/theory/pg-semver
 DATA         = $(wildcard sql/*--*.sql)
 DOCS         = $(wildcard doc/*.mmd)
 TESTS        = $(wildcard test/sql/*.sql)

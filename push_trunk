@@ -1,0 +1,114 @@
+#!/bin/bash
+
+# POC for publishing Trunk packages to an OCI repository with an image index
+# to allow pulling a platform-specific binary. Requires:
+#
+# * oras
+# * jq
+# * zot: docker run -d -p 5000:5000 --name oras-quickstart ghcr.io/project-zot/zot-linux-arm64:latest
+#
+# Inspired by the Homebrew implementation of the pattern as referenced in
+# https://github.com/oras-project/oras/issues/237, and with thanks to the
+# denizens of the #oras and #zot channels on the CNCF Slack.
+
+trap 'exit' ERR
+set -E
+
+# OCI types to create.
+ARTIFACT_TYPE=application/vnd.pgxn.trunk.layer.v1
+MEDIA_TYPE=application/vnd.oci.image.layer.v1.tar+gzip
+CONFIG_TYPE=application/vnd.oci.image.config.v1+json
+OCI_DIR=oci_dir
+INDEX_FILE=image_index.json
+
+push_image() {
+    # Push the image into the OCI layout directory $OCI_DIR.
+    local trunk=$1
+    oras push --no-tty \
+        --oci-layout "$OCI_DIR" \
+        --artifact-type "${ARTIFACT_TYPE}" \
+        --config "${trunk}_config.json":"$CONFIG_TYPE" \
+        --format go-template='{{.digest}}' \
+        --annotation-file "${trunk}_annotations.json" \
+        "$trunk.trunk":"$MEDIA_TYPE"
+}
+
+make_manifest() {
+    local trunk=$1
+    local digest=$2
+    local anno platform
+
+    # Extract just the pgxn.trunk annotations.
+    anno=$(jq -c \
+        '.["$manifest"] | with_entries(select(.key | startswith("org.pgxn.trunk.")))' \
+        "${trunk}_annotations.json"
+    )
+
+    # Extract the platform config.
+    platform=$(jq \
+        'pick(.os, .["os.version"], .architecture)| with_entries(select(.value |. !=null and . != ""))' \
+        "$trunk"_config.json
+    )
+
+    # Create and return the image manifest.
+    oras manifest fetch --oci-layout "$OCI_DIR@${digest}" --descriptor \
+        | jq --argjson anno "$anno" --argjson platform "$platform" \
+        '{
+            mediaType: .mediaType,
+            size: .size,
+            digest: .digest,
+            platform: $platform,
+            annotations: $anno
+        }'
+}
+
+write_index() {
+    darwin_manifest=$1
+    linux_manifest=$2
+
+    # Build the image index with the two manifests.
+    jq -n --argjson linux "$linux_manifest" \
+        --argjson darwin "$darwin_manifest" \
+        --argjson annotations "$(cat semver_annotations.json)" \
+        '{
+            schemaVersion: 2,
+            mediaType: "application/vnd.oci.image.index.v1+json",
+            manifests: [$linux, $darwin],
+            annotations: $annotations
+        }' > "$INDEX_FILE"
+}
+
+push_trunk() {
+    # Only testing for Darwin and Linux rn.
+    local repo=$1
+    local darwin_trunk=$2
+    local linux_trunk=$3
+
+    if [ -z "$repo" ] || [ -z "$darwin_trunk" ] || [ -z "$linux_trunk" ]; then
+        printf "Usage:\n\n  %s REPO DARWIN.trunk LINUX.trunk\n" "$0"
+        exit 1
+    fi
+
+    # Push the images and grab the resulting digests.
+    darwin_digest=$(push_image "$darwin_trunk")
+    linux_digest=$(push_image "$linux_trunk")
+
+    # Create the image manifests.
+    darwin_manifest=$(make_manifest "$darwin_trunk" "$darwin_digest")
+    linux_manifest=$(make_manifest "$linux_trunk" "$linux_digest")
+
+    # Write out and push the image index.
+    write_index "$darwin_manifest" "$linux_manifest"
+    oras manifest push --oci-layout ./"$OCI_DIR":image-index "$INDEX_FILE"
+
+    # Push everything from the local layout to the remote registry.
+    oras cp --from-oci-layout ./"$OCI_DIR":image-index --to-plain-http "${repo}"
+
+    # View the remote image index manifest.
+    #oras manifest get --plain-http "${repo}" | jq
+
+    # Cleanup.
+    rm -rf "$OCI_DIR" "$INDEX_FILE"
+}
+
+push_trunk "$@"

@@ -1,10 +1,16 @@
 # Trunk packaging. To use, create a standard PGXS Makefile for your extension.
-# The only extra variables are DISTVERSION, LICENSE, and LANGUAGE.
+# The only extra variables are DISTVERSION, TITLE, DESCRIPTION, LICENSE,
+# LANGUAGE, VENDOR, URL, and REPO_URL.
 #
 # ``` make
 # DISTVERSION  = 1.2.1
+# TITLE        = Bike
+# DESCRIPTION  = A bicycle inside your database.
 # LICENSE      = mit
 # LANGUAGE     = c
+# VENDOR       = PGXN
+# URL          = https://pgxn.org/dist/bike
+# REPO_URL     = https://github.com/pgxn/bike
 #
 # EXTENSION    = bike
 # MODULEDIR    = $(EXTENSION)
@@ -38,6 +44,9 @@
 
 LAUNGUAGE      ?= c
 LICENSE        ?= PostgreSQL
+TITLE          ?= $(EXTENSION)
+VENDOR         ?= PGXN
+URL            ?= $(REPO_URL)
 
 pkg_arch       := $(shell uname -m)
 ifeq ($(pkg_arch),x86_64)
@@ -64,7 +73,52 @@ pkg_info_files ?= $(wildcard README* readme* Readme* LICENSE* license* License* 
 EXTRA_CLEAN    += $(EXTENSION)-$(DISTVERSION)+*/
 
 # Phony target to create the trunk and OCI JSON files.
-trunk: $(pkg).trunk
+trunk: $(pkg).trunk $(pkg)_config.json $(pkg)_annotations.json $(EXTENSION)_annotations.json
+
+# Use jq to create the OCI image index annoations.
+# https://github.com/opencontainers/image-spec/blob/main/annotations.md
+$(EXTENSION)_annotations.json:
+	jq -n \
+	    --arg org.opencontainers.image.created "$$(date +%Y-%m-%dT%TZ)" \
+		--arg org.opencontainers.image.licenses "$(LICENSE)" \
+		--arg org.opencontainers.image.title "$(TITLE)" \
+		--arg org.opencontainers.image.description "$(DESCRIPTION)" \
+		--arg org.opencontainers.image.source "$(REPO_URL)" \
+		--arg org.opencontainers.image.vendor "$(VENDOR)" \
+		--arg org.opencontainers.image.ref.name "$(DISTVERSION)" \
+		--arg org.opencontainers.image.version "$(DISTVERSION)" \
+		--arg org.opencontainers.image.url "$(URL)" \
+		'$$ARGS.named | with_entries(select(.value |. !=null and . != ""))' > $@
+
+# Use jq to create the OCI image configuration.
+$(pkg)_config.json:
+	@jq -n \
+		--arg os "$(PORTNAME)" \
+		--arg os.version "$(pkg_os_ver)" \
+		--arg architecture "$(pkg_arch)" \
+		--arg created "$$(date +%Y-%m-%dT%TZ)" \
+		'$$ARGS.named | with_entries(select(.value |. !=null and . != ""))' > $@
+
+# Use jq to create the OCI image manifest annotations.
+$(pkg)_annotations.json: $(pkg).trunk $(pkg)_config.json
+	@anno=$$(jq -n \
+	    --arg org.opencontainers.image.created "$$(date +%Y-%m-%dT%TZ)" \
+		--arg org.opencontainers.image.title "$(pkg).trunk" \
+		--arg org.opencontainers.image.licenses "$(LICENSE)" \
+		--arg org.opencontainers.image.description "$(DESCRIPTION)" \
+		--arg org.opencontainers.image.source "$(REPO_URL)" \
+		--arg org.opencontainers.image.vendor "$(VENDOR)" \
+		--arg org.opencontainers.image.ref.name "$(DISTVERSION)" \
+		--arg org.opencontainers.image.version "$(DISTVERSION)" \
+		--arg org.opencontainers.image.url "$(URL)" \
+		--arg org.pgxn.trunk.pg.version "$(VERSION)" \
+		--arg org.pgxn.trunk.pg.major "$(MAJORVERSION)" \
+		--arg org.pgxn.trunk.pg.version_num "$(VERSION_NUM)" \
+		--arg org.pgxn.trunk.version "0.1.0" \
+		'$$ARGS.named | with_entries(select(.value |. !=null and . != ""))' \
+	) && jq -n \
+		--argjson '$$manifest' "$$anno" \
+		'$$ARGS.named' > $@
 
 $(pkg).trunk: package
 	tar zcvf $@ $(pkg_dir)
