@@ -31,7 +31,7 @@ services:
     image: ghcr.io/project-zot/zot-linux-arm64:latest
     container_name: zot
     ports:
-      - 5000:5000
+      - 5001:5000
     hostname: zot
 
   linux:
@@ -53,5 +53,5 @@ services:
           tar -zxf oras_1.2.0_*.tar.gz -C oras-install/
           sudo mv oras-install/oras /usr/local/bin/
           rm -rf oras_1.2.0_*.tar.gz oras-install/
-          pg-start 16 rsync jq
+          pg-start 17 rsync jq
           tail -f /dev/null
