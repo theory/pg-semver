@@ -9,11 +9,11 @@ jobs:
   build:
     strategy:
       matrix:
-        pg: [16, 15, 14, 13, 12, 11, 10, 9.6, 9.5, 9.4, 9.3, 9.2]
+        pg: [17, 16, 15, 14, 13, 12, 11, 10, 9.6, 9.5, 9.4, 9.3, 9.2]
     name: 🐘 PostgreSQL ${{ matrix.pg }}
     runs-on: ubuntu-latest
     container: pgxn/pgxn-tools
     steps:
       - run: pg-start ${{ matrix.pg }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: pg-build-test
