@@ -81,7 +81,7 @@ pre-release values:
      WHERE get_semver_prerelease(version) ~ '^0\[0-9]+($|\+)';
 
 For any results returned, update them by removing the leading `0` from the
-pre-release, or appending an alphbetic value.
+pre-release, or appending an alphabetic value.
 
 🚨 v0.30.0 Upgrade Compatibility Warning 🚨
 -------------------------------------------
@@ -137,12 +137,12 @@ And some sample usage:
     -% VALUES ('pgtap', '0.35.0',    'PostgreSQL unit testing'),
               ('pgtap', '0.35.0-b1', 'PostgreSQL unit testing.'),
               ('pair',  '0.1.0',     'Key/value pair data type'),
-              ('PostGIS', '1.5.0',   'Gelocation data types');
+              ('PostGIS', '1.5.0',   'Geolocation data types');
 
     =% SELECT * FROM extensions WHERE VERSION = '1.5.0';
       name   │ version │      description
-    ---------+---------+-----------------------
-     PostGIS │ 1.5.0   │ Gelocation data types
+    ---------+---------+------------------------
+     PostGIS │ 1.5.0   │ Geolocation data types
 
     =% SELECT * FROM extensions WHERE VERSION < '0.35.0';
      name  │ version   │       description
