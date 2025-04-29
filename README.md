@@ -48,6 +48,17 @@ You need to run the test suite using a super user, such as the default
 
     make installcheck PGUSER=postgres
 
+To install the extension in a custom prefix on PostgreSQL 18 or later, pass
+the `prefix` argument to `install` (but no other `make` targets):
+
+    make install prefix=/usr/local/extras
+
+Then ensure that the prefix is included in the following [`postgresql.conf`
+parameters]:
+
+    extension_control_path = '/usr/local/extras/postgresql/share:$system'
+    dynamic_library_path = '/usr/local/extras/postgresql/lib:$libdir'
+
 Once semver is installed, you can add it to a database. If you're running
 PostgreSQL 9.1.0 or greater, it's a simple as connecting to a database as a
 super user and running:
@@ -100,3 +111,5 @@ not limited to, the implied warranties of merchantability and fitness for a
 particular purpose. The software provided hereunder is on an "as is" basis,
 and The pg-semver Maintainers no obligations to provide maintenance, support,
 updates, enhancements, or modifications.
+
+  [`postgresql.conf` parameters]: https://www.postgresql.org/docs/devel/runtime-config-client.html#RUNTIME-CONFIG-CLIENT-OTHER

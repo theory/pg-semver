@@ -1,5 +1,13 @@
 Revision history for PostgreSQL extension semver.
 
+0.40.1
+      - Removed the `directory` and `MODULEDIR` directives that installed
+        extension files in a subdirectory named "semver", as it's not
+        necessary, and deprecated by PostgreSQL 18.
+      - Removed the `$libdir/` prefix from the `module_pathname` directive,
+        so that the module can be installed and found in any directory listed
+        in `dynamic_library_path`.
+
 0.40.0  2024-07-20T20:35:03Z
       - Updated the installation configuration to install the SQL and
         documentation files into `semver` subdirectories.
