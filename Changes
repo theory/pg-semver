@@ -6,7 +6,9 @@ Revision history for PostgreSQL extension semver.
         necessary, and deprecated by PostgreSQL 18.
       - Removed the `$libdir/` prefix from the `module_pathname` directive,
         so that the module can be installed and found in any directory listed
-        in `dynamic_library_path`.
+        in `dynamic_library_path`.\
+      - Fixed some docs typos, thanks to @0xflotus (#75)
+      - Supports PostgreSQL 9.2–18.
 
 0.40.0  2024-07-20T20:35:03Z
       - Updated the installation configuration to install the SQL and

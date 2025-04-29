@@ -7,7 +7,7 @@
  * + Xavier Caron <xcaron@gmail.com>
  * + David Wheeler <david@justatheory.com>
  *
- * Copyright 2010-2024 The pg-semver Maintainers. This program is Free
+ * Copyright 2010-2025 The pg-semver Maintainers. This program is Free
  * Software; see the LICENSE file for the license conditions.
  */
 
