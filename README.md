@@ -46,7 +46,7 @@ package management system such as RPM to install PostgreSQL, be sure that the
 to find it:
 
 ```sh
-env PG_CONFIG=/path/to/pg_config make && make installcheck && make install
+env PG_CONFIG=/path/to/pg_config make && make install && make installcheck
 ```
 
 If you encounter an error such as:
