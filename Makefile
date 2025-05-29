@@ -10,9 +10,9 @@ DOCS         = $(wildcard doc/*.mmd)
 TESTS        = $(wildcard test/sql/*.sql)
 REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
 REGRESS_OPTS = --inputdir=test
-MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
+MODULES      = src/$(EXTENSION)
 PG_CONFIG   ?= pg_config
-EXTRA_CLEAN  = sql/$(EXTENSION)--$(EXTVERSION).sql
+EXTRA_CLEAN  = sql/$(EXTENSION)--$(EXTVERSION).sql src/$(EXTENSION).c
 PG92         = $(shell $(PG_CONFIG) --version | grep -qE " 8\.| 9\.0| 9\.1" && echo no || echo yes)
 
 ifeq ($(PG92),no)
@@ -26,6 +26,9 @@ all: sql/$(EXTENSION)--$(EXTVERSION).sql
 
 sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
 	cp $< $@
+
+src/$(EXTENSION).c: src/$(EXTENSION).c.in
+	sed -e 's,__VERSION__,$(EXTVERSION),g' $< > $@
 
 .PHONY: results
 results:

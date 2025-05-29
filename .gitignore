@@ -13,3 +13,4 @@ regression.out
 /semver_binary_copy.bin
 /.vscode
 /*.bin
+/src/*.c
