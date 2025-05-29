@@ -77,34 +77,18 @@ extension_control_path = '/usr/local/extras/postgresql/share:$system'
 dynamic_library_path = '/usr/local/extras/postgresql/lib:$libdir'
 ```
 
-Once semver is installed, you can add it to a database. If you're running
-PostgreSQL 9.1.0 or greater, it's a simple as connecting to a database as a
-super user and running:
+Once semver is installed, you can add it to a database by connecting to a
+database as a super user and running:
 
 ```sql
 CREATE EXTENSION semver;
 ```
 
-If you've upgraded your cluster to PostgreSQL 9.1 and already had semver
-installed, you can upgrade it to a properly packaged extension with:
+If you've upgraded your cluster and had semver installed but not as a packaged
+extension, you can upgrade it with:
 
 ```sql
 CREATE EXTENSION semver FROM unpackaged;
-```
-
-For versions of PostgreSQL less than 9.1.0, you'll need to run the
-installation script:
-
-```sh
-psql -d mydb -f /path/to/pgsql/share/contrib/semver.sql
-```
-
-If you want to install semver and all of its supporting objects into a
-specific schema, use the `PGOPTIONS` environment variable to specify the
-schema, like so:
-
-```sh
-PGOPTIONS=--search_path=extensions psql -d mydb -f semver.sql
 ```
 
 Dependencies

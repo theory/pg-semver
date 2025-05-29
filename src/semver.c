@@ -24,8 +24,10 @@
 #include "varatt.h"
 #endif
 
-#ifdef PG_MODULE_MAGIC
-PG_MODULE_MAGIC;
+#ifdef PG_MODULE_MAGIC_EXT // Added in 18
+PG_MODULE_MAGIC_EXT(.name = "semver", .version = "0.32.1");
+#else
+PG_MODULE_MAGIC; // Added in 8.2
 #endif
 
 /* IO methods */
