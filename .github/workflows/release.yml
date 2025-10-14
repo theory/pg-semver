@@ -27,4 +27,4 @@ jobs:
         name: "Release ${{ github.ref_name }}"
         body_path: latest-changes.md
         files: ${{ steps.bundle.outputs.bundle }}
-      if: matrix.toolchain == 'stable' && startsWith( github.ref, 'refs/tags/v' )
+      if: startsWith( github.ref, 'refs/tags/v' )
