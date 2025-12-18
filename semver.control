@@ -1,5 +1,5 @@
 # semver extension
 comment = 'Semantic version data type'
-default_version = '0.40.0'
+default_version = '0.41.0'
 module_pathname = 'semver'
 relocatable = true

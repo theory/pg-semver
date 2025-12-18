@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.40.1
+0.41.0  2025-12-18T01:55:38Z
       - Removed the `directory` and `MODULEDIR` directives that installed
         extension files in a subdirectory named "semver", as it's not
         necessary, and deprecated by PostgreSQL 18.

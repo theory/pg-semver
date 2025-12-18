@@ -1,4 +1,4 @@
-semver 0.40.0
+semver 0.40.1
 =============
 
 Synopsis
