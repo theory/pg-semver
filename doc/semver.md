@@ -4,18 +4,20 @@ semver 0.40.0
 Synopsis
 --------
 
-    =% CREATE EXTENSION semver;
-    CREATE EXTENSION
+```pgsql
+=% CREATE EXTENSION semver;
+CREATE EXTENSION
 
-    =% SELECT '1.2.1'::semver;
-     semver
-    --------
-     1.2.1
+=% SELECT '1.2.1'::semver;
+ semver
+--------
+ 1.2.1
 
-    =% SELECT '1.2.0'::semver > '1.2.0-b1'::semver;
-     ?column?
-    ----------
-     t
+=% SELECT '1.2.0'::semver > '1.2.0-b1'::semver;
+ ?column?
+----------
+ t
+```
 
 Description
 -----------
@@ -77,8 +79,10 @@ prerelease values. *BEFORE YOU UPGRADE*, we strongly recommend that you check
 for and repair semvers. Use this query to find semvers with invalid
 pre-release values:
 
-    SELECT name, version FROM packages
-     WHERE get_semver_prerelease(version) ~ '^0\[0-9]+($|\+)';
+```sql
+SELECT name, version FROM packages
+ WHERE get_semver_prerelease(version) ~ '^0\[0-9]+($|\+)';
+```
 
 For any results returned, update them by removing the leading `0` from the
 pre-release, or appending an alphabetic value.
@@ -93,81 +97,95 @@ any invalid semvers. You can find them using the official [SemVer regular
 expression] like so (replace `name`, `version`, and `packages` as appropriate
 for your database):
 
-    SELECT name, version FROM packages
-    WHERE version::text !~ '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$';
+```sql
+SELECT name, version FROM packages
+WHERE version::text !~ '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$';
+```
 
 If no rows are returned, you should be good to go. If there are results, here are
 Examples of invalid semantic versions and how they should be repaired.
 
-     Invalid             Valid SemVer
-    -----------         ----------------------------
-    1.0.0-02799    ->   1.0.0-2799
-    1.0.0-0.02     ->   1.0.0-0.2
-    1.0.0-.20      ->   1.0.0-0.20
-    1.0.0+0+20     ->   1.0.0+0-20  or  1.0.0+0.20
-    1.0.0+.af      ->   1.0.0+0.af  or  1.0.0+af
+```text
+ Invalid             Valid SemVer
+-----------         ----------------------------
+1.0.0-02799    ->   1.0.0-2799
+1.0.0-0.02     ->   1.0.0-0.2
+1.0.0-.20      ->   1.0.0-0.20
+1.0.0+0+20     ->   1.0.0+0-20  or  1.0.0+0.20
+1.0.0+.af      ->   1.0.0+0.af  or  1.0.0+af
+```
 
 Usage
 -----
 
 Add the extension to a database:
 
-    CREATE EXTENSION semver;
+```sql
+CREATE EXTENSION semver;
+```
 
 Now, use it like any other data type. Here's an example in a table:
 
-    CREATE TABLE extensions (
-        name        TEXT,
-        version     SEMVER,
-        description TEXT,
-        PRIMARY KEY (name, version)
-    );
+```sql
+CREATE TABLE extensions (
+    name        TEXT,
+    version     SEMVER,
+    description TEXT,
+    PRIMARY KEY (name, version)
+);
+```
 
 The type can be in indexed using btree or hash indexes:
 
-    CREATE INDEX idx_extension_version ON extensions(version);
-    CREATE INDEX hdx_extension_version ON extensions USING hash (version);
+```sql
+CREATE INDEX idx_extension_version ON extensions(version);
+CREATE INDEX hdx_extension_version ON extensions USING hash (version);
+```
 
 Hash indexes aren't worth much, but the functionality is there to support hash
 aggregates in query optimizations.
 
 And some sample usage:
 
-    =% INSERT INTO extensions
-    -% VALUES ('pgtap', '0.35.0',    'PostgreSQL unit testing'),
-              ('pgtap', '0.35.0-b1', 'PostgreSQL unit testing.'),
-              ('pair',  '0.1.0',     'Key/value pair data type'),
-              ('PostGIS', '1.5.0',   'Geolocation data types');
+```pgsql
+=% INSERT INTO extensions
+-% VALUES ('pgtap', '0.35.0',    'PostgreSQL unit testing'),
+          ('pgtap', '0.35.0-b1', 'PostgreSQL unit testing.'),
+          ('pair',  '0.1.0',     'Key/value pair data type'),
+          ('PostGIS', '1.5.0',   'Geolocation data types');
 
-    =% SELECT * FROM extensions WHERE VERSION = '1.5.0';
-      name   │ version │      description
-    ---------+---------+------------------------
-     PostGIS │ 1.5.0   │ Geolocation data types
+=% SELECT * FROM extensions WHERE VERSION = '1.5.0';
+  name   │ version │      description
+---------+---------+------------------------
+ PostGIS │ 1.5.0   │ Geolocation data types
 
-    =% SELECT * FROM extensions WHERE VERSION < '0.35.0';
-     name  │ version   │       description
-    -------+-----------+--------------------------
-     pgtap │ 0.35.0-b1 │ PostgreSQL unit testing.
-     pair  │ 0.1.0     │ Key/value pair data type
+=% SELECT * FROM extensions WHERE VERSION < '0.35.0';
+ name  │ version   │       description
+-------+-----------+--------------------------
+ pgtap │ 0.35.0-b1 │ PostgreSQL unit testing.
+ pair  │ 0.1.0     │ Key/value pair data type
+```
 
 Note that "0.35.0-b1" is less than "0.35.0", as required by the specification.
 Use `ORDER BY` to get more of a feel for semantic version ordering rules:
 
-    =% SELECT version FROM extensions ORDER BY version;
-     version
-    -----------
-     0.1.0
-     0.35.0-b1
-     0.35.0
-     1.5.0
+```pgsql
+=% SELECT version FROM extensions ORDER BY version;
+ version
+-----------
+ 0.1.0
+ 0.35.0-b1
+ 0.35.0
+ 1.5.0
 
-    =% SELECT version FROM extensions ORDER BY version DESC;
-     version
-    -----------
-     1.5.0
-     0.35.0
-     0.35.0-b1
-     0.1.0
+=% SELECT version FROM extensions ORDER BY version DESC;
+ version
+-----------
+ 1.5.0
+ 0.35.0
+ 0.35.0-b1
+ 0.1.0
+```
 
 Interface
 ---------
@@ -211,15 +229,17 @@ requires a valid semver format, while the latter is a bit more permissive,
 doing its best to convert other version number formats (including the older
 [semver 1.0.0-beta] prerelease format) to semantic versions:
 
-    =% select to_semver('1.0');
-     to_semver
-    -----------
-     1.0.0
+```pgsql
+=% select to_semver('1.0');
+ to_semver
+-----------
+ 1.0.0
 
-    =% select to_semver('1.0beta1');
-     to_semver
-    -----------
-     1.0.0-beta1
+=% select to_semver('1.0beta1');
+ to_semver
+-----------
+ 1.0.0-beta1
+```
 
 As for `is_semver()`, it returns true for a valid semver format, and false for
 anything else, including formats that `semver()` would convert to valid
@@ -272,36 +292,44 @@ The cool thing is that you can use any of the [range operators], including the
 "contains" operators: For example, to see if `1.0.5` falls falls within the
 range `1.0.0` - `2.0.0` exclusive, run a query like this:
 
-    =% SELECT '1.0.5'::semver <@ '[1.0.0, 2.0.0)'::semverrange;
-     ?column?
-    ----------
-     t
+```pgsql
+=% SELECT '1.0.5'::semver <@ '[1.0.0, 2.0.0)'::semverrange;
+ ?column?
+----------
+ t
+```
 
 The `semverrange` constructor will build the same range,
 
-    =% SELECT semverrange('1.0.0', '2.0.0') @> '2.0.0'::semver;
-     ?column?
-    ----------
-     f
-    =% SELECT semverrange('1.0.0', '2.0.0') @> '1.9999.9999'::semver;
-     ?column?
-    ----------
-     t
+```pgsql
+=% SELECT semverrange('1.0.0', '2.0.0') @> '2.0.0'::semver;
+ ?column?
+----------
+ f
+=% SELECT semverrange('1.0.0', '2.0.0') @> '1.9999.9999'::semver;
+ ?column?
+----------
+ t
+```
 
 Pass the optional third argument to determine the bounds inclusiveness:
 
-    =% SELECT semverrange('1.0.0', '2.0.0', '[]') @> '2.0.0'::semver;
-     ?column?
-    ----------
-     t
+```pgsql
+=% SELECT semverrange('1.0.0', '2.0.0', '[]') @> '2.0.0'::semver;
+ ?column?
+----------
+ t
+```
 
 It works for unlimited bound, as well. For example, this query ensure that
 a semver is greater than or equal `1.0.0`:
 
-    =% SELECT '1000.0.0'::semver <@ '[1.0.0,]'::semverrange;
-     ?column?
-    ----------
-     t
+```pgsql
+=% SELECT '1000.0.0'::semver <@ '[1.0.0,]'::semverrange;
+ ?column?
+----------
+ t
+```
 
 If you need to omit some values, you can use an array of semverrange values.
 For example, say you want to require a version greater than `1.0.0` and less
@@ -309,25 +337,30 @@ than `2.0.0`, but versions `1.2.3` and `1.4.5` have such serious bugs that you
 don't want to include them. We create three ranges that use exclusive bounds
 to omit those versions, like so:
 
-    SELECT '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[];
+```sql
+SELECT '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[];
+```
+
 Here's an sample how to query such an array of semverranges.
 
-    =% SELECT version, version <@ ANY(
-    -%     '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[]
-    -% ) AS valid FROM (VALUES
-    -%     ('1.0.0'::semver), ('1.0.1'), ('1.2.3'), ('1.2.4'), ('1.4.4'), ('1.4.5'),
-    -%     ('1.7.0'), ('2.0.0')
-    -% ) AS v(version)
-     version | valid
-    ---------+-------
-     1.0.0   | f
-     1.0.1   | t
-     1.2.3   | f
-     1.2.4   | t
-     1.4.4   | t
-     1.4.5   | f
-     1.7.0   | t
-     2.0.0   | f
+```pgsql
+=% SELECT version, version <@ ANY(
+-%     '{"(1.0.0,1.2.3)", "(1.2.3,1.4.5)", "(1.4.5,2.0.0)"}'::semverrange[]
+-% ) AS valid FROM (VALUES
+-%     ('1.0.0'::semver), ('1.0.1'), ('1.2.3'), ('1.2.4'), ('1.4.4'), ('1.4.5'),
+-%     ('1.7.0'), ('2.0.0')
+-% ) AS v(version)
+ version | valid
+---------+-------
+ 1.0.0   | f
+ 1.0.1   | t
+ 1.2.3   | f
+ 1.2.4   | t
+ 1.4.4   | t
+ 1.4.5   | f
+ 1.7.0   | t
+ 2.0.0   | f
+```
 
 Support
 -------

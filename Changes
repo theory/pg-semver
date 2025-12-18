@@ -6,9 +6,11 @@ Revision history for PostgreSQL extension semver.
         necessary, and deprecated by PostgreSQL 18.
       - Removed the `$libdir/` prefix from the `module_pathname` directive,
         so that the module can be installed and found in any directory listed
-        in `dynamic_library_path`.\
+        in `dynamic_library_path`.
       - Fixed some docs typos, thanks to @0xflotus (#75)
       - Supports PostgreSQL 9.2–18.
+      - Converted the documentation from MultiMarkdown to Markdown, now that
+        PGXN has upgraded its Markdown parser.
 
 0.40.0  2024-07-20T20:35:03Z
       - Updated the installation configuration to install the SQL and
@@ -22,7 +24,7 @@ Revision history for PostgreSQL extension semver.
       - ***** WARNING: This release breaks compatibility with previous versions! ******
         Fixed a bug in the scanning of pre-releases that start with a zero.
         It now properly scans the rest of the pre-release string. As a result,
-        existing semvers with pre-releases the start with a zero may have been
+        existing semvers with pre-releases that start with a zero may have been
         incorrectly interpreted as valid. Any versions returned by this query
         will need the leading 0 removed from the pre-release before upgrading:
         `SELECT version FROM pkg WHERE get_semver_prerelease(version) ~ '^0\[0-9]+($|\+)'`

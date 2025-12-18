@@ -14,7 +14,7 @@
       "semver": {
          "abstract": "A semantic version data type",
          "file": "sql/semver.sql",
-         "docfile": "doc/semver.mmd",
+         "docfile": "doc/semver.md",
          "version": "0.40.0"
       }
    },
