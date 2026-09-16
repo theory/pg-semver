@@ -4,16 +4,55 @@ on:
     branches: ['*']
   pull_request:
   schedule:
-    - cron:  '0 12 5 * *' # Monthly at noon on the fifth
+    - cron:  '0 12 5 * *' # Noon on the fifth of each month
+defaults:
+  run: { shell: bash }
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
-        pg: [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9.6, 9.5, 9.4, 9.3, 9.2]
-    name: 🐘 PostgreSQL ${{ matrix.pg }}
-    runs-on: ubuntu-latest
-    container: pgxn/pgxn-tools
+        include:
+          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 19 }
+          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 18 }
+          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 17 }
+          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 16 }
+          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 15 }
+          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 14 }
+          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 13 }
+          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 12 }
+          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 11 }
+          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 19 }
+          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 18 }
+          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 17 }
+          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 16 }
+          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 15 }
+          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 14 }
+          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 13 }
+          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 12 }
+          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 11 }
+          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 18 }
+          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 17 }
+          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 16 }
+          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 15 }
+          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 14 }
+    name: ${{ matrix.img }} ${{matrix.os }} 🐘 ${{ matrix.pg }}
+    runs-on: ${{ matrix.vm }}
     steps:
-      - run: pg-start ${{ matrix.pg }}
-      - uses: actions/checkout@v6
-      - run: pg-build-test
+      - uses: actions/checkout@v7
+      - uses: pgxn/postgres-action@v0
+        with: { version: "${{ matrix.pg }}" }
+      - run: make -j $(nproc)
+      - run: sudo make install
+      - run: make installcheck
+        id: test
+      - name: Show Diffs
+        if: failure() && steps.test.outcome == 'failure'
+        run: find . -name regression.diffs -exec cat {} +
+      - uses: actions/upload-artifact@v7
+        if: failure() && steps.test.outcome == 'failure'
+        with:
+          name: regression-${{ runner.matrix.vm }}-pg${{ matrix.pg }}
+          path: |
+            regression.diffs
+            results
