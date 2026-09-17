@@ -5,13 +5,12 @@ jobs:
   release:
     name: Release on GitHub and PGXN
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v7
       - name: Release on PGXN
         uses: pgxn/release-action@v0
+        id: pgxn
         with:
           username: ${{ secrets.PGXN_USERNAME }}
           password: ${{ secrets.PGXN_PASSWORD }}
@@ -26,4 +25,4 @@ jobs:
         with:
           name: "Release ${{ github.ref_name }}"
           body_path: latest-changes.md
-          files: ${{ steps.bundle.outputs.bundle }}
+          files: ${{ steps.pgxn.outputs.archive }}
