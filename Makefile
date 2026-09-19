@@ -10,9 +10,10 @@ DOCS         = $(wildcard doc/*.md)
 TESTS        = $(wildcard test/sql/*.sql)
 REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
 REGRESS_OPTS = --inputdir=test
-MODULES      = src/$(EXTENSION)
+MODULE_big   = $(EXTENSION)
+OBJS         = $(subst .c,.o, $(wildcard src/*.c))
 PG_CONFIG   ?= pg_config
-EXTRA_CLEAN  = sql/$(EXTENSION)--$(EXTVERSION).sql src/$(EXTENSION).c
+EXTRA_CLEAN  = sql/$(EXTENSION)--$(EXTVERSION).sql src/version.h
 PG92         = $(shell $(PG_CONFIG) --version | grep -qE " 8\.| 9\.0| 9\.1" && echo no || echo yes)
 
 ifeq ($(PG92),no)
@@ -27,8 +28,9 @@ all: sql/$(EXTENSION)--$(EXTVERSION).sql
 sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
 	cp $< $@
 
-src/$(EXTENSION).c: src/$(EXTENSION).c.in
-	sed -e 's,__VERSION__,$(EXTVERSION),g' $< > $@
+$(OBJS): src/version.h
+src/version.h: META.json
+	@printf '#define SEMVER_VERSION "%s"\n' "$(DISTVERSION)" > $@
 
 .PHONY: results
 results:
