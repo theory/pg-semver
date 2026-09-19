@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(348);
+SELECT plan(349);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -604,17 +604,28 @@ SELECT is(
 
 -- Cannot test semver_recv() directly, so instead copy to a file and back into
 -- another table.
+\set copy_file '/tmp/semver_binary_copy.bin'
 CREATE TABLE vs_recv(version semver);
-\copy vs TO semver_binary_copy.bin WITH BINARY;
-\copy vs_recv from semver_binary_copy.bin with binary;
+COPY vs TO :'copy_file' WITH BINARY;
+COPY vs_recv FROM :'copy_file' with binary;
 SELECT bag_eq(
     'SELECT * FROM vs',
     'SELECT * FROM vs_recv',
     'Should have binary copied all of the semvers'
 );
 
--- Verify we support only plain storage.
+-- Reject binary input with nul byte.
+COPY (SELECT '\x0131002e312e31'::bytea) TO :'copy_file' WITH BINARY;
+
 SELECT throws_ok(
+    format('COPY vs_recv FROM %L WITH BINARY', :'copy_file'),
+    '22021',
+    format('invalid byte sequence for encoding %I: 0x00', (SELECT current_setting('server_encoding'))),
+    'Should get invalid input syntax error with nul byte'
+);
+
+--- Verify we support only plain storage.
+ SELECT throws_ok(
     'ALTER TABLE vs ALTER version SET STORAGE EXTERNAL',
     NULL,
     'column data type semver can only have storage PLAIN'

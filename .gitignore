@@ -10,7 +10,6 @@ regression.out
 /semver-*
 /latest-changes.md
 /src/*.bc
-/semver_binary_copy.bin
 /.vscode
 /*.bin
 src/version.h

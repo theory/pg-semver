@@ -16,6 +16,8 @@ Revision history for PostgreSQL extension semver.
         strings that start with a digit but contain ascii characters as
         strings, rather than discarding the string part. Patch by Hannu
         Krosing with tests by David Wheeler.
+      - Added a test to ensure that `semver_recv()` rejects values with nul
+        bytes.
 
 0.41.0  2025-12-18T01:55:38Z
       - Removed the `directory` and `MODULEDIR` directives that installed
