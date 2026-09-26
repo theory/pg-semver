@@ -8,40 +8,33 @@ on:
 defaults:
   run: { shell: bash }
 jobs:
+  matrix:
+    name: 📋 Generate Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Generate Matrix
+        id: matrix
+        uses: pgxn/matrix-action@v0
+        with:
+          min-version: 9.2
+          beta: true
+          deprecated: true
+          no-os: windows
+
   build:
+    name: ${{ matrix.pg.emoji }} ${{ matrix.pg.os }}/${{ matrix.pg.arch }} 🐘 v${{ matrix.pg.version }}
+    needs: matrix
+    runs-on: ${{ matrix.pg.runner }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 19 }
-          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 18 }
-          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 17 }
-          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 16 }
-          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 15 }
-          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 14 }
-          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 13 }
-          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 12 }
-          - { img: 🐧, os: linux/amd64,   vm: ubuntu-latest,    pg: 11 }
-          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 19 }
-          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 18 }
-          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 17 }
-          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 16 }
-          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 15 }
-          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 14 }
-          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 13 }
-          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 12 }
-          - { img: 🐧, os: linux/arm64,   vm: ubuntu-26.04-arm, pg: 11 }
-          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 18 }
-          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 17 }
-          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 16 }
-          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 15 }
-          - { img: 🍎, os: macos/arm64,   vm: macos-latest,     pg: 14 }
-    name: ${{ matrix.img }} ${{matrix.os }} 🐘 ${{ matrix.pg }}
-    runs-on: ${{ matrix.vm }}
+        pg: ${{ fromJson(needs.matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v7
       - uses: pgxn/postgres-action@v0
-        with: { version: "${{ matrix.pg }}" }
+        with: { version: "${{ matrix.pg.version }}" }
       - run: make -j $(nproc)
       - run: sudo make install
       - run: make installcheck
@@ -52,7 +45,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: failure() && steps.test.outcome == 'failure'
         with:
-          name: regression-${{ runner.matrix.vm }}-pg${{ matrix.pg }}
+          name: regression-${{ matrix.pg.os }}-${{ matrix.pg.arch }}-pg${{ matrix.pg.version }}
           path: |
             regression.diffs
             results
