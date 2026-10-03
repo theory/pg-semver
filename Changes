@@ -1,7 +1,8 @@
 Revision history for PostgreSQL extension semver.
 
-0.42.0
+0.42.0  Unreleased
       - Added policy in SECURITY.md.
+      - Added a test to ensure that semver supports only PLAIN storage.
 
 0.41.0  2025-12-18T01:55:38Z
       - Removed the `directory` and `MODULEDIR` directives that installed

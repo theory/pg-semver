@@ -1,5 +1,5 @@
 \set ECHO none
-1..334
+1..335
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -310,7 +310,7 @@ ok 307 - 1000.0.0 should be in range [1.0.0,)
 ok 308 - Should be able to work with arrays of semverranges
 ok 309 - Should properly format a 32 character semver
 ok 310 - Should properly format a 33 character semver
-ok 311 - Should propery format a prerelease with a hyphen
+ok 311 - Should properly format a prerelease with a hyphen
 ok 312 - Should get distinct values via hash aggregation
 ok 313 - Function semver_send() should exist
 ok 314 - Function semver_send(semver) should exist
@@ -334,3 +334,4 @@ ok 331 - semver_send('20110204.0.0')
 ok 332 - semver_send('1.0.0-0AEF')
 ok 333 - semver_send(NULL)
 ok 334 - Should have binary copied all of the semvers
+ok 335 - column data type semver can only have storage PLAIN

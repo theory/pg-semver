@@ -5,7 +5,7 @@ EXTVERSION   = $(shell grep -m 1 '[[:space:]]\{8\}"version":' META.json | \
 DISTVERSION  = $(shell grep -m 1 '[[:space:]]\{3\}"version":' META.json | \
                sed -e 's/[[:space:]]*"version":[[:space:]]*"\([^"]*\)",\{0,1\}/\1/')
 
-DATA         = $(wildcard sql/*.sql)
+DATA         = $(sort $(wildcard sql/*.sql) sql/$(EXTENSION)--$(EXTVERSION).sql)
 DOCS         = $(wildcard doc/*.md)
 TESTS        = $(wildcard test/sql/*.sql)
 REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))

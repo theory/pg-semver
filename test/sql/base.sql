@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(334);
+SELECT plan(335);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -486,7 +486,7 @@ SELECT is(
 -- issue-gh-46
 SELECT is(
     '1.0.0-alpha-0'::semver::text, '1.0.0-alpha-0',
-    'Should propery format a prerelease with a hyphen'
+    'Should properly format a prerelease with a hyphen'
 );
 
 -- Make sure hashing works by forcing a hash aggregation. Also confirms
@@ -550,6 +550,13 @@ SELECT bag_eq(
     'SELECT * FROM vs',
     'SELECT * FROM vs_recv',
     'Should have binary copied all of the semvers'
+);
+
+-- Verify we support only plain storage.
+SELECT throws_ok(
+    'ALTER TABLE vs ALTER version SET STORAGE EXTERNAL',
+    NULL,
+    'column data type semver can only have storage PLAIN'
 );
 
 SELECT * FROM finish();
