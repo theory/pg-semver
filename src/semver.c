@@ -647,12 +647,17 @@ hash_semver(PG_FUNCTION_ARGS) {
     Datum prerel;
 
     if (*version->prerel != '\0') {
-        prerel = CStringGetTextDatum(version->prerel);
-        hash = DirectFunctionCall1Coll(hashtext, C_COLLATION_OID, prerel);
+        char *prerel_clean = strip_meta(version->prerel);
+        if (*prerel_clean != '\0') {
+            prerel = CStringGetTextDatum(prerel_clean);
+            hash = DirectFunctionCall1Coll(hashtext, C_COLLATION_OID, prerel);
+            pfree(DatumGetPointer(prerel));
+        }
+        pfree(prerel_clean);
     }
     for (i = 0; i < 3; i++) {
-        hash = (hash << (7+(i<<1))) & (hash >> (25-(i<<1)));
-        hash ^= DirectFunctionCall1(hashint2, version->numbers[i]);
+        hash = (hash << (7 + (i << 1))) | (hash >> (25 - (i << 1)));
+        hash ^= DirectFunctionCall1(hashint4, version->numbers[i]);
     }
 
     PG_RETURN_INT32(hash);

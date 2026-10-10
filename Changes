@@ -1,6 +1,15 @@
 Revision history for PostgreSQL extension semver.
 
 0.42.0  Unreleased
+      - ***** WARNING! ****** This release breaks hash index compatibility
+        with previous versions. Be sure to reindex any semver hash indexes
+        after upgrading.
+      - Fixed the bit rotation in the hashing function, `hash_semver()`, so
+        it properly includes each part of a semver except for build
+        metadata. Also use `hashint4` rather than `hashint2` to hash each
+        version part, since they're `int4`s, not `int2`s. The previous
+        hashing outcomes were simply wrong; reindex your hash indexes if you
+        got 'em. Thanks to Hannu Krosing for the patch.
       - Added policy in SECURITY.md.
       - Added a test to ensure that semver supports only PLAIN storage.
 

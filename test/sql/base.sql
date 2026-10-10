@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(335);
+SELECT plan(339);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -512,6 +512,28 @@ SELECT bag_eq(
         )
     $$,
     'Should get distinct values via hash aggregation'
+);
+
+-- Hash index contract tests
+SELECT isnt(
+    hash_semver('1.0.0-abc'::semver),
+    hash_semver('1.0.0-xyz'::semver),
+    'hash_semver should generate different hashes for different prereleases'
+);
+SELECT is(
+    hash_semver('1.0.0'::semver),
+    hash_semver('1.0.0+foo'::semver),
+    'hash_semver should match for version with and without build metadata'
+);
+SELECT is(
+    hash_semver('1.0.0'::semver),
+    hash_semver('1.0.0+foo'::semver),
+    'hash_semver should match for version with and without build metadata'
+);
+SELECT is(
+    hash_semver('2.1.3-alpha.1+build1'::semver),
+    hash_semver('2.1.3-alpha.1+build2'::semver),
+    'hash_semver should match for prereleases with different build metadata'
 );
 
 -- Test send and receive.
