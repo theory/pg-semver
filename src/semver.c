@@ -11,16 +11,17 @@
  * Software; see the LICENSE file for the license conditions.
  */
 
+#include "math.h"
+
 #include "postgres.h"
-#include <string.h>
-#include <ctype.h>
-#include <limits.h>
 #include "utils/builtins.h"
+#include "utils/numeric.h"
 #include "catalog/pg_collation.h"
-#include "access/hash.h"
-#include "lib/stringinfo.h"
 #include "libpq/pqformat.h"
-#if PG_VERSION_NUM >= 160000
+#if PG_VERSION_NUM < 100000
+#include "utils/int8.h"
+#include "access/hash.h"
+#elif PG_VERSION_NUM >= 160000
 #include "varatt.h"
 #endif
 
@@ -712,4 +713,80 @@ is_semver(PG_FUNCTION_ARGS) {
     semver* rs = parse_semver(text_to_cstring(sv), false, false, &bad);
     if (rs != NULL) pfree(rs);
     PG_RETURN_BOOL(!bad);
+}
+
+PG_FUNCTION_INFO_V1(numeric_to_semver);
+Datum
+numeric_to_semver(PG_FUNCTION_ARGS) {
+    Numeric n = PG_GETARG_NUMERIC(0);
+    Datum d = NumericGetDatum(n);
+    char* t = DatumGetCString(DirectFunctionCall1(numeric_out, d));
+    bool bad = false;
+    semver* rs = parse_semver(t, true, true, &bad);
+    if (
+#if PG_VERSION_NUM >= 140000
+        numeric_is_inf(n) ||
+#endif
+        numeric_is_nan(n)) {
+        elog(ERROR, "cannot convert \"%s\" to semver", t);
+    }
+    PG_RETURN_POINTER(rs);
+}
+
+PG_FUNCTION_INFO_V1(real_to_semver);
+Datum
+real_to_semver(PG_FUNCTION_ARGS) {
+    float4 f = PG_GETARG_FLOAT4(0);
+    Datum d = Float4GetDatum(f);
+    char* t = DatumGetCString(DirectFunctionCall1(float4out, d));
+    bool bad = false;
+    semver* rs = parse_semver(t, true, true, &bad);
+    if (isinf(f) || isnan(f)) {
+        elog(ERROR, "cannot convert \"%s\" to semver", t);
+    }
+    PG_RETURN_POINTER(rs);
+}
+
+PG_FUNCTION_INFO_V1(double_to_semver);
+Datum
+double_to_semver(PG_FUNCTION_ARGS) {
+    float8 f = PG_GETARG_FLOAT8(0);
+    Datum d = Float8GetDatum(f);
+    char* t = DatumGetCString(DirectFunctionCall1(float8out, d));
+    bool bad = false;
+    semver* rs = parse_semver(t, true, true, &bad);
+    if (isinf(f) || isnan(f)) {
+        elog(ERROR, "cannot convert \"%s\" to semver", t);
+    }
+    PG_RETURN_POINTER(rs);
+}
+
+PG_FUNCTION_INFO_V1(int_to_semver);
+Datum
+int_to_semver(PG_FUNCTION_ARGS) {
+    Datum n = Int32GetDatum(PG_GETARG_INT32(0));
+    char* t = DatumGetCString(DirectFunctionCall1(int4out, n));
+    bool bad = false;
+    semver* rs = parse_semver(t, true, true, &bad);
+    PG_RETURN_POINTER(rs);
+}
+
+PG_FUNCTION_INFO_V1(smallint_to_semver);
+Datum
+smallint_to_semver(PG_FUNCTION_ARGS) {
+    Datum n = Int16GetDatum(PG_GETARG_INT16(0));
+    char* t = DatumGetCString(DirectFunctionCall1(int2out, n));
+    bool bad = false;
+    semver* rs = parse_semver(t, true, true, &bad);
+    PG_RETURN_POINTER(rs);
+}
+
+PG_FUNCTION_INFO_V1(bigint_to_semver);
+Datum
+bigint_to_semver(PG_FUNCTION_ARGS) {
+    Datum n = Int64GetDatum(PG_GETARG_INT64(0));
+    char* t = DatumGetCString(DirectFunctionCall1(int8out, n));
+    bool bad = false;
+    semver* rs = parse_semver(t, true, true, &bad);
+    PG_RETURN_POINTER(rs);
 }

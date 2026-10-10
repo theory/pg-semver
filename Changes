@@ -18,6 +18,10 @@ Revision history for PostgreSQL extension semver.
         Krosing with tests by David Wheeler.
       - Added a test to ensure that `semver_recv()` rejects values with nul
         bytes.
+      - Replaced the numeric, floating point, and integer `semver()` SQL
+        functions (and casts) with C implementations that should be a little
+        faster and that raise an error on "Infinity" and "NaN" numeric and
+        floating point values.
 
 0.41.0  2025-12-18T01:55:38Z
       - Removed the `directory` and `MODULEDIR` directives that installed

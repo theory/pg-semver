@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(349);
+SELECT plan(376);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -210,8 +210,29 @@ SELECT is( semver(1::bigint), '1.0.0'::semver, 'construct from bigint' );
 SELECT is( semver(1::smallint), '1.0.0'::semver, 'construct from smallint' );
 SELECT is( semver(1.2::decimal), '1.2.0'::semver, 'construct from decimal' );
 SELECT is( semver(1.2::real), '1.2.0'::semver, 'construct from real' );
+SELECT is( semver(1.02::real), '1.2.0'::semver, 'construct from real with leading 0s' );
 SELECT is( semver(1.2::double precision), '1.2.0'::semver, 'construct from double' );
+SELECT is( semver(1.02::double precision), '1.2.0'::semver, 'construct from double with leading 0s' );
 SELECT is( semver(1.2::float), '1.2.0'::semver, 'construct from float' );
+SELECT is( semver(1.02::float), '1.2.0'::semver, 'construct from float with leading 0s' );
+
+-- Test constructor errors.
+SELECT throws_ok(
+    $$ SELECT semver('$$ || v || $$'::float) $$,
+    NULL,
+    'cannot convert "' || v || '" to semver'
+)  FROM unnest(ARRAY['infinity', '-infinity', '+infinity', 'nan']) AS v;
+SELECT throws_ok(
+    $$ SELECT semver('$$ || v || $$'::float8) $$,
+    NULL,
+    'cannot convert "' || v || '" to semver'
+)  FROM unnest(ARRAY['infinity', '-infinity', '+infinity', 'nan']) AS v;
+-- Numeric Infinity not added till Postgres 13.
+SELECT throws_imatching(
+    $$ SELECT semver('$$ || v || $$'::numeric) $$,
+    '^(cannot convert "' || replace(v, '+', '') || '" to semver|invalid input syntax for type numeric: "' || replace(v, '+', '\+') || '")$',
+    $$Should catch exception for semver('$$ || v || $$'::numeric)$$
+)  FROM unnest(ARRAY['infinity', '-infinity', '+infinity', 'nan']) AS v;
 
 -- Test casting.
 SELECT is( semver('1.2.0'::text), '1.2.0', 'cast to text' );
@@ -227,6 +248,24 @@ SELECT is( 1::decimal::semver, '1.0.0'::semver, 'Cast from decimal');
 SELECT is( 1.0::real::semver, '1.0.0'::semver, 'Cast from real');
 SELECT is( 1.0::double precision::semver, '1.0.0'::semver, 'Cast from double precision');
 SELECT is( 1.0::float::semver, '1.0.0'::semver, 'Cast from float');
+
+-- Test casting errors.
+SELECT throws_ok(
+    $$ SELECT '$$ || v || $$'::float::semver $$,
+    NULL,
+    'cannot convert "' || v || '" to semver'
+)  FROM unnest(ARRAY['infinity', '-infinity', '+infinity', 'nan']) AS v;
+SELECT throws_ok(
+    $$ SELECT '$$ || v || $$'::float8::semver $$,
+    NULL,
+    'cannot convert "' || v || '" to semver'
+)  FROM unnest(ARRAY['infinity', '-infinity', '+infinity', 'nan']) AS v;
+-- Numeric Infinity not added till Postgres 13.
+SELECT throws_imatching(
+    $$ SELECT '$$ || v || $$'::numeric::semver $$,
+    '^(cannot convert "' || replace(v, '+', '') || '" to semver|invalid input syntax for type numeric: "' || replace(v, '+', '\+') || '")$',
+    $$Should catch exception for '$$ || v || $$'::numeric::semver$$
+)  FROM unnest(ARRAY['infinity', '-infinity', '+infinity', 'nan']) AS v;
 
 -- Test casting some more.
 SELECT IS(lv::text, rv, 'Should correctly cast "' || rv || '" to text')
