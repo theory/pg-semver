@@ -7,7 +7,7 @@
  * + Xavier Caron <xcaron@gmail.com>
  * + David Wheeler <david@justatheory.com>
  *
- * Copyright 2010-2025 The pg-semver Maintainers. This program is Free
+ * Copyright 2010-2026 The pg-semver Maintainers. This program is Free
  * Software; see the LICENSE file for the license conditions.
  */
 
@@ -112,7 +112,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
     int p = 0;
     int atchar = 0;
     int curpart = 0;
-    char next;
+    unsigned char next;
     char* patch = 0;
     char* ptr, *endptr;
     bool dotlast = false;
@@ -128,7 +128,13 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
     len = strlen(str);
 
     do {
-        next = (char)*ptr;
+        // Make sure the next charater is visible ASCII or nul terminator.
+        if (*ptr > '~' || (*ptr && *ptr < ' ')) {
+            *bad = true;
+            if (!throw) break;
+            elog(ERROR, "bad semver value '%s': invalid character at char %d", str, atchar+1);
+        }
+        next = (unsigned char)*ptr;
         skip_char = false;
         if (curpart < 3 && parts[2] == -1) {  // Still figuring out X.Y.Z
             if (next == '.') {  // First, check if we hit a period
@@ -181,6 +187,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
             } else if (next == '+') {
                 if (started_meta) {
                     *bad = true;
+                    if (!throw) break;
                     elog(ERROR, "bad semver value '%s': cannot have multiple + (plus) characters in metadata", str);
                 } else {
                     started_meta = true;

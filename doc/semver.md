@@ -241,8 +241,8 @@ doing its best to convert other version number formats (including the older
  1.0.0-beta1
 ```
 
-As for `is_semver()`, it returns true for a valid semver format, and false for
-anything else, including formats that `semver()` would convert to valid
+As for `semver()`, it returns true for a valid semver format, and false for
+anything else, including formats that `to_semver()` would convert to valid
 semvers. In other words, its interpretation of validity is strict.
 
 And finally, the `get_semver_*` functions all return integers except for
@@ -379,7 +379,7 @@ Authors
 Copyright and License
 ---------------------
 
-Copyright (c) 2010-2025 The pg-semver Maintainers: David E. Wheeler, Sam
+Copyright (c) 2010-2026 The pg-semver Maintainers: David E. Wheeler, Sam
 Vilain, Tom Davis, and Xavier Caron.
 
 This module is free software; you can redistribute it and/or modify it under

@@ -1,7 +1,7 @@
 Revision history for PostgreSQL extension semver.
 
 0.42.0  Unreleased
-      - ***** WARNING! ****** This release breaks hash index compatibility
+      - ***** WARNING! ***** This release breaks hash index compatibility
         with previous versions. Be sure to reindex any semver hash indexes
         after upgrading.
       - Fixed the bit rotation in the hashing function, `hash_semver()`, so
@@ -22,6 +22,12 @@ Revision history for PostgreSQL extension semver.
         functions (and casts) with C implementations that should be a little
         faster and that raise an error on "Infinity" and "NaN" numeric and
         floating point values.
+      - Fixed a bug were `is_semver()` raised an error rather than return
+        false for a semver with multiple `+` characters in its metadata.
+        Thanks to Alexander Kukushkin for the report.
+      - Added detection of invalid characters earlier in the parser to
+        properly handle non-ASCII and unprintable characters. Thanks to
+        Alexander Kukushkin for the report.
 
 0.41.0  2025-12-18T01:55:38Z
       - Removed the `directory` and `MODULEDIR` directives that installed

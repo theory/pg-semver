@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(376);
+SELECT plan(384);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -158,6 +158,20 @@ SELECT is(
 
 -- to_semver still needs to reject truly bad input
 SELECT throws_ok(
+    $$ SELECT to_semver('$$ || bad || $$') $$,
+    'XX000',
+    err,
+    $$to_semver('$$ || bad || $$') should fail$$
+)  FROM (VALUES
+   ('1.2.2-', $$bad semver value '1.2.2-': expected alphanumeric at char 6$$),
+   ('1.2.3b#5', $$bad semver value '1.2.3b#5': non-alphanumeric pre-release at char 6$$),
+   ('1.2.3.4', $$bad semver value '1.2.3.4': empty pre-release section at char 5$$),
+   ('1.2000000000000000.3.4', $$bad semver value '1.2000000000000000.3.4': version number exceeds 31-bit range$$),
+   ('1.2.3-café', $$bad semver value '1.2.3-café': invalid character at char 10$$)
+) v(bad, err);
+
+-- semver() is stricter.
+SELECT throws_ok(
     $$ SELECT '$$ || v || $$'::semver $$,
     NULL,
     '"' || v || '" is not a valid semver'
@@ -171,7 +185,8 @@ SELECT throws_ok(
    '1.2.4b.5',
    '1.2.3.4',
    '1.2.3 4',
-   '1.2000000000000000.3.4'
+   '1.2000000000000000.3.4',
+   '1.2.3-café'
 ]) AS v;
 
 -- Test sort ordering
@@ -410,6 +425,8 @@ SELECT is(
     ('1v',                        false),
     ('1v.2.2v',                   false),
     ('1.2.4b.5',                  false),
+    ('1.2.3+a+b',                 false),
+    ('1.2.3-x@',                  false),
     ('2016.5.18-MYW-600',         true),
     ('1010.5.0+2016-05-27-1832',  true),
     ('0.2.13+1583426134.07de632', true)
