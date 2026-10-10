@@ -12,6 +12,10 @@ Revision history for PostgreSQL extension semver.
         got 'em. Thanks to Hannu Krosing for the patch.
       - Added policy in SECURITY.md.
       - Added a test to ensure that semver supports only PLAIN storage.
+      - Fixed the sort ordering of the prerelease part to properly compare
+        strings that start with a digit but contain ascii characters as
+        strings, rather than discarding the string part. Patch by Hannu
+        Krosing with tests by David Wheeler.
 
 0.41.0  2025-12-18T01:55:38Z
       - Removed the `directory` and `MODULEDIR` directives that installed

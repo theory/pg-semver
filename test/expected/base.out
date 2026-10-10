@@ -1,5 +1,5 @@
 \set ECHO none
-1..339
+1..348
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -284,58 +284,67 @@ ok 281 - ORDER BY semver USING > should work (section 11)
 ok 282 - "1.0.0" = "1.0.0+535"
 ok 283 - "1.0.0" < "1.0.0+535" (NOT!)
 ok 284 - "1.0.0" > "1.0.0+535" (NOT!)
-ok 285 - Function get_semver_major() should exist
-ok 286 - semver
-ok 287 - Function get_semver_major() should return integer
-ok 288 - major version check
-ok 289 - Function get_semver_minor() should exist
-ok 290 - semver
-ok 291 - Function get_semver_minor() should return integer
-ok 292 - minor version check
-ok 293 - Function get_semver_patch() should exist
-ok 294 - semver
-ok 295 - Function get_semver_patch() should return integer
-ok 296 - patch version check
-ok 297 - Function get_semver_prerelease() should exist
-ok 298 - semver
-ok 299 - Function get_semver_prerelease() should return text
-ok 300 - prerelease label check
-ok 301 - prerelease label check. must return prerelease only
-ok 302 - prerelease label check. must return empty string
-ok 303 - 1.0.0 should be in range [1.0.0, 2.0.0]
-ok 304 - 1.0.0 should not be in range [1.0.1, 2.0.0]
-ok 305 - 2.0.0 should not be in range [1.0.1, 2.0.0)
-ok 306 - 1.9999.9999 should be in range [1.0.1, 2.0.0)
-ok 307 - 1000.0.0 should be in range [1.0.0,)
-ok 308 - Should be able to work with arrays of semverranges
-ok 309 - Should properly format a 32 character semver
-ok 310 - Should properly format a 33 character semver
-ok 311 - Should properly format a prerelease with a hyphen
-ok 312 - Should get distinct values via hash aggregation
-ok 313 - hash_semver should generate different hashes for different prereleases
-ok 314 - hash_semver should match for version with and without build metadata
-ok 315 - hash_semver should match for version with and without build metadata
-ok 316 - hash_semver should match for prereleases with different build metadata
-ok 317 - Function semver_send() should exist
-ok 318 - Function semver_send(semver) should exist
-ok 319 - Function semver_send() should return bytea
-ok 320 - Function semver_recv() should exist
-ok 321 - Function semver_recv(internal) should exist
-ok 322 - Function semver_recv() should return semver
-ok 323 - semver_send('0.9.9-a1.1+1234')
-ok 324 - semver_send('0.9.9-a1.2.3')
-ok 325 - semver_send('0.9.9-a1.2')
-ok 326 - semver_send('0.9.9')
-ok 327 - semver_send('1.0.0+99')
-ok 328 - semver_send('1.0.0-1')
-ok 329 - semver_send('1.2.2')
-ok 330 - semver_send('9999.9999999.823823')
-ok 331 - semver_send('1.0.0-beta1')
-ok 332 - semver_send('1.0.0-1')
-ok 333 - semver_send('1.0.0-alpha+d34dm34t')
-ok 334 - semver_send('1.0.0+d34dm34t')
-ok 335 - semver_send('20110204.0.0')
-ok 336 - semver_send('1.0.0-0AEF')
-ok 337 - semver_send(NULL)
-ok 338 - Should have binary copied all of the semvers
-ok 339 - column data type semver can only have storage PLAIN
+ok 285 - "1.0.0-a.2147483649" > "1.0.0-a.2147483649" (NOT!)
+ok 286 - "1.0.0-a.99999999999999999999" > "1.0.0-a.99999999999999999999" (NOT!)
+ok 287 - "1.0.0-a.99999999999999999999k" > "1.0.0-a.99999999999999999999k" (NOT!)
+ok 288 - "1.0.0-a.2147483649" = "1.0.0-a.2147483650"
+ok 289 - "1.0.0-a.99999999999999999998" = "1.0.0-a.99999999999999999999"
+ok 290 - "1.0.0-a.99999999999999999999k" = "1.0.0-a.99999999999999999999j"
+ok 291 - Function get_semver_major() should exist
+ok 292 - semver
+ok 293 - Function get_semver_major() should return integer
+ok 294 - major version check
+ok 295 - Function get_semver_minor() should exist
+ok 296 - semver
+ok 297 - Function get_semver_minor() should return integer
+ok 298 - minor version check
+ok 299 - Function get_semver_patch() should exist
+ok 300 - semver
+ok 301 - Function get_semver_patch() should return integer
+ok 302 - patch version check
+ok 303 - Function get_semver_prerelease() should exist
+ok 304 - semver
+ok 305 - Function get_semver_prerelease() should return text
+ok 306 - prerelease label check
+ok 307 - prerelease label check. must return prerelease only
+ok 308 - prerelease label check. must return empty string
+ok 309 - 1.0.0 should be in range [1.0.0, 2.0.0]
+ok 310 - 1.0.0 should not be in range [1.0.1, 2.0.0]
+ok 311 - 2.0.0 should not be in range [1.0.1, 2.0.0)
+ok 312 - 1.9999.9999 should be in range [1.0.1, 2.0.0)
+ok 313 - 1000.0.0 should be in range [1.0.0,)
+ok 314 - Should be able to work with arrays of semverranges
+ok 315 - Should properly format a 32 character semver
+ok 316 - Should properly format a 33 character semver
+ok 317 - Should properly format a prerelease with a hyphen
+ok 318 - Should get distinct values via hash aggregation
+ok 319 - hash_semver should generate different hashes for different prereleases
+ok 320 - hash_semver should match for version with and without build metadata
+ok 321 - hash_semver should match for version with and without build metadata
+ok 322 - hash_semver should match for prereleases with different build metadata
+ok 323 - Function semver_send() should exist
+ok 324 - Function semver_send(semver) should exist
+ok 325 - Function semver_send() should return bytea
+ok 326 - Function semver_recv() should exist
+ok 327 - Function semver_recv(internal) should exist
+ok 328 - Function semver_recv() should return semver
+ok 329 - semver_send('0.9.9-a1.1+1234')
+ok 330 - semver_send('0.9.9-a1.2.3')
+ok 331 - semver_send('0.9.9-a1.2')
+ok 332 - semver_send('0.9.9-a1.2222222222222222222222222222222222222222')
+ok 333 - semver_send('0.9.9-01ab')
+ok 334 - semver_send('0.9.9-01ba')
+ok 335 - semver_send('0.9.9')
+ok 336 - semver_send('1.0.0+99')
+ok 337 - semver_send('1.0.0-1')
+ok 338 - semver_send('1.2.2')
+ok 339 - semver_send('9999.9999999.823823')
+ok 340 - semver_send('1.0.0-beta1')
+ok 341 - semver_send('1.0.0-1')
+ok 342 - semver_send('1.0.0-alpha+d34dm34t')
+ok 343 - semver_send('1.0.0+d34dm34t')
+ok 344 - semver_send('20110204.0.0')
+ok 345 - semver_send('1.0.0-0AEF')
+ok 346 - semver_send(NULL)
+ok 347 - Should have binary copied all of the semvers
+ok 348 - column data type semver can only have storage PLAIN

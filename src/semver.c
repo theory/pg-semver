@@ -492,7 +492,7 @@ char* strip_meta(const char *str) {
 #define TAIL_CMP_KO  9
 
 int tail_cmp ( char *lhs, char *rhs ) {
-    char *dot = ".";
+    const char *dot = ".";
     char *l_last, *r_last, *l_token, *r_token;
 
     if (!strcmp(lhs, rhs)) return TAIL_CMP_EQ;
@@ -500,19 +500,31 @@ int tail_cmp ( char *lhs, char *rhs ) {
     l_token = strtok_r(lhs, dot, &l_last);
     r_token = strtok_r(rhs, dot, &r_last);
 
-    if (l_token  && !r_token) return TAIL_CMP_LT;
-    if (!l_token &&  r_token) return TAIL_CMP_GT;
-
     while (l_token || r_token) {
         if (l_token && r_token) {
-            int l_numeric = isdigit (l_token[0]);
-            int r_numeric = isdigit (r_token[0]);
+            size_t l_len = strlen(l_token);
+            size_t r_len = strlen(r_token);
+            bool l_numeric = (l_len > 0 && strspn(l_token, "0123456789") == l_len);
+            bool r_numeric = (r_len > 0 && strspn(r_token, "0123456789") == r_len);
 
             if (l_numeric && r_numeric) {
-                int l_int = atoi (l_token);
-                int r_int = atoi (r_token);
-                if (l_int < r_int) return TAIL_CMP_LT;
-                if (l_int > r_int) return TAIL_CMP_GT;
+                const char *p1 = l_token;
+                const char *p2 = r_token;
+                size_t len1;
+                size_t len2;
+                int cmp;
+
+                // Prerelease numbers cannot start with zero, but prune them anyway.
+                while (*p1 == '0' && *(p1 + 1) != '\0') p1++;
+                while (*p2 == '0' && *(p2 + 1) != '\0') p2++;
+
+                len1 = strlen(p1);
+                len2 = strlen(p2);
+                if (len1 < len2) return TAIL_CMP_LT;
+                if (len1 > len2) return TAIL_CMP_GT;
+                cmp = strcmp(p1, p2);
+                if (cmp < 0) return TAIL_CMP_LT;
+                if (cmp > 0) return TAIL_CMP_GT;
             } else if (l_numeric) {
                 return TAIL_CMP_LT;
             } else if (r_numeric) {
@@ -531,7 +543,7 @@ int tail_cmp ( char *lhs, char *rhs ) {
         r_token = strtok_r(NULL, dot, &r_last);
     }
 
-    return TAIL_CMP_KO;
+    return TAIL_CMP_EQ;
 }
 
 int prerelcmp(const char* a, const char* b) {

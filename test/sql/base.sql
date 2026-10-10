@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(339);
+SELECT plan(348);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -272,18 +272,46 @@ SELECT throws_ok(
    '1.0.0-1.02'
 ]) AS v;
 
+-- Test sort ordering.
 DELETE FROM vs;
-INSERT INTO vs VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9'::semver), ('1.0.0+99'::semver), ('1.0.0-1'::semver);
+INSERT INTO vs
+VALUES ('0.9.9-a1.1+1234'::semver),
+       ('0.9.9-a1.2.3'),
+       ('0.9.9-a1.2'),
+       ('0.9.9-a1.2222222222222222222222222222222222222222'),
+       ('0.9.9-01ab'),
+       ('0.9.9-01ba'),
+       ('0.9.9'),
+       ('1.0.0+99'),
+       ('1.0.0-1');
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING < $$,
-    $$ VALUES ('0.9.9-a1.1+1234'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9'::semver), ('1.0.0-1'::semver), ('1.0.0+99'::semver) $$,
+    $$ VALUES ('0.9.9-01ab'::semver),
+              ('0.9.9-01ba'),
+              ('0.9.9-a1.1+1234'),
+              ('0.9.9-a1.2'),
+              ('0.9.9-a1.2.3'),
+              ('0.9.9-a1.2222222222222222222222222222222222222222'),
+              ('0.9.9'),
+              ('1.0.0-1'),
+              ('1.0.0+99')
+    $$,
     'ORDER BY semver (2.0.0) USING < should work'
 );
 
 SELECT results_eq(
     $$ SELECT version FROM vs ORDER BY version USING > $$,
-    $$ VALUES ('1.0.0+99'::semver), ('1.0.0-1'::semver), ('0.9.9'::semver), ('0.9.9-a1.2.3'::semver), ('0.9.9-a1.2'::semver), ('0.9.9-a1.1+1234'::semver) $$,
+    $$ VALUES ('1.0.0+99'::semver),
+              ('1.0.0-1'),
+              ('0.9.9'),
+              ('0.9.9-a1.2222222222222222222222222222222222222222'),
+              ('0.9.9-a1.2.3'),
+              ('0.9.9-a1.2'),
+              ('0.9.9-a1.1+1234'),
+              ('0.9.9-01ba'),
+              ('0.9.9-01ab')
+    $$,
     'ORDER BY semver (2.0.0) USING > should work'
 );
 
@@ -398,7 +426,18 @@ SELECT isnt(lv::semver < rv::semver, true, '"' || lv || '" < "' || rv || '" (NOT
 ) AS f(lv, rv);
 SELECT isnt(lv::semver > rv::semver, true, '"' || lv || '" > "' || rv || '" (NOT!)')
   FROM (VALUES
-    ('1.0.0', '1.0.0+535')
+    ('1.0.0', '1.0.0+535'),
+    -- Works when prerelease numbers exceed integer bounds.
+    ('1.0.0-a.2147483649', '1.0.0-a.2147483649'),
+    ('1.0.0-a.99999999999999999999', '1.0.0-a.99999999999999999999'),
+    ('1.0.0-a.99999999999999999999k', '1.0.0-a.99999999999999999999k')
+) AS f(lv, rv);
+
+SELECT is(lv::semver = rv::semver, false, '"' || lv || '" = "' || rv || '"')
+  FROM (VALUES
+    ('1.0.0-a.2147483649', '1.0.0-a.2147483650'),
+    ('1.0.0-a.99999999999999999998', '1.0.0-a.99999999999999999999'),
+    ('1.0.0-a.99999999999999999999k', '1.0.0-a.99999999999999999999j')
 ) AS f(lv, rv);
 
 -- Test get_semver_major
