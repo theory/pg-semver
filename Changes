@@ -1,6 +1,6 @@
 Revision history for PostgreSQL extension semver.
 
-0.42.0  Unreleased
+0.42.0  2026-10-11T02:31:16Z
       - ***** WARNING! ***** This release breaks hash index compatibility
         with previous versions. Be sure to reindex any semver hash indexes
         after upgrading.
