@@ -52,7 +52,6 @@ SELECT lives_ok(
     -- 
 ]) AS v;
 
-SELECT todo('Large versions overflow integer bounds', 1);
 SELECT lives_ok(
     $$ SELECT '99999999999999999999999.999999999999999999.99999999999999999'::semver $$,
     '"99999999999999999999999.999999999999999999.99999999999999999" is a valid semver'

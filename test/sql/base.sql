@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(384);
+SELECT plan(497);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -159,14 +159,14 @@ SELECT is(
 -- to_semver still needs to reject truly bad input
 SELECT throws_ok(
     $$ SELECT to_semver('$$ || bad || $$') $$,
-    'XX000',
+    '22P02',
     err,
     $$to_semver('$$ || bad || $$') should fail$$
 )  FROM (VALUES
    ('1.2.2-', $$bad semver value '1.2.2-': expected alphanumeric at char 6$$),
    ('1.2.3b#5', $$bad semver value '1.2.3b#5': non-alphanumeric pre-release at char 6$$),
    ('1.2.3.4', $$bad semver value '1.2.3.4': empty pre-release section at char 5$$),
-   ('1.2000000000000000.3.4', $$bad semver value '1.2000000000000000.3.4': version number exceeds 31-bit range$$),
+   ('1.2000000000000000.3.4', $$bad semver value '1.2000000000000000.3.4': empty pre-release section at char 20$$),
    ('1.2.3-café', $$bad semver value '1.2.3-café': invalid character at char 10$$)
 ) v(bad, err);
 
@@ -616,9 +616,9 @@ SELECT isnt(
     'hash_semver should generate different hashes for different prereleases'
 );
 SELECT is(
-    hash_semver('1.0.0'::semver),
     hash_semver('1.0.0+foo'::semver),
-    'hash_semver should match for version with and without build metadata'
+    hash_semver('1.0.0+bar'::semver),
+    'hash_semver should ignore build metadata'
 );
 SELECT is(
     hash_semver('1.0.0'::semver),
@@ -686,6 +686,190 @@ SELECT throws_ok(
     NULL,
     'column data type semver can only have storage PLAIN'
 );
+
+-- Extended 64-bit hash tests
+SELECT has_function('hash_semver_extended');
+SELECT has_function('hash_semver_extended', ARRAY['semver', 'bigint']);
+SELECT function_returns('hash_semver_extended', 'bigint');
+SELECT is(
+    hash_semver_extended('1.0.0+foo'::semver, 0),
+    hash_semver_extended('1.0.0+bar'::semver, 0),
+    'hash_semver_extended with seed 0 matches for equal semver'
+);
+SELECT is(
+    hash_semver_extended('1.0.0+foo'::semver, 12345),
+    hash_semver_extended('1.0.0+bar'::semver, 12345),
+    'hash_semver_extended with seed 12345 matches for equal semver'
+);
+SELECT is(
+    hash_semver_extended('2.1.3-alpha.1+build1'::semver, 999),
+    hash_semver_extended('2.1.3-alpha.1+build2'::semver, 999),
+    'hash_semver_extended matches for prereleases with different build metadata'
+);
+SELECT isnt(
+    hash_semver_extended('1.0.0'::semver, 1),
+    hash_semver_extended('1.0.0'::semver, 2),
+    'hash_semver_extended varies by seed'
+);
+
+-- Round 2 security: boundary conditions, null character validation, and operator commutators
+SELECT is( is_semver('1.0.0+foo+bar'), false, 'multiple plus signs in metadata returns false via is_semver' );
+SELECT is( is_semver('1.0.0-01+foo'), false, 'leading zero in numeric prerelease rejected even with metadata' );
+SELECT is( is_semver('1.0.0+'), false, 'empty metadata after plus returns false' );
+SELECT is( is_semver('1.0.0-alpha+'), false, 'empty metadata after prerelease returns false' );
+SELECT is( is_semver('1.0.0-'), false, 'empty prerelease after minus returns false' );
+
+-- Operator commutators and selectivity
+SELECT ok( '1.0.0'::semver < '2.0.0'::semver, 'semver < operator works' );
+SELECT ok( '2.0.0'::semver > '1.0.0'::semver, 'semver > operator works' );
+SELECT ok( '1.0.0'::semver <= '1.0.0'::semver, 'semver <= operator works' );
+SELECT ok( '1.0.0'::semver >= '1.0.0'::semver, 'semver >= operator works' );
+SELECT ok( '1.0.0'::semver <> '2.0.0'::semver, 'semver <> operator works' );
+
+-- Aggregate tests
+SELECT is( min(version), '0.9.9-01ab'::semver, 'min(semver) aggregate works' ) FROM vs WHERE version IS NOT NULL;
+SELECT is( max(version), '20110204.0.0'::semver, 'max(semver) aggregate works' ) FROM vs WHERE version IS NOT NULL;
+
+-- Security Review: leading zeros rejection for 00 in version numbers
+SELECT is( is_semver('00.1.2'), false, 'leading 00 in major version rejected' );
+SELECT is( is_semver('1.00.2'), false, 'leading 00 in minor version rejected' );
+SELECT is( is_semver('1.2.00'), false, 'leading 00 in patch version rejected' );
+SELECT is( is_semver('0.0.0'), true, 'single 0 version parts are valid' );
+
+-- Security Review: internal whitespace rejection
+SELECT is( is_semver('1. 2.3'), false, 'internal whitespace before minor rejected' );
+SELECT is( is_semver('1.2. 3'), false, 'internal whitespace before patch rejected' );
+SELECT is( is_semver(E'1.2.\n3'), false, 'internal newline in semver rejected' );
+
+-- Security Review: release vs prerelease precedence and memory leak safety
+SELECT ok( '1.0.0'::semver > '1.0.0-alpha'::semver, 'release version has higher precedence than prerelease' );
+SELECT ok( '1.0.0-alpha'::semver < '1.0.0'::semver, 'prerelease has lower precedence than release' );
+
+-- Security Review: declarative hash table partitioning (hash_semver_extended)
+CREATE TABLE test_hash_part (v semver) PARTITION BY HASH (v);
+CREATE TABLE test_hash_part_p0 PARTITION OF test_hash_part FOR VALUES WITH (MODULUS 2, REMAINDER 0);
+CREATE TABLE test_hash_part_p1 PARTITION OF test_hash_part FOR VALUES WITH (MODULUS 2, REMAINDER 1);
+INSERT INTO test_hash_part VALUES ('1.0.0'), ('1.0.0+build1'), ('2.1.0-alpha');
+SELECT is( count(DISTINCT tableoid)::bigint, 1::bigint, 'equal semvers with different build metadata route to the same hash partition' )
+    FROM test_hash_part WHERE v = '1.0.0'::semver;
+DROP TABLE test_hash_part;
+
+-- Security Review: storage and accessors on long semvers
+CREATE TABLE test_toast_semver (id int, v semver);
+INSERT INTO test_toast_semver VALUES (1, ('1.0.0-' || repeat('a', 2000))::semver);
+SELECT is( length(v::text), 2006, 'long semver text length matches' ) FROM test_toast_semver;
+SELECT is( get_semver_major(v), 1, 'get_semver_major on long semver' ) FROM test_toast_semver;
+SELECT is( get_semver_minor(v), 0, 'get_semver_minor on long semver' ) FROM test_toast_semver;
+SELECT is( get_semver_patch(v), 0, 'get_semver_patch on long semver' ) FROM test_toast_semver;
+SELECT is( length(get_semver_prerelease(v)), 2000, 'get_semver_prerelease on long semver' ) FROM test_toast_semver;
+CREATE INDEX idx_toast_btree ON test_toast_semver USING btree (v);
+CREATE INDEX idx_toast_hash ON test_toast_semver USING hash (v);
+SELECT is( count(*), 1::bigint, 'btree index scan on long semver' ) FROM test_toast_semver WHERE v = ('1.0.0-' || repeat('a', 2000))::semver;
+DROP TABLE test_toast_semver;
+
+-- Security Review: unprivileged role access and permission safety (Rule 28)
+CREATE ROLE semver_test_unpriv NOSUPERUSER NOCREATEDB NOCREATEROLE LOGIN;
+GRANT USAGE ON SCHEMA public TO semver_test_unpriv;
+SET ROLE semver_test_unpriv;
+SELECT is( '1.2.3'::semver < '1.2.4'::semver, true, 'unprivileged role can use semver operators' );
+SELECT is( to_semver('1.2')::text, '1.2.0', 'unprivileged role can execute to_semver' );
+SELECT is( to_semver1(1, 2, 3)::text, '1.2.3', 'unprivileged role can execute to_semver1' );
+RESET ROLE;
+--
+-- semver2 tests: bigint and text accessors, >32-bit and >64-bit components,
+-- component digit limits, and legacy v1 compatibility.
+--
+
+-- Function existence and return types
+SELECT has_function('get_semver_major_bigint');
+SELECT has_function('get_semver_major_bigint', ARRAY['semver']);
+SELECT function_returns('get_semver_major_bigint', 'bigint');
+SELECT has_function('get_semver_minor_bigint');
+SELECT has_function('get_semver_minor_bigint', ARRAY['semver']);
+SELECT function_returns('get_semver_minor_bigint', 'bigint');
+SELECT has_function('get_semver_patch_bigint');
+SELECT has_function('get_semver_patch_bigint', ARRAY['semver']);
+SELECT function_returns('get_semver_patch_bigint', 'bigint');
+SELECT has_function('get_semver_major_text');
+SELECT has_function('get_semver_major_text', ARRAY['semver']);
+SELECT function_returns('get_semver_major_text', 'text');
+SELECT has_function('get_semver_minor_text');
+SELECT has_function('get_semver_minor_text', ARRAY['semver']);
+SELECT function_returns('get_semver_minor_text', 'text');
+SELECT has_function('get_semver_patch_text');
+SELECT has_function('get_semver_patch_text', ARRAY['semver']);
+SELECT function_returns('get_semver_patch_text', 'text');
+
+-- Standard values with bigint and text accessors
+SELECT is(get_semver_major_bigint('2.1.0-alpha'::semver), 2::bigint, 'major bigint');
+SELECT is(get_semver_minor_bigint('2.1.0-alpha'::semver), 1::bigint, 'minor bigint');
+SELECT is(get_semver_patch_bigint('2.1.0-alpha'::semver), 0::bigint, 'patch bigint');
+SELECT is(get_semver_major_text('2.1.0-alpha'::semver), '2', 'major text');
+SELECT is(get_semver_minor_text('2.1.0-alpha'::semver), '1', 'minor text');
+SELECT is(get_semver_patch_text('2.1.0-alpha'::semver), '0', 'patch text');
+
+-- Values exceeding 32-bit integer range
+SELECT throws_ok($$ SELECT get_semver_major('3000000000.4000000000.5000000000'::semver) $$, '22003', NULL, 'major 32-bit overflow error');
+SELECT throws_ok($$ SELECT get_semver_minor('3000000000.4000000000.5000000000'::semver) $$, '22003', NULL, 'minor 32-bit overflow error');
+SELECT throws_ok($$ SELECT get_semver_patch('3000000000.4000000000.5000000000'::semver) $$, '22003', NULL, 'patch 32-bit overflow error');
+SELECT is(get_semver_major_bigint('3000000000.4000000000.5000000000'::semver), 3000000000::bigint, 'major bigint > 32-bit');
+SELECT is(get_semver_minor_bigint('3000000000.4000000000.5000000000'::semver), 4000000000::bigint, 'minor bigint > 32-bit');
+SELECT is(get_semver_patch_bigint('3000000000.4000000000.5000000000'::semver), 5000000000::bigint, 'patch bigint > 32-bit');
+SELECT is(get_semver_major_text('3000000000.4000000000.5000000000'::semver), '3000000000', 'major text > 32-bit');
+SELECT is(get_semver_minor_text('3000000000.4000000000.5000000000'::semver), '4000000000', 'minor text > 32-bit');
+SELECT is(get_semver_patch_text('3000000000.4000000000.5000000000'::semver), '5000000000', 'patch text > 32-bit');
+
+-- Values exceeding 64-bit integer range
+SELECT throws_ok($$ SELECT get_semver_major_bigint(('99999999999999999999999999999999999999999999999999.0.0')::semver) $$, '22003', NULL, 'major 64-bit overflow error');
+SELECT is(get_semver_major_text(('99999999999999999999999999999999999999999999999999.0.0')::semver), '99999999999999999999999999999999999999999999999999', 'major text > 64-bit');
+
+-- Component limits (127 vs 128 digits)
+SELECT lives_ok($$ SELECT (repeat('1', 127) || '.0.0')::semver $$, '127 digits component is valid');
+SELECT is(is_semver(repeat('1', 128) || '.0.0'), false, '128 digits component rejected by is_semver');
+SELECT throws_ok($$ SELECT (repeat('1', 128) || '.0.0')::semver $$, '22P02', NULL, '128 digits component throws error');
+
+-- Legacy v1 format compatibility via to_semver1
+SELECT is(to_semver1(1, 2, 3, 'alpha')::text, '1.2.3-alpha', 'to_semver1 text cast');
+SELECT is(to_semver1(1, 2, 3)::text, '1.2.3', 'to_semver1 without prerel text cast');
+SELECT is(to_semver1(NULL::int, 1, 2), NULL, 'to_semver1 NULL major returns NULL');
+SELECT is(to_semver1(1, NULL::int, 2), NULL, 'to_semver1 NULL minor returns NULL');
+SELECT is(to_semver1(1, 2, NULL::int), NULL, 'to_semver1 NULL patch returns NULL');
+SELECT throws_ok($$ SELECT to_semver1(-1, 0, 0) $$, '22023', NULL, 'to_semver1 negative major rejected');
+SELECT throws_ok($$ SELECT to_semver1(0, -1, 0) $$, '22023', NULL, 'to_semver1 negative minor rejected');
+SELECT throws_ok($$ SELECT to_semver1(0, 0, -1) $$, '22023', NULL, 'to_semver1 negative patch rejected');
+SELECT throws_ok($$ SELECT to_semver1(1, 0, 0, 'a' || chr(0) || 'b') $$, '54000', NULL, 'to_semver1 embedded null prerel rejected');
+SELECT ok(to_semver1(1, 2, 3, 'alpha') = '1.2.3-alpha'::semver, 'v1 vs v2 equality');
+SELECT ok(to_semver1(1, 2, 3) < '1.2.4'::semver, 'v1 vs v2 less than');
+SELECT ok('1.2.4'::semver > to_semver1(1, 2, 3), 'v2 vs v1 greater than');
+SELECT ok(to_semver1(1, 2, 3) < '3000000000.0.0'::semver, 'v1 vs large v2 less than');
+SELECT ok('3000000000.0.0'::semver > to_semver1(1, 2, 3), 'large v2 vs v1 greater than');
+SELECT is(get_semver_major(to_semver1(1, 2, 3)), 1, 'get_semver_major on v1');
+SELECT is(get_semver_major_bigint(to_semver1(1, 2, 3)), 1::bigint, 'get_semver_major_bigint on v1');
+SELECT is(get_semver_major_text(to_semver1(1, 2, 3)), '1', 'get_semver_major_text on v1');
+SELECT is(get_semver_prerelease(to_semver1(1, 2, 3, 'alpha+build')), 'alpha', 'get_semver_prerelease on v1');
+SELECT is(hash_semver(to_semver1(1, 2, 3, 'alpha')), hash_semver('1.2.3-alpha'::semver), 'v1 and v2 hash_semver match');
+SELECT is(hash_semver_extended(to_semver1(1, 2, 3, 'alpha'), 42), hash_semver_extended('1.2.3-alpha'::semver, 42), 'v1 and v2 hash_semver_extended match');
+
+-- Additional edge case tests: v2 length vs numeric ordering, v1 vs v2 mixed ordering, and build metadata hashing
+SELECT ok('10.0.0'::semver > '9.0.0'::semver, 'v2 numeric len comparison 10 > 9');
+SELECT ok('1.0.0-alpha.10'::semver > '1.0.0-alpha.2'::semver, 'v2 prerelease numeric comparison 10 > 2');
+SELECT ok(to_semver1(10, 0, 0) > '9.0.0'::semver, 'v1 vs v2 mixed comparison 10 > 9');
+SELECT ok(to_semver1(9, 0, 0) < '10.0.0'::semver, 'v1 vs v2 mixed comparison 9 < 10');
+SELECT ok(to_semver1(1, 0, 0) > '1.0.0-alpha'::semver, 'v1 release > v2 prerelease');
+SELECT ok(to_semver1(1, 0, 0, 'alpha') < '1.0.0'::semver, 'v1 prerelease < v2 release');
+SELECT is(hash_semver('1.0.0+foo'::semver), hash_semver('1.0.0+bar'::semver), 'v2 build metadata ignored in hash_semver');
+SELECT is(hash_semver_extended('1.0.0+foo'::semver, 123), hash_semver_extended('1.0.0+bar'::semver, 123), 'v2 build metadata ignored in hash_semver_extended');
+
+-- Control character and trailing space rejection in strict mode, and build metadata leading zeros in lax mode
+SELECT is(is_semver(E'1.2.3\n'), false, 'trailing newline rejected by is_semver');
+SELECT is(is_semver(E'\t1.2.3'), false, 'leading tab rejected by is_semver');
+SELECT is(is_semver('1.2.3 '), false, 'trailing space rejected by is_semver');
+SELECT throws_ok($$ SELECT E'1.2.3\n'::semver $$, '22P02', NULL, 'trailing newline throws invalid character error');
+SELECT throws_ok($$ SELECT E'\t1.2.3'::semver $$, '22P02', NULL, 'leading tab throws invalid character error');
+SELECT throws_ok($$ SELECT '1.2.3 '::semver $$, '22P02', NULL, 'trailing space throws error in strict mode');
+SELECT is(to_semver('1.0.0+build.01')::text, '1.0.0+build.01', 'to_semver preserves leading zero in dot-separated build metadata');
+SELECT is(to_semver('1.0.0+01.02')::text, '1.0.0+01.02', 'to_semver preserves leading zeros across multiple build metadata parts');
+SELECT is(to_semver('1.0.0-01.002+03.004')::text, '1.0.0-1.2+03.004', 'to_semver strips leading zeros in prerelease but preserves them in build metadata');
 
 SELECT * FROM finish();
 ROLLBACK;

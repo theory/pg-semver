@@ -28,7 +28,7 @@ all: sql/$(EXTENSION)--$(EXTVERSION).sql
 sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
 	cp $< $@
 
-$(OBJS): src/version.h
+$(OBJS): src/version.h src/semver.h
 src/version.h: META.json
 	@printf '#define SEMVER_VERSION "%s"\n' "$(DISTVERSION)" > $@
 

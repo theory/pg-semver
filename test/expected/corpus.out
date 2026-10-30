@@ -35,9 +35,7 @@ ok 32 - "1.0.0-1.2.3-1234" is a valid semver
 ok 33 - "1.0.0-1234" is a valid semver
 ok 34 - "1.0.0-4321" is a valid semver
 ok 35 - "0.0.0-00010101000000-000000000000" is a valid semver
-not ok 36 - "99999999999999999999999.999999999999999999.99999999999999999" is a valid semver # TODO Large versions overflow integer bounds
-# Failed (TODO) test 36: ""99999999999999999999999.999999999999999999.99999999999999999" is a valid semver"
-#         died: XX000: bad semver value '99999999999999999999999.999999999999999999.99999999999999999': version number exceeds 31-bit range
+ok 36 - "99999999999999999999999.999999999999999999.99999999999999999" is a valid semver
 ok 37 - "1" is not a valid semver
 ok 38 - "1.2" is not a valid semver
 ok 39 - "1.2.3-0123" is not a valid semver
