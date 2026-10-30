@@ -1,5 +1,5 @@
 \set ECHO none
-1..384
+1..497
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -354,7 +354,7 @@ ok 351 - Should properly format a 33 character semver
 ok 352 - Should properly format a prerelease with a hyphen
 ok 353 - Should get distinct values via hash aggregation
 ok 354 - hash_semver should generate different hashes for different prereleases
-ok 355 - hash_semver should match for version with and without build metadata
+ok 355 - hash_semver should ignore build metadata
 ok 356 - hash_semver should match for version with and without build metadata
 ok 357 - hash_semver should match for prereleases with different build metadata
 ok 358 - Function semver_send() should exist
@@ -384,3 +384,116 @@ ok 381 - semver_send(NULL)
 ok 382 - Should have binary copied all of the semvers
 ok 383 - Should get invalid input syntax error with nul byte
 ok 384 - column data type semver can only have storage PLAIN
+ok 385 - Function hash_semver_extended() should exist
+ok 386 - Function hash_semver_extended(semver, bigint) should exist
+ok 387 - Function hash_semver_extended() should return bigint
+ok 388 - hash_semver_extended with seed 0 matches for equal semver
+ok 389 - hash_semver_extended with seed 12345 matches for equal semver
+ok 390 - hash_semver_extended matches for prereleases with different build metadata
+ok 391 - hash_semver_extended varies by seed
+ok 392 - multiple plus signs in metadata returns false via is_semver
+ok 393 - leading zero in numeric prerelease rejected even with metadata
+ok 394 - empty metadata after plus returns false
+ok 395 - empty metadata after prerelease returns false
+ok 396 - empty prerelease after minus returns false
+ok 397 - semver < operator works
+ok 398 - semver > operator works
+ok 399 - semver <= operator works
+ok 400 - semver >= operator works
+ok 401 - semver <> operator works
+ok 402 - min(semver) aggregate works
+ok 403 - max(semver) aggregate works
+ok 404 - leading 00 in major version rejected
+ok 405 - leading 00 in minor version rejected
+ok 406 - leading 00 in patch version rejected
+ok 407 - single 0 version parts are valid
+ok 408 - internal whitespace before minor rejected
+ok 409 - internal whitespace before patch rejected
+ok 410 - internal newline in semver rejected
+ok 411 - release version has higher precedence than prerelease
+ok 412 - prerelease has lower precedence than release
+ok 413 - equal semvers with different build metadata route to the same hash partition
+ok 414 - long semver text length matches
+ok 415 - get_semver_major on long semver
+ok 416 - get_semver_minor on long semver
+ok 417 - get_semver_patch on long semver
+ok 418 - get_semver_prerelease on long semver
+ok 419 - btree index scan on long semver
+ok 420 - unprivileged role can use semver operators
+ok 421 - unprivileged role can execute to_semver
+ok 422 - unprivileged role can execute to_semver1
+ok 423 - Function get_semver_major_bigint() should exist
+ok 424 - Function get_semver_major_bigint(semver) should exist
+ok 425 - Function get_semver_major_bigint() should return bigint
+ok 426 - Function get_semver_minor_bigint() should exist
+ok 427 - Function get_semver_minor_bigint(semver) should exist
+ok 428 - Function get_semver_minor_bigint() should return bigint
+ok 429 - Function get_semver_patch_bigint() should exist
+ok 430 - Function get_semver_patch_bigint(semver) should exist
+ok 431 - Function get_semver_patch_bigint() should return bigint
+ok 432 - Function get_semver_major_text() should exist
+ok 433 - Function get_semver_major_text(semver) should exist
+ok 434 - Function get_semver_major_text() should return text
+ok 435 - Function get_semver_minor_text() should exist
+ok 436 - Function get_semver_minor_text(semver) should exist
+ok 437 - Function get_semver_minor_text() should return text
+ok 438 - Function get_semver_patch_text() should exist
+ok 439 - Function get_semver_patch_text(semver) should exist
+ok 440 - Function get_semver_patch_text() should return text
+ok 441 - major bigint
+ok 442 - minor bigint
+ok 443 - patch bigint
+ok 444 - major text
+ok 445 - minor text
+ok 446 - patch text
+ok 447 - major 32-bit overflow error
+ok 448 - minor 32-bit overflow error
+ok 449 - patch 32-bit overflow error
+ok 450 - major bigint > 32-bit
+ok 451 - minor bigint > 32-bit
+ok 452 - patch bigint > 32-bit
+ok 453 - major text > 32-bit
+ok 454 - minor text > 32-bit
+ok 455 - patch text > 32-bit
+ok 456 - major 64-bit overflow error
+ok 457 - major text > 64-bit
+ok 458 - 127 digits component is valid
+ok 459 - 128 digits component rejected by is_semver
+ok 460 - 128 digits component throws error
+ok 461 - to_semver1 text cast
+ok 462 - to_semver1 without prerel text cast
+ok 463 - to_semver1 NULL major returns NULL
+ok 464 - to_semver1 NULL minor returns NULL
+ok 465 - to_semver1 NULL patch returns NULL
+ok 466 - to_semver1 negative major rejected
+ok 467 - to_semver1 negative minor rejected
+ok 468 - to_semver1 negative patch rejected
+ok 469 - to_semver1 embedded null prerel rejected
+ok 470 - v1 vs v2 equality
+ok 471 - v1 vs v2 less than
+ok 472 - v2 vs v1 greater than
+ok 473 - v1 vs large v2 less than
+ok 474 - large v2 vs v1 greater than
+ok 475 - get_semver_major on v1
+ok 476 - get_semver_major_bigint on v1
+ok 477 - get_semver_major_text on v1
+ok 478 - get_semver_prerelease on v1
+ok 479 - v1 and v2 hash_semver match
+ok 480 - v1 and v2 hash_semver_extended match
+ok 481 - v2 numeric len comparison 10 > 9
+ok 482 - v2 prerelease numeric comparison 10 > 2
+ok 483 - v1 vs v2 mixed comparison 10 > 9
+ok 484 - v1 vs v2 mixed comparison 9 < 10
+ok 485 - v1 release > v2 prerelease
+ok 486 - v1 prerelease < v2 release
+ok 487 - v2 build metadata ignored in hash_semver
+ok 488 - v2 build metadata ignored in hash_semver_extended
+ok 489 - trailing newline rejected by is_semver
+ok 490 - leading tab rejected by is_semver
+ok 491 - trailing space rejected by is_semver
+ok 492 - trailing newline throws invalid character error
+ok 493 - leading tab throws invalid character error
+ok 494 - trailing space throws error in strict mode
+ok 495 - to_semver preserves leading zero in dot-separated build metadata
+ok 496 - to_semver preserves leading zeros across multiple build metadata parts
+ok 497 - to_semver strips leading zeros in prerelease but preserves them in build metadata
