@@ -142,14 +142,19 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
                 atchar++;
                 curpart++;
             } else {  // OK, it should be a version part number then
+                // Skip leading spaces first (needed for range literals such as
+                // '[1.0.0, 2.0.0]'::semverrange and lax inputs like
+                // '  012.2.2'), then verify that the first non-space character
+                // is an ASCII digit so leading spaces cannot bypass sign or
+                // leading-zero validation.
+                while (isspace((unsigned char)*ptr)) {
+                    ptr++;
+                    atchar++;
+                }
+                next = (unsigned char)*ptr;
                 errno = 0;
-                num = strtol(ptr, &endptr, 10);
-                // N.B. According to strtol(3), a valid number may be preceded
-                // by a single +/-, so a value like 0.1-1 will end up being
-                // parsed incorrectly when in `lax` mode. It will in fact end
-                // up being 0.0.0 because {0, 0, -1} is coerced to {0, 0, 0}.
-                // Not fun enough? 0.0+2 becomes 0.2.0!
-                if (ptr == endptr || next == '-' || next == '+') {  // Not a number
+                num = isdigit(next) ? strtol(ptr, &endptr, 10) : 0;
+                if (!isdigit(next) || ptr == endptr) {  // Not a number
                     if (lax) {
                         // Since it's not a period, we have to assume it's a legit pre-
                         // related token. We'll skip to the next number part, but leave
@@ -162,7 +167,8 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
                         elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
                     }
                 }
-                if (errno != 0 || num > INT32_MAX) { // Invalid or too big
+                // Reject negative version numbers in addition to > INT32_MAX.
+                if (errno != 0 || num < 0 || num > INT32_MAX) { // Invalid, negative, or too big
                     *bad = true;
                     if (!throw) break;
                     elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
@@ -258,7 +264,8 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
     } while (atchar < len);
 
     for (p=0; p < 3; p++) {
-        if (parts[p] == -1) {
+        // Check for any negative value rather than only the -1 sentinel.
+        if (parts[p] < 0) {
             if (lax) {
                 parts[p] = 0;
             } else {

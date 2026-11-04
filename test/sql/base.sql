@@ -4,7 +4,7 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(384);
+SELECT plan(395);
 --SELECT * FROM no_plan();
 
 SELECT has_type('semver');
@@ -685,6 +685,38 @@ SELECT throws_ok(
     'ALTER TABLE vs ALTER version SET STORAGE EXTERNAL',
     NULL,
     'column data type semver can only have storage PLAIN'
+);
+
+-- Verify that leading spaces cannot bypass negative, 64-bit overflow,
+-- leading-zero, or sign validation on version numbers.
+SELECT throws_ok(
+    $$ SELECT '$$ || v || $$'::semver $$,
+    NULL,
+    '"' || v || '" with leading whitespace/sign should not be a valid semver'
+) FROM unnest(ARRAY[
+    ' -2.0.0',
+    '1. -5.0',
+    '1.0. -3',
+    ' -4294967296.0.0',
+    ' 01. 02. 03',
+    ' +1. +2. +3'
+]) AS v;
+
+SELECT is(
+    is_semver(v),
+    false,
+    'is_semver(' || v || ') should return false'
+) FROM unnest(ARRAY[
+    ' -2.0.0',
+    ' -4294967296.0.0',
+    ' 01. 02. 03',
+    ' +1. +2. +3'
+]) AS v;
+
+SELECT is(
+    to_semver(' -2.0.0'),
+    '0.0.0-2.0.0'::semver,
+    'to_semver( -2.0.0) should not produce a negative major version'
 );
 
 SELECT * FROM finish();

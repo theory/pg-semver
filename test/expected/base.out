@@ -1,5 +1,5 @@
 \set ECHO none
-1..384
+1..395
 ok 1 - Type semver should exist
 ok 2 - semvers should be NULLable
 ok 3 - "1.2.2" is a valid semver
@@ -384,3 +384,14 @@ ok 381 - semver_send(NULL)
 ok 382 - Should have binary copied all of the semvers
 ok 383 - Should get invalid input syntax error with nul byte
 ok 384 - column data type semver can only have storage PLAIN
+ok 385 - " -2.0.0" with leading whitespace/sign should not be a valid semver
+ok 386 - "1. -5.0" with leading whitespace/sign should not be a valid semver
+ok 387 - "1.0. -3" with leading whitespace/sign should not be a valid semver
+ok 388 - " -4294967296.0.0" with leading whitespace/sign should not be a valid semver
+ok 389 - " 01. 02. 03" with leading whitespace/sign should not be a valid semver
+ok 390 - " +1. +2. +3" with leading whitespace/sign should not be a valid semver
+ok 391 - is_semver( -2.0.0) should return false
+ok 392 - is_semver( -4294967296.0.0) should return false
+ok 393 - is_semver( 01. 02. 03) should return false
+ok 394 - is_semver( +1. +2. +3) should return false
+ok 395 - to_semver( -2.0.0) should not produce a negative major version
