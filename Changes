@@ -1,6 +1,20 @@
 Revision history for PostgreSQL extension semver.
 
-0.43.0
+0.43.0  2026-11-09T16:56:16Z
+      - ***** WARNING: This release breaks compatibility with previous versions! ******
+        Previous versions of the semver extension incorrectly allowed some
+        invalid prerelease and build metadata values. Details below, but *BEFORE
+        YOU UPGRADE* we strongly recommend that you check for and repair any
+        invalid semvers. You can find them using the official [SemVer regular
+        expression](https://regex101.com/r/vkijKf/1/) like so:
+
+            SELECT name, version FROM packages
+             WHERE version::text !~ '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$';
+
+        If no rows are returned, you should be good to go. If there are results,
+        they will show invalid semvers with negative parts, such as `-2.1.0` or
+        `1.-3.0`. Replace the negative parts with positive parts.
+
       - Fixed parser to always ignore leading and trailing blank space, as
         Postgres does for core types.
       - Fixed the handling of blank space and plus and minus signs preceding
@@ -119,7 +133,7 @@ Revision history for PostgreSQL extension semver.
          WHERE version::text !~ '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$';
 
         If no rows are returned, you should be good to go. If there are results,
-        here are Examples of invalid semantic versions and how they should be
+        here are examples of invalid semantic versions and how they should be
         repaired.
 
             1.0.0-02799   ->   1.0.0-2799
