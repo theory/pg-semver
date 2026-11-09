@@ -104,6 +104,17 @@ semver* make_semver(const int *numbers, const char* prerel) {
     return rv;
 }
 
+/* Utility function. */
+static inline bool is_empty(const char *s);
+static inline bool is_empty(const char *s) {
+  while (*s != '\0') {
+    if (!isspace((unsigned char)*s))
+      return false;
+    s++;
+  }
+  return true;
+}
+
 semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
     int parts[] = {-1, -1, -1};
     long int num;
@@ -128,7 +139,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
     len = strlen(str);
 
     do {
-        // Make sure the next charater is visible ASCII or nul terminator.
+        // Make sure the next character is visible ASCII or nul terminator.
         if (*ptr > '~' || (*ptr && *ptr < ' ')) {
             *bad = true;
             if (!throw) break;
@@ -141,20 +152,26 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
                 ptr++;
                 atchar++;
                 curpart++;
-            } else {  // OK, it should be a version part number then
-                errno = 0;
-                num = strtol(ptr, &endptr, 10);
-                // N.B. According to strtol(3), a valid number may be preceded
-                // by a single +/-, so a value like 0.1-1 will end up being
-                // parsed incorrectly when in `lax` mode. It will in fact end
-                // up being 0.0.0 because {0, 0, -1} is coerced to {0, 0, 0}.
-                // Not fun enough? 0.0+2 becomes 0.2.0!
-                if (ptr == endptr || next == '-' || next == '+') {  // Not a number
+            } else {
+                // OK, it should be a version part number then. Ignore blank
+                // space before the major version, required for range
+                // literals, or before all version parts in lax mode.
+                if (isspace(next) && (lax || curpart == 0)) {
+                    while (isspace((unsigned char)*ptr)) {
+                        ptr++;
+                        atchar++;
+                    }
+                    next = (unsigned char)*ptr;
+                }
+
+                if (!isdigit(next)) {
+                     // Invalid major/minor/patch part.
                     if (lax) {
                         // Since it's not a period, we have to assume it's a legit pre-
                         // related token. We'll skip to the next number part, but leave
                         // the pointers.
                         curpart++;
+                        num = 0;
                         continue;
                     } else {
                         *bad = true;
@@ -162,7 +179,10 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
                         elog(ERROR, "bad semver value '%s': expected number/separator at char %d", str, atchar);
                     }
                 }
-                if (errno != 0 || num > INT32_MAX) { // Invalid or too big
+
+                // Parse digits into an integer.
+                num = strtol(ptr, &endptr, 10);
+                if (num > INT32_MAX || num < 0) { // Invalid
                     *bad = true;
                     if (!throw) break;
                     elog(ERROR, "bad semver value '%s': version number exceeds 31-bit range", str);
@@ -178,8 +198,13 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
                 atchar += (strlen(ptr) - strlen(endptr));
                 ptr = endptr;
             }
-        } else {  // Onto pre-release/metadata
-            if (!started_prerel && !started_meta && (next == '-' || (next != '+' && lax))) {  // Starts with -
+        } else if (is_empty(ptr)) {
+            // Ignore trailing blank space.
+            break;
+        } else { 
+            // Onto pre-release/metadata
+            if (!started_prerel && !started_meta && (next == '-' || (next != '+' && lax))) { 
+                // Starts with -
                 started_prerel = true;
                 if (next == '-') {
                     skip_char = true;
@@ -214,7 +239,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
             }
 
             if (!skip_char && (next != '.' && next != '+' && next != '-' && !isalpha(next) && !isdigit(next))) {
-                if (lax && isspace(next)) { // In lax mode, ignore whitespace
+                if (lax && isspace(next)) { // In lax mode, ignore blank space
                     skip_char = true;
                 } else {
                     *bad = true;
@@ -258,7 +283,7 @@ semver* parse_semver(char* str, bool lax, bool throw, bool* bad) {
     } while (atchar < len);
 
     for (p=0; p < 3; p++) {
-        if (parts[p] == -1) {
+        if (parts[p] < 0) {
             if (lax) {
                 parts[p] = 0;
             } else {

@@ -4,8 +4,8 @@ BEGIN;
 \i test/pgtap-core.sql
 CREATE EXTENSION semver;
 
-SELECT plan(384);
---SELECT * FROM no_plan();
+SELECT plan(408);
+-- SELECT * FROM no_plan();
 
 SELECT has_type('semver');
 SELECT is( NULL::semver, NULL, 'semvers should be NULLable' );
@@ -29,7 +29,10 @@ SELECT lives_ok(
     '1.0.0-alpha.0a',
     '1.0.0+010',
     '1.0.0+alpha.010',
-    '1.0.0-0AEF'
+    '1.0.0-0AEF',
+    ' 2.0.0',
+    '2.0.0 ',
+    '2.0.0-x10 '
 ]) AS v;
 
 SELECT throws_ok(
@@ -53,7 +56,18 @@ SELECT throws_ok(
     '1.1.2+.123',
     '1.1.2-.123',
     '1.2.3-ñø',
-    '1.2.3+ñø1'
+    '1.2.3+ñø1',
+    '-2.0.0',
+    ' -2.0.0',
+    '1. -5.0',
+    '1.0. -3',
+    ' -4294967296.0.0',
+    '4294967296.0.0',
+    ' 01. 02. 03',
+    ' +1. +2. +3',
+    '+1.+2.+3',
+    '0.1-1',
+    '0.0+2'
 ]) AS v;
 
 -- Test =, <=, and >=.
@@ -139,7 +153,12 @@ SELECT is(
     ('1.2.3 a',         '1.2.3-a'),
     ('..2 b',           '0.0.2-b'),
     ('  012.2.2',       '12.2.2'),
-    ('20110204',        '20110204.0.0')
+    ('20110204',        '20110204.0.0'),
+    ('0.1-1',           '0.1.0-1'),
+    ('0.0+2',           '0.0.0+2'),
+    ('-2.0.0',          '0.0.0-2.0.0'),
+    (' -2.0.0',         '0.0.0-2.0.0'),
+    (' 01. 02. 03',     '1.2.3')
 ) v(dirty, clean);
 
 SELECT is(
@@ -429,7 +448,12 @@ SELECT is(
     ('1.2.3-x@',                  false),
     ('2016.5.18-MYW-600',         true),
     ('1010.5.0+2016-05-27-1832',  true),
-    ('0.2.13+1583426134.07de632', true)
+    ('0.2.13+1583426134.07de632', true),
+    ('-2.0.0',                    false),
+    (' -2.0.0',                   false),
+    (' -4294967296.0.0',          false),
+    (' 01. 02. 03',               false),
+    (' +1. +2. +3',               false)
 ) v(stimulus, expected);
 
 -- issue-gh-23
@@ -528,7 +552,7 @@ SELECT ok(
     '1.0.0 should be in range [1.0.0, 2.0.0]'
 );
 SELECT ok(
-    NOT '1.0.0'::semver <@ '[1.0.1, 2.0.0]'::semverrange,
+    NOT '1.0.0'::semver <@ '[1.0.1 , 2.0.0]'::semverrange,
     '1.0.0 should not be in range [1.0.1, 2.0.0]'
 );
 

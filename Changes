@@ -1,5 +1,18 @@
 Revision history for PostgreSQL extension semver.
 
+0.43.0
+      - Fixed parser to always ignore leading and trailing blank space, as
+        Postgres does for core types.
+      - Fixed the handling of blank space and plus and minus signs preceding
+        the major, minor, and patch numbers. The parser now consistently
+        ignores leading and trailing blank space to support range expressions
+        such as `'[1.0.0 , 2.0.0]'` and blank space preceding any part in lax
+        mode. Such blank spaces no longer allow a negative version part. In
+        lax mode, a plus or minus sign signals the end of the major, minor,
+        and patch parts and the beginning of the prerelease and/or metadata
+        part. Thus `0.1-1` becomes `0.1.0-1` and `0.0+2` becomes `0.0.0+2`.
+        Thanks to Srividya Reddy for the report (#83)!
+
 0.42.0  2026-10-11T02:31:16Z
       - ***** WARNING! ***** This release breaks hash index compatibility
         with previous versions. Be sure to reindex any semver hash indexes
